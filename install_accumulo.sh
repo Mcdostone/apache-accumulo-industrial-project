@@ -6,8 +6,8 @@
 #               TO SETUP              #
 #######################################
 INSTALL_DIR=~/installs
-SOFTWARE_NAME=zookeeper
-SOFTWARE_URL_DOWNLOAD="http://apache.crihan.fr/dist/zookeeper/zookeeper-3.4.10/zookeeper-3.4.10.tar.gz"
+SOFTWARE_NAME=accumulo
+SOFTWARE_URL_DOWNLOAD="http://apache.mediamirrors.org/accumulo/1.8.1/accumulo-1.8.1-bin.tar.gz"
 SOFTWARE_INSTALL_DIR=$INSTALL_DIR/$SOFTWARE_NAME
 
 
@@ -38,15 +38,13 @@ check_environnment_variables()
 
 print_software() 
 {
-    echo " ________                  __                                             ";
-    echo "/\_____  \                /\ \                                            ";
-    echo "\/____//'/'    ___     ___\ \ \/'\      __     __   _____      __   _ __  ";
-    echo "     //'/'    / __\`\  / __\`\ \ , <    /'__\`\ /'__\`\/\ '__\`\  /'__\`\/\\\`'__\\";
-    echo "    //'/'___ /\ \L\ \/\ \L\ \ \ \\\`\ /\  __//\  __/\ \ \L\ \/\  __/\ \ \/ ";
-    echo "    /\_______\ \____/\ \____/\ \_\ \_\ \____\ \____\\ \ ,__/\ \____\\ \_\ ";
-    echo "    \/_______/\/___/  \/___/  \/_/\/_/\/____/\/____/ \ \ \/  \/____/ \/_/ ";
-    echo "                                                      \ \_\               ";
-    echo "                                                       \/_/               ";
+    echo " ______                                              ___             ";
+    echo "/\  _  \                                            /\_ \            ";
+    echo "\ \ \L\ \    ___    ___   __  __    ___ ___   __  __\//\ \     ___   ";
+    echo " \ \  __ \  /'___\ /'___\/\ \/\ \ /' __\` __\`\/\ \/\ \ \ \ \   / __\`\ ";
+    echo "  \ \ \/\ \/\ \__//\ \__/\ \ \_\ \/\ \/\ \/\ \ \ \_\ \ \_\ \_/\ \L\ \\";
+    echo "   \ \_\ \_\ \____\ \____\\ \____/\ \_\ \_\ \_\ \____/ /\____\ \____/";
+    echo "    \/_/\/_/\/____/\/____/ \/___/  \/_/\/_/\/_/\/___/  \/____/\/___/ ";
 }
 
 log()
@@ -91,9 +89,8 @@ execute_critical_command()
 
 before_installing()
 {
-    log info 'Before installing'
-    check_mandatory_programs java wget
-    check_environnment_variables JAVA_HOME
+    check_mandatory_programs wget java hdfs zkServer.sh
+    check_environnment_variables JAVA_HOME HADOOP_HOME ZOOKEEPER_HOME
 }
 
 
@@ -123,16 +120,61 @@ download_and_install()
 
 after_installing()
 {
-    cp $SOFTWARE_INSTALL_DIR/conf/zoo_sample.cfg $SOFTWARE_INSTALL_DIR/conf/zoo.cfg
+    printf "\n\n\e[1m\e[4mThe installation of $SOFTWARE_NAME is finished soon.\n\n\e[0m\n"
 
-    printf "\n\n\e[1m\e[4mThe installation of Zookeeper is finished soon.\n\n\e[0m\n"
+    echo " 1. Setup the configuration"
+    echo -e " Accumulo comes with sample configurations for servers with various memory sizes: 512 MB, 1 GB, 2 GB and 3 GB. Choose one:"
+    echo -e "\t 512 MB  [1]"
+    echo -e "\t 1 GB    [2]"
+    echo -e "\t 2 GB    [3]"
+    echo -e "\t 3 GB    [4]"
+    read -r -p "> " response
+    FOLDER_CONF=512MB
+    case "$response" in
+        1)
+            FOLDER_CONF=512MB
+            ;;
+        2)
+            FOLDER_CONF=1GB
+            ;;
+        3)
+            FOLDER_CONF=2GB
+            ;;
+        4)
+            FOLDER_CONF=3GB
+            ;;
+    esac
+    log info "Prepare configuration with $FOLDER_CONF"
+    cp $SOFTWARE_INSTALL_DIR/conf/examples/$FOLDER_CONF/standalone/* $SOFTWARE_INSTALL_DIR/conf/
 
-    echo " 1. Setup environnment variables"
-    echo -e "\texport ZOOKEEPER_HOME=$SOFTWARE_INSTALL_DIR"
-    echo -e "\texport PATH=\$PATH:$SOFTWARE_INSTALL_DIR/bin/\n\n"
-    
-    echo -e " 2. Start zookeeper"
-    echo -e "\t$SOFTWARE_INSTALL_DIR/bin/zkServer.sh start\n"
+    echo -e "\n 2. Setup accumulo-env.sh"
+    echo -e " In $SOFTWARE_INSTALL_DIR/conf/accumulo-env.sh, change the following value:\n"
+    echo -e "\texport ACCUMULO_MONITOR_BIND_ALL=\"true\""
+
+    echo -e "\n 3. Setup accumulo-site.xml"
+    echo -e " Accumulo's worker processes communicate with each other using a secret key. This should be changed to a string which is secure."
+    echo -e " In $SOFTWARE_INSTALL_DIR/conf/accumulo-site.xml, change the following value:\n"
+    echo -e "\t<property>"
+    echo -e "\t\t<name>instance.secret</name>"
+    echo -e "\t\t<value>SECRETTOKEN684564&#65FSDJ</value>"
+    echo -e "\t</property>\n"
+
+    echo -e " After that, add a new property in the same file:"
+    echo -e "\t<property>"
+    echo -e "\t\t<name>instance.volumes</name>"
+    echo -e "\t\t<value>hdfs://localhost:9000/accumulo</value>"
+    echo -e "\t</property>"
+
+    echo -e "\n The last step is to define a secured password:"
+    echo -e "\t<property>"
+    echo -e "\t\t<name>trace.token.property.password</name>"
+    echo -e "\t\t<value>AWEsOM3Pa22w0rd</value>"
+    echo -e "\t</property>"
+
+    echo -e "\n 4. Initialize Accumulo"
+    echo -e "\t$SOFTWARE_INSTALL_DIR/bin/accumulo init"
+    echo -e "\t# Define an instance name and enter the password defined previously"
+    echo -e "\t$SOFTWARE_INSTALL_DIR/bin/start-all.sh"
 }
 
 print_version()
@@ -142,6 +184,7 @@ print_version()
     echo "                                          Installer version 0.1"
     FILENAME=$(basename $SOFTWARE_URL_DOWNLOAD .tar.gz)
     echo "Tested on Ubuntu 17.10 for $FILENAME"
+
 }
 
 print_help()
