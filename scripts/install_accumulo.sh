@@ -174,7 +174,9 @@ after_installing()
     echo -e "\n 4. Initialize Accumulo"
     echo -e "\t$SOFTWARE_INSTALL_DIR/bin/accumulo init"
     echo -e "\t# Define an instance name and enter the password defined previously"
-    echo -e "\t$SOFTWARE_INSTALL_DIR/bin/start-all.sh"
+    echo -e "\t$SOFTWARE_INSTALL_DIR/bin/start-all.sh\n"
+
+    echo -e "\t\e[1mHave fun http://localhost:9995/\e[0m"
 }
 
 print_version()
