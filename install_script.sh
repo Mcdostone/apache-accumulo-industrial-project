@@ -8,6 +8,7 @@
 INSTALL_DIR=~/installs
 SOFTWARE_NAME=software
 SOFTWARE_URL_DOWNLOAD="http://apache.crihan.fr/dist/hadoop/common/hadoop-2.8.2/hadoop-2.8.2.tar.gz"
+SOFTWARE_INSTALL_DIR=$INSTALL_DIR/$SOFTWARE_NAME
 
 
 check_mandatory_programs()
@@ -97,7 +98,7 @@ before_installing()
 download_and_install() 
 {
     if [ "$#" -ne 2 ]; then
-        echo "Illegal number of parameters at download_and_install_hadoop:$LINENO, expected 2 params, given $#"
+        echo "Illegal number of parameters at download_and_install:$LINENO, expected 2 params, given $#"
         echo "Param 1: URL to download the software"
         echo "Param 2: Path to install the software"
         exit 1
@@ -128,7 +129,9 @@ print_version()
     print_software
     echo ""
     echo "                                          Installer version 0.1"
-    echo "Tested on Ubuntu 17.10 for $SOFTWARE_NAME-X.X.X"
+    FILENAME=$(basename $SOFTWARE_URL_DOWNLOAD .tar.gz)
+    echo "Tested on Ubuntu 17.10 for $FILENAME"
+
 }
 
 print_help()
@@ -183,13 +186,11 @@ if [ $# -eq 0 ] ; then
     read -r -p "Have you configured all variables of the script (line 8) ? [y/n] " response
 	if [[ $response == y* ]] || [[ $response == Y* ]]; then
         log info "Start the installation"
-        #mkdir -p $INSTALL_DIR
+        #before_installing
         #check_mandatory_programs java git ssh rsync wget
-        #check_mandatory_environnment_variable JAVA_HOME
-        #create_hadoop_user hadoop $HADOOP_STORAGE
-        #check_ssh_key $HADOOP_USER
-        #download_and_install_hadoop $HADOOP_URL_DOWNLOAD $HADOOP_INSTALL
-        #print_tips_after_install $HADOOP_INSTALL $HADOOP_STORAGE
+        #check_environnment_variables JAVA_HOME
+        #download_and_install $SOFTWARE_URL_DOWNLOAD $SOFTWARE_INSTALL_DIR
+        #after_installing
     fi
 else 
     while getopts "abhv" OPT; do

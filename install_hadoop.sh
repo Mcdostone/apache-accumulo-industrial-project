@@ -233,7 +233,8 @@ print_version()
     print_software
     echo ""
     echo "                                          Installer version 0.1"
-    echo "Tested on Ubuntu 17.10 for $SOFTWARE_NAME-X.X.X"
+    FILENAME=$(basename $SOFTWARE_URL_DOWNLOAD .tar.gz)
+    echo "Tested on Ubuntu 17.10 for $FILENAME"
     echo -e "This script is based on the digitalOcean's tutorial\nhttps://www.digitalocean.com/community/tutorials/how-to-install-the-big-data-friendly-apache-accumulo-nosql-database-on-ubuntu-14-04\n"
 }
 
