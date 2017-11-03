@@ -114,7 +114,7 @@ download_and_install()
         log "info" "Untar the archive /tmp/$FILENAME"
         DIR_NAME=$(tar -xvf /tmp/$FILENAME -C /tmp | sed -e 's@/.*@@' | uniq)
         log "info" "Installing at $INSTALL_DIR"
-        execute_critiq_command mv /tmp/$DIR_NAME $INSTALL_DIR
+        execute_critical_command mv /tmp/$DIR_NAME $INSTALL_DIR
     fi
 }
 

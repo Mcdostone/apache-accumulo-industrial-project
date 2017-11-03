@@ -6,10 +6,9 @@
 #               TO SETUP              #
 #######################################
 INSTALL_DIR=~/installs
-SOFTWARE_NAME=hadoop
-SOFTWARE_URL_DOWNLOAD="http://apache.crihan.fr/dist/hadoop/common/hadoop-2.8.2/hadoop-2.8.2.tar.gz"
+SOFTWARE_NAME=zookeeper
+SOFTWARE_URL_DOWNLOAD="http://apache.crihan.fr/dist/zookeeper/zookeeper-3.4.10/zookeeper-3.4.10.tar.gz"
 SOFTWARE_INSTALL_DIR=$INSTALL_DIR/$SOFTWARE_NAME
-HADOOP_STORAGE=$INSTALL_DIR/storage
 
 
 check_mandatory_programs()
@@ -39,15 +38,15 @@ check_environnment_variables()
 
 print_software() 
 {
-    echo " __  __               __                            "
-    echo "/\ \/\ \             /\ \                           "
-    echo "\ \ \_\ \     __     \_\ \    ___     ___   _____   "
-    echo " \ \  _  \  /'__\`\   /'_\` \  / __\`\  / __\`\/\ '__\`\ "
-    echo "  \ \ \ \ \/\ \L\.\_/\ \L\ \/\ \L\ \/\ \L\ \ \ \L\ \\"
-    echo "   \ \_\ \_\ \__/.\_\ \___,_\ \____/\ \____/\ \ ,__/"
-    echo "    \/_/\/_/\/__/\/_/\/__,_ /\/___/  \/___/  \ \ \/ "
-    echo "                                              \ \_\ "
-    echo "                                               \/_/ "
+    echo " ________                  __                                             ";
+    echo "/\_____  \                /\ \                                            ";
+    echo "\/____//'/'    ___     ___\ \ \/'\      __     __   _____      __   _ __  ";
+    echo "     //'/'    / __\`\  / __\`\ \ , <    /'__\`\ /'__\`\/\ '__\`\  /'__\`\/\\\`'__\\";
+    echo "    //'/'___ /\ \L\ \/\ \L\ \ \ \\\`\ /\  __//\  __/\ \ \L\ \/\  __/\ \ \/ ";
+    echo "    /\_______\ \____/\ \____/\ \_\ \_\ \____\ \____\\ \ ,__/\ \____\\ \_\ ";
+    echo "    \/_______/\/___/  \/___/  \/_/\/_/\/____/\/____/ \ \ \/  \/____/ \/_/ ";
+    echo "                                                      \ \_\               ";
+    echo "                                                       \/_/               ";
 }
 
 log()
@@ -89,60 +88,14 @@ execute_critical_command()
     fi
 }
 
-check_ssh_key()
-{   
-    if [ "$#" -ne 1 ]; then
-        log "fail" "Illegal number of parameters at check_ssh_key:$LINENO, expected 1 param, given $#"
-        echo " - Param 1: the user name of the hadoop user"
-        exit 1
-    fi
-    log info "Check if SSH keys exists for user $1, please enter password for $1"
-    su - $1 -c "if [ ! -f /home/$1/.ssh/id_rsa.pub ]; then ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa; cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized; fi"
-    if [ $? -ne 0 ]; then        
-        log fail "Cannot check for SSH key"
-        exit 1
-    else
-        log info "Public RSA key is configured"
-    fi
-}
-
-create_hadoop_user()
-{
-    if [ "$#" -ne 1 ]; then
-        log "fail" "Illegal number of parameters at create_hadoop_user:$LINENO, expected 1 paramS, given $#"
-        echo " - Param 1: the directory to create for HDFS (naming and data storage)"
-        exit 1
-    fi
-    DATA_DIR=$1
-    read -r -p "Do you want to create a dedicated user for hadoop? [y/n] " response
-	if [[ $response == y* ]] || [[ $response == Y* ]]; then
-    log "info" "Creating the 'hadoop' user"
-        USERNAME="hadoop"    
-        if id $1 >/dev/null 2>&1; then
-            log "warn" "User '$USERNAME' exists"
-        else
-            execute_critical_command "adduser" $USERNAME
-            log "info" "Hadoop user created with success"
-        fi
-    else
-        USERNAME=$USER
-    fi
-    log "info" "Data directory for hadoop is $DATA_DIR"
-    execute_critical_command mkdir "-p" $DATA_DIR
-    execute_critical_command mkdir "-p" $DATA_DIR/name
-    execute_critical_command mkdir "-p" $DATA_DIR/data
-    log "info" "HDFS directory '$DATA_DIR' created with success"
-    execute_critical_command chown "$USERNAME:$USERNAME" $DATA_DIR
-    check_ssh_key $USERNAME
-}
 
 before_installing()
 {
     log info 'Before installing'
-    check_mandatory_programs java git ssh rsync wget sshd
+    check_mandatory_programs java wget
     check_environnment_variables JAVA_HOME
-    create_hadoop_user $HADOOP_STORAGE
 }
+
 
 download_and_install() 
 {
@@ -170,62 +123,17 @@ download_and_install()
 
 after_installing()
 {
-    if [ "$#" -ne 2 ]; then
-        echo "Illegal number of parameters at after_installing:$LINENO, expected 2 params, given $#"
-        echo "Param 1: Home directory where hadoop is install (HADOOP_HOME)"
-        echo "Param 2: Path where data are stored"
+    if [ "$#" -ne 1 ]; then
+        echo "Illegal number of parameters at after_installing:$LINENO, expected 1 param, given $#"
+        echo "Param 1: Path were zookeeper is installed"
         exit 1
     fi
-    HADOOP_DIR=$1
-    DATA_DIR=$2
-    printf "\n\n\e[1m\e[4mThe installation of Hadoop is finished soon. You have to configure it now!\n\n\e[0m"
-    
-    echo " 1. Setup environnment variables"
-    echo -e "\texport HADOOP_HOME=$HADOOP_DIR"
-    echo -e "\texport PATH=\$PATH:${HADOOP_DIR}/sbin:${HADOOP_DIR}/bin\n\n"
-    
-    echo " 2. Setup JAVA_HOME variable in hadoop"
-    echo -e " In the file $HADOOP_DIR/etc/hadoop/hadoop-env.sh, look for the line 'export JAVA_HOME' and set to:\n"
-    echo -e "\texport JAVA_HOME=$JAVA_HOME\n\n"
+    INSTALL_DIR=$1
+    cp $INSTALL_DIR/conf/zoo_sample.cfg $INSTALL_DIR/conf/zoo.cfg
 
-    echo " 3. Disable debug logs"
-    echo -e " Hadoop generates a lot of debug logs, if you want to disable these behavior (same file as step 1)\n"
-    echo -e "\texport HADOOP_OPTS=\"\$HADOOP_OPTS -XX:-PrintWarnings -Djava.net.preferIPv4Stack=true\n\n"
-
-    echo " 4. Setup core-site.xml"
-    echo -e " Modify the file $HADOOP_DIR/etc/hadoop/core-site.xml to configure the namenode's hostname and port:\n"
-    echo -e "\t<property>"
-    echo -e "\t\t <name>fs.defaultFS</name>"
-    echo -e "\t\t<value>hdfs://localhost:9000</value>"
-    echo -e "\t</property>\n\n"
-
-    echo " 5. Setup hdfs-site.xml"
-    echo -e " Modify the file $HADOOP_DIR/etc/hadoop/hdfs-site.xml to configure the 3 properties:\n"
-    echo -e "\t<configuration>
-\t\t<property>
-\t\t\t<name>dfs.replication</name>
-\t\t\t<value>1</value>
-\t\t</property>
-\t\t<property>
-\t\t\t<name>dfs.name.dir</name>
-\t\t\t<value>$DATA_DIR/name</value>
-\t\t</property>
-\t\t<property>
-\t\t\t<name>dfs.data.dir</name>
-\t\t\t<value>$DATA_DIR/data</value>
-\t\t</property>
-\t</configuration>\n\n"
-
-    echo " 6. Setup mapred-site.xml"
-    echo -e " Modify the file $HADOOP_DIR/etc/hadoop/mapred-site.xml to configure the hostname and port number on which the MapReduce job tracker runs:\n"
-    echo -e "\t<property>"
-    echo -e "\t\t<name>mapred.job.tracker</name>"
-    echo -e "\t\t<value>localhost:9001</value>"
-    echo -e "\t</property>\n\n"
-    
-    echo " 7. Initialize and start the nameNode"
-    echo -e "\thdfs namenode -format"
-    echo -e "\tstart-dfs.sh\n"
+    printf "\n\n\e[1m\e[4mThe installation of Zookeeper is finished soon.\n\n\e[0m"
+    echo -e "You can start zookeeper:\n"
+    echo -e "\t$INSTALL_DIR/bin/zkServer.sh start\n"
 }
 
 print_version()
@@ -235,7 +143,6 @@ print_version()
     echo "                                          Installer version 0.1"
     FILENAME=$(basename $SOFTWARE_URL_DOWNLOAD .tar.gz)
     echo "Tested on Ubuntu 17.10 for $FILENAME"
-    echo -e "This script is based on the digitalOcean's tutorial\nhttps://www.digitalocean.com/community/tutorials/how-to-install-the-big-data-friendly-apache-accumulo-nosql-database-on-ubuntu-14-04\n"
 }
 
 print_help()
@@ -292,13 +199,13 @@ if [ $# -eq 0 ] ; then
         log info "Start the installation"
         before_installing
         download_and_install $SOFTWARE_URL_DOWNLOAD $SOFTWARE_INSTALL_DIR
-        after_installing $SOFTWARE_INSTALL_DIR $HADOOP_STORAGE
+        after_installing $SOFTWARE_INSTALL_DIR
     fi
 else 
     while getopts "abhv" OPT; do
         case "$OPT" in
             a)
-                after_installing $SOFTWARE_INSTALL_DIR $HADOOP_STORAGE
+                after_installing
                 ;;
             b)
                 before_installing
