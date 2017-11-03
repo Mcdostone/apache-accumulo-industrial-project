@@ -15,7 +15,7 @@ depending on how you want to install Accumulo, Hadoop and Zookeeper.
     
     INSTALL_DIR=~/installs
     SOFTWARE_NAME=hadoop
-    SOFTWARE_URL_DOWNLOAD="http://apache.crihan.fr/dist/hadoop/common/hadoop-2.8.   2/hadoop-2.8.2.tar.gz"
+    SOFTWARE_URL_DOWNLOAD="http://apache.crihan.fr/dist/hadoop/common/hadoop-2.8.2/hadoop-2.8.2.tar.gz"
     SOFTWARE_INSTALL_DIR=$INSTALL_DIR/$SOFTWARE_NAME
     HADOOP_STORAGE=$INSTALL_DIR/storage
 
