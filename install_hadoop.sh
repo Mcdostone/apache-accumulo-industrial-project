@@ -121,7 +121,7 @@ create_hadoop_user()
         if id $1 >/dev/null 2>&1; then
             log "warn" "User '$USERNAME' exists"
         else
-            execute_critiq_command "adduser" $USERNAME
+            execute_critical_command "adduser" $USERNAME
             log "info" "Hadoop user created with success"
         fi
     else
