@@ -2,8 +2,6 @@
 
 This folder contains 3 scripts in order to have an fonctionnal machine quickly!
 
-
-
 ## Usage
 
 ### Setup the variables
@@ -21,11 +19,30 @@ depending on how you want to install Accumulo, Hadoop and Zookeeper.
 
 
 ### Run the scripts
-
+    cd scripts/
     ./install_hadoop.sh
     ./install_zookeeper.sh
     ./install_accumulo.sh
 
+
+### Start Accumulo
+
+First of all, you have to format the HDFS nameNode thanks to the following script: 
+
+    ./init_hdfs.sh
+
+After that, run Hadoop, Zookeeper and accumulo. For the first time you run the script, it will ask you to define an instance name for accumulo.
+
+    ./start-accumulo.sh
+
+
+### Stop Accumulo
+You have the possibility to stop all services running with accumulo:
+
+    ./stop-accumulo.sh
+
+
+### Troubleshooting
 After the end of each script, you have to execute some commands in order to finalize the installation yourself (setup environment variables, edit config files ...)
 
 If you have some trouble, you can read the help:

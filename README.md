@@ -6,6 +6,13 @@ Organisation
 -----
 
     scripts/            # Contains shell scripts
+    schemas/            # Contains all schemas explaining architectures (use draw.io to read them)
+
+
+Ressources
+---
+
+ -  [draw.io](https://draw.io), used for schemas
 
 
 Authors

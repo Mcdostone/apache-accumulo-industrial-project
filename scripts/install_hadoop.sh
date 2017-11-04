@@ -10,16 +10,17 @@ SOFTWARE_NAME=hadoop
 SOFTWARE_URL_DOWNLOAD="http://apache.crihan.fr/dist/hadoop/common/hadoop-2.8.2/hadoop-2.8.2.tar.gz"
 SOFTWARE_INSTALL_DIR=$INSTALL_DIR/$SOFTWARE_NAME
 HADOOP_STORAGE=$INSTALL_DIR/storage
+LOG=$(cd -P "$( dirname $0 )" && pwd)/log.sh
 
 
 check_mandatory_programs()
 {
     for PGM in "$@"; do
         if ! [ -x "$(command -v $PGM)" ]; then
-            log fail "$PGM is not installed, please install it to continue the installation"
+            $LOG fail "$PGM is not installed, please install it to continue the installation"
             exit 1
         else
-            log info "$PGM is installed"
+            $LOG info "$PGM is installed"
         fi
     done
 }
@@ -28,10 +29,10 @@ check_environnment_variables()
 {
     for VAR in "$@"; do
         if [ -z "$(printenv | grep $VAR)" ]; then
-           log fail "$VAR is not configured, please configure this environnment variable to continue the installation"
+           $LOG fail "$VAR is not configured, please configure this environnment variable to continue the installation"
            exit 1
         else
-           log info "$VAR is configured"
+           $LOG info "$VAR is configured"
         fi
     done
 }
@@ -50,40 +51,16 @@ print_software()
     echo "                                               \/_/ "
 }
 
-log()
-{
-    if [ "$#" -ne 2 ]; then
-        echo "Illegal number of parameters, expected 2 parameters, given $#"
-        echo "Param 1: Level of log (info|warning|error)"
-        echo "Param 2: Message to log"
-        exit 1
-    fi
-    LEVEL=$(echo $1 | tr "[:lower:]" "[:upper:]")
-    shift
-    if [ "$LEVEL" = "INFO" ] ; then
-        COLOR="\e[34m"
-    fi
-    if [ "$LEVEL" = "WARN" ] ; then
-        COLOR="\e[33m"
-    fi
-    if [ "$LEVEL" = "FAIL" ] ; then
-        COLOR="\e[31m"
-    fi
-    if [ -n "$COLOR"  ] ; then
-        printf "\e[1m[${COLOR}%s\e[39m]\e[21m %s\n" "$LEVEL" "$*"
-    fi
-}
-
 execute_critical_command()
 {
     COMMAND=$1
     shift
     eval $COMMAND $*
     if [ $? -ne 0 ]; then
-        log warn "Cannot execute command '$COMMAND $*' (need sudo maybe?)"
+        $LOG warn "Cannot execute command '$COMMAND $*' (need sudo maybe?)"
         eval sudo $COMMAND $*
         if [ $? -ne 0 ]; then
-            log fail "Cannot execute command '$COMMAND $*', stop here"
+            $LOG fail "Cannot execute command '$COMMAND $*', stop here"
             exit 1
         fi
     fi
@@ -92,53 +69,53 @@ execute_critical_command()
 check_ssh_key()
 {   
     if [ "$#" -ne 1 ]; then
-        log "fail" "Illegal number of parameters at check_ssh_key:$LINENO, expected 1 param, given $#"
+        $LOG "fail" "Illegal number of parameters at check_ssh_key:$LINENO, expected 1 param, given $#"
         echo " - Param 1: the user name of the hadoop user"
         exit 1
     fi
-    log info "Check if SSH keys exists for user $1, please enter password for $1"
+    $LOG info "Check if SSH keys exists for user $1, please enter password for $1"
     su - $1 -c "if [ ! -f /home/$1/.ssh/id_rsa.pub ]; then ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa; cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized; fi"
     if [ $? -ne 0 ]; then        
-        log fail "Cannot check for SSH key"
+        $LOG fail "Cannot check for SSH key"
         exit 1
     else
-        log info "Public RSA key is configured"
+        $LOG info "Public RSA key is configured"
     fi
 }
 
 create_hadoop_user()
 {
     if [ "$#" -ne 1 ]; then
-        log "fail" "Illegal number of parameters at create_hadoop_user:$LINENO, expected 1 paramS, given $#"
+        $LOG "fail" "Illegal number of parameters at create_hadoop_user:$LINENO, expected 1 paramS, given $#"
         echo " - Param 1: the directory to create for HDFS (naming and data storage)"
         exit 1
     fi
     DATA_DIR=$1
     read -r -p "Do you want to create a dedicated user for hadoop? [y/n] " response
 	if [[ $response == y* ]] || [[ $response == Y* ]]; then
-    log "info" "Creating the 'hadoop' user"
+    $LOG "info" "Creating the 'hadoop' user"
         USERNAME="hadoop"    
         if id $1 >/dev/null 2>&1; then
-            log "warn" "User '$USERNAME' exists"
+            $LOG "warn" "User '$USERNAME' exists"
         else
             execute_critical_command "adduser" $USERNAME
-            log "info" "Hadoop user created with success"
+            $LOG "info" "Hadoop user created with success"
         fi
     else
         USERNAME=$USER
     fi
-    log "info" "Data directory for hadoop is $DATA_DIR"
+    $LOG "info" "Data directory for hadoop is $DATA_DIR"
     execute_critical_command mkdir "-p" $DATA_DIR
     execute_critical_command mkdir "-p" $DATA_DIR/name
     execute_critical_command mkdir "-p" $DATA_DIR/data
-    log "info" "HDFS directory '$DATA_DIR' created with success"
+    $LOG "info" "HDFS directory '$DATA_DIR' created with success"
     execute_critical_command chown "$USERNAME:$USERNAME" $DATA_DIR
     check_ssh_key $USERNAME
 }
 
 before_installing()
 {
-    log info 'Before installing'
+    $LOG info 'Before installing'
     check_mandatory_programs java git ssh rsync wget sshd
     check_environnment_variables JAVA_HOME
     create_hadoop_user $HADOOP_STORAGE
@@ -155,14 +132,14 @@ download_and_install()
         URL=$1
         INSTALL_DIR=$2
     if [ -d $INSTALL_DIR ]; then 
-        log warn "Skip installation, already installed at '$INSTALL_DIR'"
+        $LOG warn "Skip installation, already installed at '$INSTALL_DIR'"
     else
         FILENAME=$(basename $URL)
-        log "info" "Downloading $FILENAME"
+        $LOG "info" "Downloading $FILENAME"
         wget -cP /tmp $URL
-        log "info" "Untar the archive /tmp/$FILENAME"
+        $LOG "info" "Untar the archive /tmp/$FILENAME"
         DIR_NAME=$(tar -xvf /tmp/$FILENAME -C /tmp | sed -e 's@/.*@@' | uniq)
-        log "info" "Installing at $INSTALL_DIR"
+        $LOG "info" "Installing at $INSTALL_DIR"
         execute_critical_command mv /tmp/$DIR_NAME $INSTALL_DIR
     fi
 }
@@ -270,8 +247,6 @@ print_help()
     
     echo -e "\t\e[1mexecute_critical_command(cmd)\e[0m"
     echo -e "\t\tExecutes a critical command. If the first try fails, the command is executed again with sudo"
-    echo -e "\t\e[1mlog(level=info|warn|fail, msg)\e[0m"
-    echo -e "\t\tSimple logger for this script"
     echo -e "\t\e[1mprint_software\e[0m"
     echo -e "\t\tPrint ASCII text"
     echo -e "\t\e[1mprint_version\e[0m"
@@ -289,7 +264,7 @@ if [ $# -eq 0 ] ; then
     echo ""
     read -r -p "Have you configured all variables of the script (line 8) ? [y/n] " response
 	if [[ $response == y* ]] || [[ $response == Y* ]]; then
-        log info "Start the installation"
+        $LOG info "Start the installation"
         before_installing
         download_and_install $SOFTWARE_URL_DOWNLOAD $SOFTWARE_INSTALL_DIR
         after_installing $SOFTWARE_INSTALL_DIR $HADOOP_STORAGE
