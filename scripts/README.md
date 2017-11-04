@@ -20,6 +20,7 @@ depending on how you want to install Accumulo, Hadoop and Zookeeper.
 
 ### Run the scripts
     cd scripts/
+    chmod +x log.sh         # Apply this command for all others scripts
     ./install_hadoop.sh
     ./install_zookeeper.sh
     ./install_accumulo.sh
@@ -27,11 +28,13 @@ depending on how you want to install Accumulo, Hadoop and Zookeeper.
 
 ### Start Accumulo
 
-First of all, you have to format the HDFS nameNode thanks to the following script: 
+First of all, you have to format the HDFS nameNode and init an instance for accumulo: 
 
     ./init_hdfs.sh
+    $ACCUMULO_HOME/bin/accumulo init
 
 After that, run Hadoop, Zookeeper and accumulo. For the first time you run the script, it will ask you to define an instance name for accumulo.
+
 
     ./start-accumulo.sh
 

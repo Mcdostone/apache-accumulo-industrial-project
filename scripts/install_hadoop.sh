@@ -147,22 +147,14 @@ download_and_install()
 
 after_installing()
 {
-    if [ "$#" -ne 2 ]; then
-        echo "Illegal number of parameters at after_installing:$LINENO, expected 2 params, given $#"
-        echo "Param 1: Home directory where hadoop is install (HADOOP_HOME)"
-        echo "Param 2: Path where data are stored"
-        exit 1
-    fi
-    HADOOP_DIR=$1
-    DATA_DIR=$2
     printf "\n\n\e[1m\e[4mThe installation of Hadoop is finished soon. You have to configure it now!\n\n\e[0m"
     
     echo " 1. Setup environnment variables"
-    echo -e "\texport HADOOP_HOME=$HADOOP_DIR"
-    echo -e "\texport PATH=\$PATH:${HADOOP_DIR}/sbin:${HADOOP_DIR}/bin\n\n"
+    echo -e "\texport HADOOP_HOME=$SOFTWARE_INSTALL_DIR"
+    echo -e "\texport PATH=\$PATH:${SOFTWARE_INSTALL_DIR}/sbin:${SOFTWARE_INSTALL_DIR}/bin\n\n"
     
     echo " 2. Setup JAVA_HOME variable in hadoop"
-    echo -e " In the file $HADOOP_DIR/etc/hadoop/hadoop-env.sh, look for the line 'export JAVA_HOME' and set to:\n"
+    echo -e " In the file $SOFTWARE_INSTALL_DIR/etc/hadoop/hadoop-env.sh, look for the line 'export JAVA_HOME' and set to:\n"
     echo -e "\texport JAVA_HOME=$JAVA_HOME\n\n"
 
     echo " 3. Disable debug logs"
@@ -170,14 +162,14 @@ after_installing()
     echo -e "\texport HADOOP_OPTS=\"\$HADOOP_OPTS -XX:-PrintWarnings -Djava.net.preferIPv4Stack=true\n\n"
 
     echo " 4. Setup core-site.xml"
-    echo -e " Modify the file $HADOOP_DIR/etc/hadoop/core-site.xml to configure the namenode's hostname and port:\n"
+    echo -e " Modify the file $SOFTWARE_INSTALL_DIR/etc/hadoop/core-site.xml to configure the namenode's hostname and port:\n"
     echo -e "\t<property>"
     echo -e "\t\t <name>fs.defaultFS</name>"
     echo -e "\t\t<value>hdfs://localhost:9000</value>"
     echo -e "\t</property>\n\n"
 
     echo " 5. Setup hdfs-site.xml"
-    echo -e " Modify the file $HADOOP_DIR/etc/hadoop/hdfs-site.xml to configure the 3 properties:\n"
+    echo -e " Modify the file $SOFTWARE_INSTALL_DIR/etc/hadoop/hdfs-site.xml to configure the 3 properties:\n"
     echo -e "\t<configuration>
 \t\t<property>
 \t\t\t<name>dfs.replication</name>
@@ -185,16 +177,16 @@ after_installing()
 \t\t</property>
 \t\t<property>
 \t\t\t<name>dfs.name.dir</name>
-\t\t\t<value>$DATA_DIR/name</value>
+\t\t\t<value>$HADOOP_STORAGE/name</value>
 \t\t</property>
 \t\t<property>
 \t\t\t<name>dfs.data.dir</name>
-\t\t\t<value>$DATA_DIR/data</value>
+\t\t\t<value>$HADOOP_STORAGE/data</value>
 \t\t</property>
 \t</configuration>\n\n"
 
     echo " 6. Setup mapred-site.xml"
-    echo -e " Modify the file $HADOOP_DIR/etc/hadoop/mapred-site.xml to configure the hostname and port number on which the MapReduce job tracker runs:\n"
+    echo -e " Modify the file $SOFTWARE_INSTALL_DIR/etc/hadoop/mapred-site.xml to configure the hostname and port number on which the MapReduce job tracker runs:\n"
     echo -e "\t<property>"
     echo -e "\t\t<name>mapred.job.tracker</name>"
     echo -e "\t\t<value>localhost:9001</value>"
@@ -267,13 +259,13 @@ if [ $# -eq 0 ] ; then
         $LOG info "Start the installation"
         before_installing
         download_and_install $SOFTWARE_URL_DOWNLOAD $SOFTWARE_INSTALL_DIR
-        after_installing $SOFTWARE_INSTALL_DIR $HADOOP_STORAGE
+        after_installing
     fi
 else 
     while getopts "abhv" OPT; do
         case "$OPT" in
             a)
-                after_installing $SOFTWARE_INSTALL_DIR $HADOOP_STORAGE
+                after_installing
                 ;;
             b)
                 before_installing

@@ -1,9 +1,21 @@
 #!/bin/bash
 
-INSTALL_DIR=~/installs
-ACCUMULO=$INSTALL_DIR/accumulo
+
 LOG=$(cd -P "$( dirname $0 )" && pwd)/log.sh
 
+check_environnment_variables()
+{
+    for VAR in "$@"; do
+        if [ -z "$(printenv | grep $VAR)" ]; then
+           $LOG fail "$VAR is not configured, please configure this environnment variable to continue the installation"
+           exit 1
+        else
+           $LOG info "$VAR is configured"
+        fi
+    done
+}
+
+check_environnment_variables JAVA_HOME ZOOKEEPER_HOME HADOOP_HOME ACCUMULO_HOME
 
 $LOG info "Start Hadoop"
 $HADOOP_HOME/sbin/start-dfs.sh
@@ -13,12 +25,8 @@ $LOG info "Start Zookeeper"
 $ZOOKEEPER_HOME/bin/zkServer.sh start
 echo ""
 
-$ACCUMULO/bin/accumulo init
-if [ $? -eq 255 ]; then $LOG warn "Accumulo is already initialized"; else $LOG info "Init accumulo"; fi
-echo ""
-
 $LOG info "Start Accumulo"
-$ACCUMULO/bin/start-all.sh
+$ACCUMULO_HOME/bin/start-all.sh
 echo ""
 
 $LOG info "Hadoop monitor available at http://localhost:50070/"

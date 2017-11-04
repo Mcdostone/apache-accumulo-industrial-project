@@ -150,7 +150,10 @@ after_installing()
     echo -e "\t\t<value>AWEsOM3Pa22w0rd</value>"
     echo -e "\t</property>"
 
-    echo -e "\n 4. Initialize Accumulo"
+    echo -e "\n 4. Setup environnment variables"
+    echo -e "\texport ACCUMULO_HOME=$SOFTWARE_INSTALL_DIR"
+
+    echo -e "\n 5. Initialize Accumulo"
     echo -e "\t$SOFTWARE_INSTALL_DIR/bin/accumulo init"
     echo -e "\t# Define an instance name and enter the password defined previously"
     echo -e "\t$SOFTWARE_INSTALL_DIR/bin/start-all.sh\n"
