@@ -45,6 +45,13 @@ You have the possibility to stop all services running with accumulo:
     ./stop-accumulo.sh
 
 
+
+### Some useful commands
+``` bash
+    hdfs dfs -rm -r /<instance>      # Delete the instance in HDFS
+    $ACCUMULO_HOME/bin/accumulo init # Create a new instance for accumulo
+```
+
 ### Troubleshooting
 After the end of each script, you have to execute some commands in order to finalize the installation yourself (setup environment variables, edit config files ...)
 
