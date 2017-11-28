@@ -17,7 +17,9 @@ check_environnment_variables()
 
 check_environnment_variables JAVA_HOME ZOOKEEPER_HOME HADOOP_HOME ACCUMULO_HOME
 
+
 $LOG info "Start Hadoop"
+$HADOOP_HOME/bin/hdfs dfs -rm -r /accumulo
 $HADOOP_HOME/sbin/start-dfs.sh
 echo ""
 
