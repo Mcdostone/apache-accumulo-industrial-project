@@ -1,9 +1,10 @@
 version: "2.0"
 services:
-  # docker run --name some-zookeeper --restart always -d -v $(pwd)/zoo.cfg:/conf/zoo.cfg zookeeper
   zookeeper:
-    image: zookeeper:3.3.6
+    build: ./zookeeper
     container_name: zookeeper-container
-    volumes:
-      - ./zoo.cfg:/conf/zoo.cfg
+    restart: always
+  hadoop:
+    build: ./hadoop
+    container_name: hadoop-container
     restart: always

@@ -1,19 +1,25 @@
 .DEFAULT_GOAL=help
-.PHONY: build_accumulo build_zookeeper help
+.PHONY: build_accumulo build_zookeeper build_hadoop help
 
-ACCUMULO_VERSION=1.8.1
 ZOOKEEPER_VERSION=3.4.11
+HADOOP_VERSION=2.9.0
+ACCUMULO_VERSION=1.8.1
+
 
 build_zookeeper: 	
 	wget -nc http://apache.crihan.fr/dist/zookeeper/zookeeper-$(ZOOKEEPER_VERSION)/zookeeper-$(ZOOKEEPER_VERSION).tar.gz -P ./zookeeper
 	docker build -t zookeeper-$(ZOOKEEPER_VERSION) zookeeper/
+
+build_hadoop:
+	wget -nc http://apache.mindstudios.com/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz -P ./hadoop
+	docker build -t hadoop-$(HADOOP_VERSION) hadoop/
 
 build_accumulo:
 	wget -nc http://apache.crihan.fr/dist/accumulo/$(ACCUMULO_VERSION)/accumulo-$(ACCUMULO_VERSION)-bin.tar.gz -P ./accumulo
 	docker build -t accumulo-$(ACCUMULO_VERSION) accumulo/
 
 clean:
-	rm accumulo/*.tar.gz zookeeper/*.tar.gz
+	rm -f accumulo/*.tar.gz zookeeper/*.tar.gz hadoop/*.tar.gz
 
 help:
 	#                    __                 ___      ___             
