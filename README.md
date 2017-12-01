@@ -5,15 +5,16 @@ This reposiory contains all essential resources in order to work on the industri
 Organisation
 -----
 
+    docker/            # Contains dockerfiles and custom scripts
     scripts/            # Contains shell scripts
     schemas/            # Contains all schemas explaining architectures (use draw.io to read them)
 
 
 Ressources
 ---
-
- -  [draw.io](https://draw.io), used for schemas
-
+ - [docker](http://docker.io/), used for running containers
+ - [make](https://www.gnu.org/software/make/manual/make.html), used automate some commands
+ - [draw.io](https://draw.io), used for schemas
 
 Authors
 -----
