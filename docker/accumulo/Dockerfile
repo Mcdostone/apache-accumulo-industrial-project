@@ -26,5 +26,4 @@ RUN apk add --update --no-cache bash build-base; \
     echo -e "\nexport ACCUMULO_MONITOR_BIND_ALL=\"true\"" >> ${ACCUMULO_HOME}/conf/accumulo-env.sh; \
     chmod +x /usr/bin/entrypoint.sh
 
-EXPOSE 2181 2888 3888
 CMD [ "bash", "/usr/bin/entrypoint.sh" ]
