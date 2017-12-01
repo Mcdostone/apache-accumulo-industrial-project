@@ -1,5 +1,5 @@
 .DEFAULT_GOAL=help
-.PHONY: build_accumulo build_zookeeper build_hadoop help download_zookeeper
+.PHONY: build_hadoop help download_zookeeper download_accumulo
 FLAGS = --network=host
 ZOOKEEPER_VERSION = 3.4.11
 HADOOP_VERSION = 2.9.0
@@ -7,37 +7,33 @@ ACCUMULO_VERSION = 1.8.1
 
 
 download_zookeeper:
-	wget -nc http://apache.crihan.fr/dist/zookeeper/zookeeper-$(ZOOKEEPER_VERSION)/zookeeper-$(ZOOKEEPER_VERSION).tar.gz -P ./zookeeper
+	-wget -nc http://apache.crihan.fr/dist/zookeeper/zookeeper-$(ZOOKEEPER_VERSION)/zookeeper-$(ZOOKEEPER_VERSION).tar.gz -P ./zookeeper
 
-build_zookeeper: download_zookeeper
-	docker build -t pi-zookeeper:latest $(FLAGS) zookeeper/
+download_accumulo:
+	-wget -nc http://apache.crihan.fr/dist/accumulo/$(ACCUMULO_VERSION)/accumulo-$(ACCUMULO_VERSION)-bin.tar.gz  -O ./accumulo/accumulo-$(ACCUMULO_VERSION).tar.gz
 
 build_hadoop:
 	wget -nc http://www.eu.apache.org/dist/hadoop/common/stable/hadoop-${HADOOP_VERSION}.tar.gz -P ./hadoop
-	docker build -t pi-hadoop:latest $(FLAGS) hadoop/
+	docker build $(FLAGS) \
+		-t \pi-hadoop:latest \
+		--build-arg HADOOP_VERSION=$(HADOOP_VERSION) \
+		 hadoop/
 
-build_accumulo: build_hadoop download_zookeeper
-	wget -nc http://apache.crihan.fr/dist/accumulo/$(ACCUMULO_VERSION)/accumulo-$(ACCUMULO_VERSION)-bin.tar.gz -P ./accumulo
-	cp ./zookeeper/zookeeper-$(ZOOKEEPER_VERSION).tar.gz ./accumulo/
-	docker build -t pi-accumulo:latest $(FLAGS) accumulo/
-
-build_all: build_zookeeper build_accumulo
+build: download_zookeeper download_accumulo build_hadoop 
+	cp ./zookeeper/zookeeper-$(ZOOKEEPER_VERSION).tar.gz ./single-container/
+	cp ./accumulo/accumulo-$(ACCUMULO_VERSION).tar.gz ./single-container/
+	docker build $(FLAGS) \
+		-t pi-accumulo:latest \
+		--build-arg ACCUMULO_VERSION=$(ACCUMULO_VERSION) \
+		--build-arg ZOOKEEPER_VERSION=$(ZOOKEEPER_VERSION) \
+		single-container
 
 run:
-	docker run --rm -dt --name zookeeper pi-zookeeper:latest
-	# docker run --rm -dtp 50070:50070 -p --name  hadoop pi-hadoop:latest
-	docker run --rm -itp 50070:50070 -p 9995:9995 --link zookeeper pi-accumulo:latest bash
-
-rm_all: rm_containers rm_images
-
-rm_images:
-	docker rmi -f $$(docker images -aq)
-	
-rm_containers:
-	docker rm $$(docker ps -aq)
+	docker run -itp 50070:50070 -p 9995:9995 pi-accumulo:latest bash
 
 clean:
 	rm -f accumulo/*.tar.gz zookeeper/*.tar.gz hadoop/*.tar.gz
+	docker rmi -f $$(docker images -aq)
 
 help:
 	#                    __                 ___      ___             
@@ -52,4 +48,11 @@ help:
 	#                                          Tested on Ubuntu 17.10
 	#                        Docker version 17.11.0-ce, build 1caf76c
 	#                    docker-compose version 1.17.1, build 6d101fb
+	#
+	# Main rules:
+	#	- build		Build the docker image for accumulo (single container)
+	#	- run		Run the accumulo image
+	#	- clean		Delete tar.gz archives and all docker images
+	#	- build_hadoop	Build the image for hadoop
+	#
 	@echo ''
