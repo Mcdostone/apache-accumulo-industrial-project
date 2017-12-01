@@ -1,22 +1,30 @@
 .DEFAULT_GOAL=help
-.PHONY: build_accumulo build_zookeeper build_hadoop help
+.PHONY: build_accumulo build_zookeeper build_hadoop help download_zookeeper
 BFLAGS = --network=host
 ZOOKEEPER_VERSION = 3.4.11
 HADOOP_VERSION = 2.9.0
 ACCUMULO_VERSION = 1.8.1
 
 
-build_zookeeper: 	
+download_zookeeper:
 	wget -nc http://apache.crihan.fr/dist/zookeeper/zookeeper-$(ZOOKEEPER_VERSION)/zookeeper-$(ZOOKEEPER_VERSION).tar.gz -P ./zookeeper
-	docker build -t zookeeper-$(ZOOKEEPER_VERSION) $(BFLAGS) zookeeper/
+
+build_zookeeper: download_zookeeper
+	docker build -t pi-zookeeper:latest $(BFLAGS) zookeeper/
 
 build_hadoop:
 	wget -nc http://www.eu.apache.org/dist/hadoop/common/stable/hadoop-${HADOOP_VERSION}.tar.gz -P ./hadoop
-	docker build -t hadoop-$(HADOOP_VERSION) $(BFLAGS) hadoop/
+	docker build -t pi-hadoop:latest $(BFLAGS) hadoop/
 
-build_accumulo:
+build_accumulo: build_hadoop download_zookeeper
 	wget -nc http://apache.crihan.fr/dist/accumulo/$(ACCUMULO_VERSION)/accumulo-$(ACCUMULO_VERSION)-bin.tar.gz -P ./accumulo
-	docker build -t accumulo-$(ACCUMULO_VERSION) $(BFLAGS) accumulo/
+	cp ./zookeeper/zookeeper-$(ZOOKEEPER_VERSION).tar.gz ./accumulo/
+	docker build -t pi-accumulo:latest $(BFLAGS) accumulo/
+
+build_all: build_zookeeper build_hadoop build_accumulo
+
+up:
+	docker-compose up -d
 
 delete_all_images:
 	docker rmi -f $$(docker images -aq)
@@ -35,3 +43,5 @@ help:
 	#
 	#                                        Version 0.1 by mcdostone
 	#                                          Tested on Ubuntu 17.10
+	#						 Docker version 17.11.0-ce, build 1caf76c
+	#                    docker-compose version 1.17.1, build 6d101fb

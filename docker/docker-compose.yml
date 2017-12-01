@@ -1,10 +1,29 @@
-version: "2.0"
+version: "2.2"
 services:
   zookeeper:
-    build: ./zookeeper
-    container_name: zookeeper-container
-    restart: always
+    image: pi-zookeeper:latest
+    build: 
+      context: ./zookeeper
+      network: host
+    ports:
+      - 2181:2181
   hadoop:
-    build: ./hadoop
-    container_name: hadoop-container
-    restart: always
+    image: pi-hadoop:latest
+    build:
+      context: ./hadoop
+      network: host
+    ports:
+      - 50070:50070 # namenode
+      - 50090:50090 # secondary namenode
+    tty: true
+  accumulo:
+    image: pi-accumulo:latest
+    build:
+      context: ./accumulo
+      network: host
+    links:
+      - zookeeper
+      - hadoop
+    depends_on:
+      - zookeeper
+    tty: true

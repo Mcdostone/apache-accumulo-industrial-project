@@ -1,18 +1,26 @@
-FROM openjdk:8-jdk-alpine
+FROM pi-hadoop:latest
 MAINTAINER Mcdostone
 
 WORKDIR /opt
 
-RUN apk add --update --no-cache bash build-base
 ARG ACCUMULO_VERSION=1.8.1
 ARG ACCUMULO_MEM=3GB
 ENV ACCUMULO_HOME=/opt/accumulo-${ACCUMULO_VERSION}
-ENV ACCUMULO_ARCHIVE=accumulo-${ACCUMULO_VERSION}-bin.tar.gz
+ENV ACCUMULO_MONITOR_BIND_ALL="true"
+ENV ZOOKEEPER_HOME /usr/lib/zookeeper
 ENV PATH $PATH:$ACCUMULO_HOME/bin
+ARG ZOOKEEPER_VERSION=3.4.11
+ENV ZOOKEEPER_HOME=/opt/zookeeper-${ZOOKEEPER_VERSION}
+ENV ZOOKEEPER_ARCHIVE=zookeeper-${ZOOKEEPER_VERSION}.tar.gz
+ENV PATH $PATH:$ZOOKEEPER_HOME/bin
 
-ADD ./${ACCUMULO_ARCHIVE} ./
-# Fix for mktemp
-RUN sed -i 's?mktemp -d /tmp/accumulo-native.XXXX?mktemp -d /tmp/accumulo-native.XXXXXX?g' ${ACCUMULO_HOME}/bin/build_native_library.sh
-RUN ${ACCUMULO_HOME}/bin/build_native_library.sh
-# RUN ${ACCUMULO_HOME}/bin/bootstrap_config.sh
-RUN cp ${ACCUMULO_HOME}/conf/examples/${ACCUMULO_MEM}/standalone/* ${ACCUMULO_HOME}/conf
+ADD ./*.tar.gz ./
+
+RUN apk add --update --no-cache bash build-base; \
+    sed -i 's?mktemp -d /tmp/accumulo-native.XXXX?mktemp -d /tmp/accumulo-native.XXXXXX?g' ${ACCUMULO_HOME}/bin/build_native_library.sh; \
+    ${ACCUMULO_HOME}/bin/build_native_library.sh; \
+    cp ${ACCUMULO_HOME}/conf/examples/${ACCUMULO_MEM}/standalone/* ${ACCUMULO_HOME}/conf; \
+    echo -e "\nexport ACCUMULO_MONITOR_BIND_ALL=\"true\"" >> ${ACCUMULO_HOME}/conf/accumulo-env.sh
+
+EXPOSE 2181 2888 3888
+CMD /bin/bash
