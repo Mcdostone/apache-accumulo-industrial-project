@@ -26,11 +26,11 @@ log()
 
 /usr/sbin/sshd
 ${HADOOP_HOME}/sbin/start-dfs.sh
-log INFO starting HDFS
+log INFO "starting HDFS"
 sed -i "s/localhost:2181/$ZOOKEEPER_PORT_2181_TCP_ADDR:2181/g" ${ACCUMULO_HOME}/conf/accumulo-site.xml
 sed -i "s#<value></value>#<value>hdfs://localhost:9000/accumulo</value>#g" ${ACCUMULO_HOME}/conf/accumulo-site.xml
 sed -i "s/DEFAULT/$(tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1)/g" ${ACCUMULO_HOME}/conf/accumulo-site.xml
-log INFO HDFS is running !
+log INFO "HDFS is running !"
 
 log INFO "Zookeeper running on $ZOOKEEPER_PORT_2181_TCP_ADDR"
 printf "\e[1m\e[33m%s\e[39m\e[21m %s\n" "You have to run manually accumulo !"
