@@ -35,7 +35,10 @@ log INFO "HDFS is running !"
 log INFO "Zookeeper running on $ZOOKEEPER_PORT_2181_TCP_ADDR"
 printf "\e[1m\e[33m%s\e[39m\e[21m %s\n" "You have to run manually accumulo !"
 echo -e "\taccumulo init"
-echo -e "\t\$ACCUMULO_HOME/bin/start-all.sh"
+echo -e "\t\$ACCUMULO_HOME/bin/start-all.sh\n"
+
+log info "Hadoop monitor available at http://localhost:50070/"
+log info "Accumulo monitor will be available at http://localhost:9995/"
 
 # Accumulo and hadoop separated
 # sed -i "s#<value></value>#<value>hdfs://$HADOOP_PORT_9000_TCP_ADDR:9000/accumulo</value>#g" ${ACCUMULO_HOME}/conf/accumulo-site.xml
