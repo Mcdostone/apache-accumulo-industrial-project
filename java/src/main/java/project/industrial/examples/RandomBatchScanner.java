@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package project.industrial;
-
-import static project.industrial.RandomBatchWriter.abs;
+package project.industrial.examples;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,7 +63,7 @@ public class RandomBatchScanner {
   static void generateRandomQueries(int num, long min, long max, Random r, HashSet<Range> ranges, HashMap<Text,Boolean> expectedRows) {
     log.info(String.format("Generating %,d random queries...", num));
     while (ranges.size() < num) {
-      long rowid = (abs(r.nextLong()) % (max - min)) + min;
+      long rowid = (RandomBatchWriter.abs(r.nextLong()) % (max - min)) + min;
 
       Text row1 = new Text(String.format("row_%010d", rowid));
 

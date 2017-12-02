@@ -25,8 +25,10 @@ RUN apk add --update --no-cache bash build-base; \
     ln -s ${ACCUMULO_HOME}/bin/start-all.sh /usr/bin/accumulo-start-all-sh
 
 ADD ./entrypoint.sh /usr/bin/
+ADD ./reminder.sh /usr/bin/
 ADD ./.bashrc /root/
 RUN chmod +x /usr/bin/accumulo-start-all-sh; \
-    chmod +x /usr/bin/entrypoint.sh
+    chmod +x /usr/bin/entrypoint.sh; \
+    chmod +x /usr/bin/reminder.sh
 
 CMD [ "/usr/bin/entrypoint.sh" ]

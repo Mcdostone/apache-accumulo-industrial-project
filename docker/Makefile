@@ -1,5 +1,5 @@
 .DEFAULT_GOAL=help
-.PHONY: build_hadoop help download_zookeeper download_accumulo
+.PHONY: build_hadoop help download_zookeeper download_accumulo build run run_java clean build_java
 FLAGS = --network=host
 ZOOKEEPER_VERSION = 3.4.11
 HADOOP_VERSION = 2.9.0
@@ -19,7 +19,7 @@ build_hadoop:
 		--build-arg HADOOP_VERSION=$(HADOOP_VERSION) \
 		 hadoop/
 
-build:
+build: build_hadoop download_accumulo download_zookeeper
 	cp ./zookeeper/zookeeper-$(ZOOKEEPER_VERSION).tar.gz ./single-container/
 	cp ./accumulo/accumulo-$(ACCUMULO_VERSION).tar.gz ./single-container/
 	docker build $(FLAGS) \
@@ -28,16 +28,25 @@ build:
 		--build-arg ZOOKEEPER_VERSION=$(ZOOKEEPER_VERSION) \
 		single-container
 
-run_java:
+build_java:
+	mvn package -f ../java/pom.xml
+
+run_java:	
 	docker run \
+		--rm \
 		-it \
 		-p 50070:50070 \
 		-p 9995:9995 \
-		-v $$(pwd)/../java:$(ACCUMULO_HOME)/lib/ext:rw \
-		pi-accumulo:latest bash \
+		-v $$(pwd)/../java/target/:$(ACCUMULO_HOME)/lib/ext:rw \
+		pi-accumulo:latest bash
 
 run:
-	docker run -it -p 50070:50070 -p 9995:9995 pi-accumulo:latest bash	
+	docker run \
+	--rm \
+	-it \
+	-p 50070:50070 \
+	-p 9995:9995 \
+	pi-accumulo:latest bash	
 
 clean:
 	rm -f accumulo/*.tar.gz zookeeper/*.tar.gz hadoop/*.tar.gz

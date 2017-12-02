@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package project.industrial;
+package project.industrial.examples;
 
 import java.util.Map.Entry;
 import java.util.SortedSet;
