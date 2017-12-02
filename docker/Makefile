@@ -33,7 +33,7 @@ run_java:
 		-it \
 		-p 50070:50070 \
 		-p 9995:9995 \
-		-v $$(pwd)/java:$(ACCUMULO_HOME)/lib/ext \
+		-v $$(pwd)/../java:$(ACCUMULO_HOME)/lib/ext:rw \
 		pi-accumulo:latest bash \
 
 run:

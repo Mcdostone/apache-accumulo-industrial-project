@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package test.client;
+package project.industrial;
 
-import static org.apache.accumulo.examples.client.RandomBatchWriter.abs;
+import static project.industrial.RandomBatchWriter.abs;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +24,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.accumulo.core.cli.BatchScannerOpts;
+import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.BatchScanner;
@@ -32,8 +34,6 @@ import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import org.apache.accumulo.examples.cli.BatchScannerOpts;
-import org.apache.accumulo.examples.cli.ClientOnRequiredTable;
 import org.apache.hadoop.io.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import com.beust.jcommander.Parameter;
 
 /**
- * Simple example for reading random batches of data from Accumulo.
+ * Simple example for reading random batches of data from Accumulo. See docs/examples/README.batch for instructions.
  */
 public class RandomBatchScanner {
   private static final Logger log = LoggerFactory.getLogger(RandomBatchScanner.class);
