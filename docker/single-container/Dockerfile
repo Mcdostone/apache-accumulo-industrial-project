@@ -8,6 +8,7 @@ ARG ACCUMULO_MEM=3GB
 ARG ZOOKEEPER_VERSION=3.4.11
 ENV INSTANCE=accumulo
 ENV ACCUMULO_PASSWORD=root
+ENV ACCUMULO_DEFAULT_TABLE=my_table
 ENV ACCUMULO_HOME=/opt/accumulo-${ACCUMULO_VERSION}
 ENV ZOOKEEPER_HOME=/opt/zookeeper-${ZOOKEEPER_VERSION}
 ENV PATH $PATH:$ACCUMULO_HOME/bin:$ZOOKEEPER_HOME/bin
@@ -22,7 +23,6 @@ RUN apk add --update --no-cache bash build-base; \
     echo -e "\nexport ACCUMULO_MONITOR_BIND_ALL=\"true\"" >> ${ACCUMULO_HOME}/conf/accumulo-env.sh; \
     cp ${ZOOKEEPER_HOME}/conf/zoo_sample.cfg ${ZOOKEEPER_HOME}/conf/zoo.cfg; \
     ln -s ${ACCUMULO_HOME}/bin/start-all.sh /usr/bin/accumulo-start-all-sh
-
 
 ADD ./entrypoint.sh /usr/bin/
 ADD ./.bashrc /root/

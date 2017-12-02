@@ -10,7 +10,7 @@ log() {
     LEVEL=$(echo $1 | tr "[:lower:]" "[:upper:]")
     shift
     if [ "$LEVEL" = "INFO" ] ; then
-        COLOR="\e[34m"
+        COLOR="\e[32m"
     fi
     if [ "$LEVEL" = "WARN" ] ; then
         COLOR="\e[33m"
@@ -62,7 +62,18 @@ start_accumulo() {
 print_info() {
     log info "Hadoop monitor available at http://localhost:50070/"
     log info "Accumulo monitor will be available at http://localhost:9995/"
+    echo -e "\n\n\e[1mAccumulo is configured. Test if everything works fine by running:"
+    echo -e "\n\taccumulo org.apache.accumulo.examples.simple.client.SequentialBatchWriter -i $INSTANCE -t $ACCUMULO_DEFAULT_TABLE  --size 50 --num 100 -u root -p $ACCUMULO_PASSWORD && echo 'Everything works!'"
+    echo -e "\e[21m"
+}
 
+create_default_table() {
+    if [ ! -z "$ACCUMULO_DEFAULT_TABLE" ]; then
+        log info "Creating the default table '$ACCUMULO_DEFAULT_TABLE'"
+        accumulo shell -u root -p $ACCUMULO_PASSWORD -e "createtable $ACCUMULO_DEFAULT_TABLE"
+    else
+        log warn "There is no default table to create"
+    fi
 }
 
 start_all() {
@@ -71,6 +82,7 @@ start_all() {
     start_zookeeper
     start_hdfs
     start_accumulo
+    create_default_table
     print_info
 }
 

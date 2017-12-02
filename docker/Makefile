@@ -4,7 +4,7 @@ FLAGS = --network=host
 ZOOKEEPER_VERSION = 3.4.11
 HADOOP_VERSION = 2.9.0
 ACCUMULO_VERSION = 1.8.1
-
+ACCUMULO_HOME=/opt/accumulo-$(ACCUMULO_VERSION)
 
 download_zookeeper:
 	-wget -nc http://apache.crihan.fr/dist/zookeeper/zookeeper-$(ZOOKEEPER_VERSION)/zookeeper-$(ZOOKEEPER_VERSION).tar.gz -P ./zookeeper
@@ -19,7 +19,7 @@ build_hadoop:
 		--build-arg HADOOP_VERSION=$(HADOOP_VERSION) \
 		 hadoop/
 
-build: download_zookeeper download_accumulo build_hadoop 
+build:
 	cp ./zookeeper/zookeeper-$(ZOOKEEPER_VERSION).tar.gz ./single-container/
 	cp ./accumulo/accumulo-$(ACCUMULO_VERSION).tar.gz ./single-container/
 	docker build $(FLAGS) \
@@ -28,8 +28,16 @@ build: download_zookeeper download_accumulo build_hadoop
 		--build-arg ZOOKEEPER_VERSION=$(ZOOKEEPER_VERSION) \
 		single-container
 
+run_java:
+	docker run \
+		-it \
+		-p 50070:50070 \
+		-p 9995:9995 \
+		-v $$(pwd)/java:$(ACCUMULO_HOME)/lib/ext \
+		pi-accumulo:latest bash \
+
 run:
-	docker run -itp 50070:50070 -p 9995:9995 pi-accumulo:latest bash
+	docker run -it -p 50070:50070 -p 9995:9995 pi-accumulo:latest bash	
 
 clean:
 	rm -f accumulo/*.tar.gz zookeeper/*.tar.gz hadoop/*.tar.gz
