@@ -5,7 +5,8 @@ This reposiory contains all essential resources in order to work on the industri
 Organisation
 -----
 
-    docker/            # Contains dockerfiles and custom scripts
+    docker/             # Contains dockerfiles and custom scripts
+    java/               # Contains the java project with all java classes written for our tests
     scripts/            # Contains shell scripts
     schemas/            # Contains all schemas explaining architectures (use draw.io to read them)
 
