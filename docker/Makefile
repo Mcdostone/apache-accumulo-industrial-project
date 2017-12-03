@@ -37,6 +37,9 @@ run: build_java
 		-it \
 		-p 50070:50070 \
 		-p 9995:9995 \
+		-e DISPLAY=$$DISPLAY \
+		--net=host \
+		-v /tmp/.X11-unix:/tmp/.X11-unix \
 		-v $$(pwd)/../java/target/:$(ACCUMULO_HOME)/lib/ext:rw \
 		-v $$(pwd)/single-container/Makefile:/opt/Makefile:rw \
 		pi-accumulo:latest bash

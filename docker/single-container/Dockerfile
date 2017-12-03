@@ -17,6 +17,7 @@ ENV ACCUMULO_MONITOR_BIND_ALL="true"
 ADD ./*.tar.gz ./
 
 RUN apk add --update --no-cache bash git python python-dev py-pip build-base; \
+    apk add --update --no-cache libxtst libxi libxrender bash-completion; \
     sed -i 's?mktemp -d /tmp/accumulo-native.XXXX?mktemp -d /tmp/accumulo-native.XXXXXX?g' ${ACCUMULO_HOME}/bin/build_native_library.sh; \
     ${ACCUMULO_HOME}/bin/build_native_library.sh; \
     cp ${ACCUMULO_HOME}/conf/examples/${ACCUMULO_MEM}/standalone/* ${ACCUMULO_HOME}/conf; \
