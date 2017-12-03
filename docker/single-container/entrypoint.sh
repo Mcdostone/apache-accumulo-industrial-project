@@ -30,6 +30,7 @@ setup_accumulo_configuration() {
     sed -i "s/DEFAULT/$(tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1)/" ${ACCUMULO_HOME}/conf/accumulo-site.xml
     # Modify password of user root
     sed -i "s#<value>secret</value>#<value>$ACCUMULO_PASSWORD</value>#" ${ACCUMULO_HOME}/conf/accumulo-site.xml 
+    sed -i "s/test/$INSTANCE/" $ACCUMULO_HOME/proxy/proxy.properties
 }
 
 start_zookeeper() {

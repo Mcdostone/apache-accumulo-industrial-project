@@ -27,6 +27,7 @@ RUN apk add --update --no-cache bash git python python-dev py-pip build-base; \
 ADD ./entrypoint.sh /usr/bin/
 ADD ./reminder.sh /usr/bin/
 ADD ./.bashrc /root/
+ADD ./Makefile ./
 RUN chmod +x /usr/bin/accumulo-start-all-sh; \
     chmod +x /usr/bin/entrypoint.sh; \
     chmod +x /usr/bin/reminder.sh

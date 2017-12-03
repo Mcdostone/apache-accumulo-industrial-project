@@ -38,6 +38,7 @@ run: build_java
 		-p 50070:50070 \
 		-p 9995:9995 \
 		-v $$(pwd)/../java/target/:$(ACCUMULO_HOME)/lib/ext:rw \
+		-v $$(pwd)/single-container/Makefile:/opt/Makefile:rw \
 		pi-accumulo:latest bash
 
 clean:
