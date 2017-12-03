@@ -29,9 +29,9 @@ build: build_hadoop download_accumulo download_zookeeper
 		single-container
 
 build_java:
-	mvn package -f ../java/pom.xml
+	mvn -f ../java/pom.xml -Pprod clean compile assembly:single
 
-run_java:	
+run: build_java
 	docker run \
 		--rm \
 		-it \
@@ -39,14 +39,6 @@ run_java:
 		-p 9995:9995 \
 		-v $$(pwd)/../java/target/:$(ACCUMULO_HOME)/lib/ext:rw \
 		pi-accumulo:latest bash
-
-run:
-	docker run \
-	--rm \
-	-it \
-	-p 50070:50070 \
-	-p 9995:9995 \
-	pi-accumulo:latest bash	
 
 clean:
 	rm -f accumulo/*.tar.gz zookeeper/*.tar.gz hadoop/*.tar.gz

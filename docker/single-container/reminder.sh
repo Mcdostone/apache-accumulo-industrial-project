@@ -43,6 +43,7 @@ print_reminder() {
         printf "\t* \e[31;1m %-40s \e[0m*\n" "There is no jar loaded! (make run_java)"
     else
         printf "\t* \e[36;1m %-40s \e[0m*\n" "$(ls -A $ACCUMULO_HOME/lib/ext/*.jar | wc -l) jar(s) imported"
+        echo -ne "\e[1m"
     fi
     border
     echo -e "\e[21m"

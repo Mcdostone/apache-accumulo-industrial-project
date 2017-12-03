@@ -25,7 +25,7 @@ log() {
 
 setup_accumulo_configuration() {
     # The adress of HDFS master
-    sed -i "s#<value></value>#<value>hdfs://localhost:9000/accumulo</value>#" ${ACCUMULO_HOME}/conf/accumulo-site.xml
+    sed -i "s#<value></value>#<value>hdfs://localhost:9000/accumulo</value>#g" ${ACCUMULO_HOME}/conf/accumulo-site.xml
     # Generate random secret token
     sed -i "s/DEFAULT/$(tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1)/" ${ACCUMULO_HOME}/conf/accumulo-site.xml
     # Modify password of user root
@@ -50,20 +50,25 @@ start_hdfs() {
 
 start_accumulo() {
     log INFO "Initialize accumulo"
-    accumulo init --instance-name $INSTANCE --password "$ACCUMULO_PASSWORD" --clear-instance-name
+    echo "accumulo init --instance-name $INSTANCE --password $ACCUMULO_PASSWORD"
+    accumulo init --instance-name $INSTANCE --password $ACCUMULO_PASSWORD
     if [ $? -ne 0 ]; then
         log warn "Cannot initialize accumulo"
         exit 1
     fi
     log info "Starting accumulo"
-    accumulo-start-all-sh
+    $ACCUMULO_HOME/bin/start-all.sh
 }
 
 print_info() {
     log info "Hadoop monitor available at http://localhost:50070/"
     log info "Accumulo monitor will be available at http://localhost:9995/"
     echo -e "\n\n\e[1mAccumulo is configured. Test if everything works fine by running:"
-    echo -e "\n\taccumulo org.apache.accumulo.examples.simple.client.SequentialBatchWriter -i $INSTANCE -t $ACCUMULO_DEFAULT_TABLE  --size 50 --num 100 -u root -p $ACCUMULO_PASSWORD && echo 'Everything works!'"
+    echo -e "\n\taccumulo org.apache.accumulo.examples.simple.client.SequentialBatchWriter -i $INSTANCE -t $ACCUMULO_DEFAULT_TABLE  --size 50 --num 100 -u root -p $ACCUMULO_PASSWORD && echo 'Everything works!'\n"
+    if [ ! -z "$(ls -A $ACCUMULO_HOME/lib/ext)" ]; then
+        echo -e "You can list all java classes available with:"
+        echo -e "\n\taccumulo project.industrial.Help"
+    fi
     echo -e "\e[21m"
 }
 
@@ -79,8 +84,8 @@ create_default_table() {
 start_all() {
     setup_accumulo_configuration
     start_sshd
-    start_zookeeper
     start_hdfs
+    start_zookeeper
     start_accumulo
     create_default_table
     print_info

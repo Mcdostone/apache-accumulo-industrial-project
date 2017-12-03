@@ -7,6 +7,7 @@ USER root
 ARG HADOOP_VERSION=2.9.0
 ENV HADOOP_HOME=/opt/hadoop-${HADOOP_VERSION}
 ENV HADOOP_OPTS="$HADOOP_OPTS -XX:-PrintWarnings -Djava.net.preferIPv4Stack=true"
+ENV HADOOP_PREFIX=${HADOOP_HOME}
 ENV PATH $PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 
 ADD ./*.tar.gz ./

@@ -23,11 +23,11 @@
 	</property>
   <property>
     <name>dfs.name.dir</name>
-    <value>file:///opt/hdfs/namenode</value>
+    <value>/opt/hdfs/namenode</value>
   </property>
   <property>
     <name>dfs.data.dir</name>
-    <value>file:///opt/hdfs/data</value>
+    <value>/opt/hdfs/data</value>
   </property>
   <property>
     <name>dfs.datanode.synconclose</name>
