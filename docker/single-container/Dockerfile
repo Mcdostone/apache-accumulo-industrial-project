@@ -33,4 +33,6 @@ RUN chmod +x /usr/bin/accumulo-start-all-sh; \
     chmod +x /usr/bin/entrypoint.sh; \
     chmod +x /usr/bin/reminder.sh
 
+EXPOSE 42424
+
 CMD [ "/usr/bin/entrypoint.sh" ]
