@@ -46,6 +46,17 @@ Nb. All the programs are installed in */opt/*
         docker/single-container/Makefile <-->  /opt/Makefile
 
 
+## Test somes features
+
+All features that can be tested with some java code is available with a Makefile located at */opt/*.
+
+Just run **make help** to see the feature you can test.
+
+   to run accumulo:**
+``` bash
+    make help
+``` 
+
 ## Some useful commands
 ``` bash
     docker ps -a # Show active containers

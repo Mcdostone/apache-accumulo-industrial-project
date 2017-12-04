@@ -23,7 +23,7 @@ partitioning: ## Write some data if a given prefix
 	-i $$INSTANCE \
 	-u root \
 	-p $$ACCUMULO_PASSWORD \
-	--table $$ACCUMULO_DEFAULT_TABLE \
+	--table "people" \
 	--prefix "famous_people"
 
 cross-language: start_thrift_server ## Optional feature: Other programming languages to interact with accumulo

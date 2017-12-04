@@ -40,7 +40,7 @@ print_reminder() {
     printf "\t*  %-40s *\n" "To print this help, type 'reminder.sh'"
     printf "\t*  %-40s *\n" "To start accumulo, type 'entrypoint.sh'"
     if [ -z "$(ls -A $ACCUMULO_HOME/lib/ext)" ]; then
-        printf "\t* \e[31;1m %-40s \e[0m*\n" "There is no jar loaded! (make run_java)"
+        printf "\t* \e[31;1m %-40s \e[0m*\n" "There is no jar loaded! (make transfer_jar)"
     else
         printf "\t* \e[36;1m %-40s \e[0m*\n" "$(ls -A $ACCUMULO_HOME/lib/ext/*.jar | wc -l) jar(s) imported"
         echo -ne "\e[1m"
