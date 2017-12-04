@@ -41,9 +41,8 @@ class TsvReader:
 
 
 ## Main 
-
 def create_mutation_from_wikipedia(row, data):
-    mutation = Mutation(row)
+    mutation = Mutation("row)
     mutation.put(cf='title', cq='content', val="%s" % data.title)
     mutation.put(cf='summary', cq='content', val="%s" % data.summary)
     return mutation
