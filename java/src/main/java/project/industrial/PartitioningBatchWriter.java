@@ -33,6 +33,10 @@ public class PartitioningBatchWriter {
         return m;
     }
 
+    public void close() throws MutationsRejectedException {
+        this.bw.close();
+    }
+
 
     static class Opts extends ClientOnRequiredTable {
         @Parameter(names = "--prefix", required = true, description = "Prefix to use for the rowID")
@@ -48,6 +52,7 @@ public class PartitioningBatchWriter {
         int currentLine = 0;
         while((line = reader.readLine()) != null && currentLine <= firstLines) {
             String person = line.split("\t")[1];
+            System.out.println(person);
             currentLine++;
             bw.createMutation(Integer.toString(currentLine), "name", "cq", new ColumnVisibility(""), person);
         }
@@ -61,6 +66,7 @@ public class PartitioningBatchWriter {
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
         PartitioningBatchWriter writer = new PartitioningBatchWriter(opts.prefix, bw);
         readFileAndAddMutation("people.tsv", 50, writer);
+        writer.close();
     }
 
 }

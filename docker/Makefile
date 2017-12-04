@@ -40,7 +40,7 @@ run: build_java
 		-e DISPLAY=$$DISPLAY \
 		-v /tmp/.X11-unix:/tmp/.X11-unix \
 		-v $$(pwd)/../java/target/:$(ACCUMULO_HOME)/lib/ext:rw \
-		-v $$(pwd)/single-container/Makefile:/opt/Makefile:rw \
+		-v $wd)/single-container/Makefile:/opt/Makefile:rw \
 		pi-accumulo:latest bash
 
 clean:
