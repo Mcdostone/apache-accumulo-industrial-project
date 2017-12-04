@@ -12,13 +12,17 @@ sequential-batch-writer: ## This is a example on how write a rule
 	-u root \
 	--size 50 --num 100 
 
-cross-language: ## Optional feature: Other programming languages to interact with accumulo
+start_thrift_server: ## Start the accumulo thrift server
+	@sed -i "s/50096/$(PORT_THRIFT_SERVER)/" pyaccumulo/settings.py
+	@sed -i "s/secret/$$ACCUMULO_PASSWORD/" pyaccumulo/settings.py	
+	accumulo proxy -p $$ACCUMULO_HOME/proxy/proxy.properties & \
+	sleep 5; \
+
+cross-language: start_thrift_server ## Optional feature: Other programming languages to interact with accumulo
 	@if [ ! -d pyaccumulo ]; then \
 		git clone https://github.com/jt6211/pyaccumulo.git; \
 		pip install -r pyaccumulo/requirements.txt; \
 	fi
-	@sed -i "s/50096/$(PORT_THRIFT_SERVER)/" pyaccumulo/settings.py
-	@sed -i "s/secret/$$ACCUMULO_PASSWORD/" pyaccumulo/settings.py
 	@if ! nc -z localhost 42424; then \
 		accumulo proxy -p $$ACCUMULO_HOME/proxy/proxy.properties & \
 		sleep 5; \
