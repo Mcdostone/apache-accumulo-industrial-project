@@ -21,17 +21,19 @@ start_thrift_server: ## Start the accumulo thrift server
 	accumulo proxy -p $$ACCUMULO_HOME/proxy/proxy.properties & \
 	sleep 5; \
 
-get_key: partitioning ## Returns the row which corresponds to the given rowId
+get_key:  ## Returns the row which corresponds to the given rowId
+	@echo "Inserting some basic data: 'make partitioning'"
+	@$(MAKE) partitioning > /dev/null
 	accumulo project.industrial.GetKey \
 	-i $$INSTANCE \
 	-u root \
 	-p $$ACCUMULO_PASSWORD \
 	-t $(TABLE_PEOPLE) \
-	--rowId $(GET_KEY);
+	--rowId $(GET_KEY)
+	@echo ""
 
 
 scan_table: ## Scan all the rows of given table
-	@if -z echo $(rowId); then \
 	accumulo project.industrial.Scan \
 	-i $$INSTANCE \
 	-u root \
