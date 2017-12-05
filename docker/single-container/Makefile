@@ -18,6 +18,14 @@ start_thrift_server: ## Start the accumulo thrift server
 	accumulo proxy -p $$ACCUMULO_HOME/proxy/proxy.properties & \
 	sleep 5; \
 
+partitioning: ## Write some data if a given prefix
+	accumulo project.industrial.PartitioningBatchWriter \
+	-i $$INSTANCE \
+	-u root \
+	-p $$ACCUMULO_PASSWORD \
+	--table "people" \
+	--prefix "famous_people"
+
 cross-language: start_thrift_server ## Optional feature: Other programming languages to interact with accumulo
 	@if [ ! -d pyaccumulo ]; then \
 		git clone https://github.com/jt6211/pyaccumulo.git; \
