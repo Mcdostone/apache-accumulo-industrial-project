@@ -1,5 +1,6 @@
 package project.industrial;
 
+import project.industrial.injectors.PeopleInjector;
 import project.industrial.mining.GetByKey;
 import project.industrial.examples.*;
 

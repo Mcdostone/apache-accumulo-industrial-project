@@ -5,17 +5,8 @@ import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.MutationsRejectedException;
-import org.apache.accumulo.core.client.Scanner;
-import org.apache.accumulo.core.data.Mutation;
-import org.apache.accumulo.core.data.Range;
-import org.apache.accumulo.core.security.ColumnVisibility;
-import org.apache.hadoop.io.Text;
-import org.apache.log4j.Logger;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import project.industrial.injectors.PeopleInjector;
+import project.industrial.injectors.PrefixRowIdStrategy;
 
 /**
  * Enables the user to write some data into accumulo
@@ -25,53 +16,6 @@ import java.io.InputStreamReader;
  * @author Yann Prono, mcdostone
  */
 public class PartitioningBatchWriter {
-
-    private final BatchWriter bw;
-    private String prefix;
-    private static Logger logger = Logger.getLogger(PartitioningBatchWriter.class);
-
-    /**
-     * @param prefix Prefix used for row ID.
-     * @param bw the BatchWriter created by a connector
-     */
-    public PartitioningBatchWriter(String prefix, BatchWriter bw) {
-        this.prefix = prefix;
-        this.bw = bw;
-    }
-
-    /**
-     * Create a mutation with the prefix for the rowID.
-     * Prefix and rowID are separated by an '_'.
-     * @param rowId
-     * @param cf
-     * @param cq
-     * @param visibility
-     * @param value
-     * @return
-     * @throws MutationsRejectedException
-     */
-    public Mutation createMutation(String rowId, String cf, String cq, ColumnVisibility visibility, String value) throws MutationsRejectedException {
-        Text row = new Text(String.format("%s_%s", this.prefix, rowId));
-        Mutation m = new Mutation(row);
-        m.put(cf, cq, visibility, value);
-        this.bw.addMutation(m);
-        return m;
-    }
-
-    /**
-     * @return The prefix for this BatchWriter
-     */
-    public String getPrefix() {
-        return this.prefix;
-    }
-
-    /**
-     * @throws MutationsRejectedException
-     */
-    public void close() throws MutationsRejectedException {
-        this.bw.close();
-    }
-
 
     /**
      * Options supported for this class
@@ -100,36 +44,11 @@ public class PartitioningBatchWriter {
         // Create the table if not exist
         if(!connector.tableOperations().exists(opts.getTableName()))
             connector.tableOperations().create(opts.getTableName());
-        // Create a BatchWriter thanks to connector
+
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
-
-
-        PartitioningBatchWriter writer = new PartitioningBatchWriter(opts.prefix, bw);
-        String filename = "people.tsv";
-        logger.info("Going to Read the first "+ opts.size + " lines of " + filename);
-        InputStream in = PartitioningBatchWriter.class.getResourceAsStream('/' + filename);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line;
-        // Skip header
-        reader.readLine();
-        int currentLine = 1;
-        logger.info(opts.size + " will be inserted");
-        logger.info("Prefix for rowID: " + writer.getPrefix());
-        while((line = reader.readLine()) != null && currentLine <= opts.size) {
-            String person = line.split("\t")[1];
-            currentLine++;
-            writer.createMutation(Integer.toString(currentLine), "name", "cq", new ColumnVisibility(""), person);
-        }
-        // Last mutations are flushed
-        writer.close();
-        logger.info(currentLine - 1 + " rows has been inserted");
-
-        // Read data now
-        logger.info("Reading data freshly inserted");
-        Scanner scanner = connector.createScanner(opts.getTableName(),opts.auths);
-        scanner.setRange(new Range());
-        Printer.printAll(scanner.iterator());
-        scanner.close();
+        PeopleInjector injector = new PeopleInjector(bw);
+        injector.setRowIdStrategy(new PrefixRowIdStrategy(opts.prefix));
+        injector.insert();
     }
 
 }

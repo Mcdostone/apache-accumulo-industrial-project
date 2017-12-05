@@ -1,4 +1,4 @@
-package project.industrial;
+package project.industrial.injectors;
 
 import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.cli.ClientOnRequiredTable;
@@ -9,6 +9,7 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import project.industrial.PartitioningBatchWriter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,16 +26,22 @@ public class PeopleInjector {
 
     private static final String FILENAME = "people.tsv";
     private static final Logger logger = LoggerFactory.getLogger(PeopleInjector.class);
+    private RowIdStrategy rowIdStrategy;
     private BatchWriter bw;
 
     public PeopleInjector(BatchWriter bw) {
+        this(bw, new DefaultRowIdStrategy());
+    }
+
+    public PeopleInjector(BatchWriter bw, RowIdStrategy strategy) {
         this.bw = bw;
+        this.rowIdStrategy = strategy;
     }
 
     /**
      * Read all file and insert data
      */
-    public void insert() {
+    public int insert() {
         InputStream in = PeopleInjector.class.getResourceAsStream('/' + FILENAME);
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String line;
@@ -51,6 +58,7 @@ public class PeopleInjector {
             e1.printStackTrace();
         }
         logger.info(countLine - 1 + " rows has been inserted");
+        return countLine - 1;
     }
 
     /**
@@ -58,14 +66,14 @@ public class PeopleInjector {
      */
     private List<Mutation> createMutations(int id, String[] data) {
         List<Mutation> mutations = new ArrayList<>();
-        Mutation name = new Mutation(String.valueOf(id));
+        Mutation name = new Mutation(this.rowIdStrategy.getRowId(String.valueOf(id)));
         name.put(
                 "identity",
                 "name",
                 new ColumnVisibility(""),
                 data[1]
         );
-        Mutation city = new Mutation(String.valueOf(id));
+        Mutation city = new Mutation(this.rowIdStrategy.getRowId(String.valueOf(id)));
         city.put(
                 "identity",
                 "city",
@@ -77,6 +85,10 @@ public class PeopleInjector {
         return mutations;
     }
 
+    public void setRowIdStrategy(PrefixRowIdStrategy rowIdStrategy) {
+        this.rowIdStrategy = rowIdStrategy;
+    }
+
     public static void main(String[] args) throws Exception {
         // Init the connection with accumulo
         ClientOnRequiredTable opts = new ClientOnRequiredTable();
@@ -85,9 +97,9 @@ public class PeopleInjector {
         Connector connector = opts.getConnector();
         if(!connector.tableOperations().exists(opts.getTableName()))
             connector.tableOperations().create(opts.getTableName());
+
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
         PeopleInjector injector = new PeopleInjector(bw);
         injector.insert();
     }
-
 }
