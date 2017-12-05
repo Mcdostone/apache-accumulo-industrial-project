@@ -18,6 +18,13 @@ start_thrift_server: ## Start the accumulo thrift server
 	accumulo proxy -p $$ACCUMULO_HOME/proxy/proxy.properties & \
 	sleep 5; \
 
+scan_table: table ## Scan all the rows of given table
+	accumulo project.industrial.Scan \
+	-i $$INSTANCE \
+	-u root \
+	-p $$ACCUMULO_PASSWORD \
+	-t table
+
 partitioning: ## Write some data if a given prefix
 	accumulo project.industrial.PartitioningBatchWriter \
 	-i $$INSTANCE \
