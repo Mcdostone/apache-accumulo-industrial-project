@@ -21,6 +21,7 @@ public class Help {
         classes.add(RandomBatchScanner.class);
         classes.add(RandomBatchWriter.class);
         classes.add(ReadWriteExample.class);
+        classes.add(InsertWithBatchWriter.class);
         classes.add(RowOperations.class);
         classes.add(SequentialBatchWriter.class);
         classes.add(TraceDumpExample.class);
