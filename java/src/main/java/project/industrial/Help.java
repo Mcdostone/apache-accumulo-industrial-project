@@ -1,5 +1,6 @@
 package project.industrial;
 
+import project.industrial.mining.GetByKey;
 import project.industrial.examples.*;
 
 import java.io.IOException;
@@ -27,8 +28,9 @@ public class Help {
         classes.add(TraceDumpExample.class);
         classes.add(TracingExample.class);
         classes.add(PartitioningBatchWriter.class);
-        classes.add(GetKey.class);
+        classes.add(GetByKey.class);
         classes.add(Scan.class);
+        classes.add(PeopleInjector.class);
         System.out.printf("%d java classes available:\n", classes.size());
         for(Class c: classes)
             System.out.printf("\t%s\n", c.getName());

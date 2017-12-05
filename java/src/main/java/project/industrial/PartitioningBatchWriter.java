@@ -124,9 +124,6 @@ public class PartitioningBatchWriter {
         writer.close();
         logger.info(currentLine - 1 + " rows has been inserted");
 
-        java.util.Scanner sc = new java.util.Scanner(System.in);
-        System.out
-
         // Read data now
         logger.info("Reading data freshly inserted");
         Scanner scanner = connector.createScanner(opts.getTableName(),opts.auths);
