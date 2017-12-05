@@ -18,7 +18,7 @@ public class GetByKey {
 	private static Logger logger = Logger.getLogger(GetByKey.class);
 
 	static class Opts extends ClientOnRequiredTable {
-		@Parameter(names = "--rowId", required = true, description = "the rowId you want to to retrieve")
+		@Parameter(names = "--id", required = true, description = "the rowId you want to to retrieve")
 		String rowId = null;
 	}
 

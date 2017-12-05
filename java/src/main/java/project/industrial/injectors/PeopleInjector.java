@@ -95,8 +95,10 @@ public class PeopleInjector {
         BatchWriterOpts bwOpts = new BatchWriterOpts();
         opts.parseArgs(PartitioningBatchWriter.class.getName(), args, bwOpts);
         Connector connector = opts.getConnector();
-        if(!connector.tableOperations().exists(opts.getTableName()))
+        if(!connector.tableOperations().exists(opts.getTableName())) {
+            logger.info("Creating table " + opts.getTableName());
             connector.tableOperations().create(opts.getTableName());
+        }
 
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
         PeopleInjector injector = new PeopleInjector(bw);

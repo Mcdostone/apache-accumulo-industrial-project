@@ -36,7 +36,7 @@ public class GetByList {
         else {
             BatchScanner scanner = connector.createBatchScanner(opts.getTableName(), opts.auths, 10);
             scanner.setRanges(opts.rowIds.stream().map(id -> Range.exact(new Text(id))).collect(Collectors.toList()));
-            logger.info("Looking for rows where rowIDs in {" + String.join(",", opts.rowIds));
+            logger.info("Looking for rows where ID in {" + String.join(",", opts.rowIds) + "}");
             Printer.printAll(scanner.iterator());
         }
     }

@@ -1,8 +1,11 @@
 package project.industrial;
 
 import project.industrial.injectors.PeopleInjector;
+import project.industrial.mining.GetAll;
 import project.industrial.mining.GetByKey;
 import project.industrial.examples.*;
+import project.industrial.mining.GetByList;
+import project.industrial.mining.GetByRange;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,8 +32,10 @@ public class Help {
         classes.add(TraceDumpExample.class);
         classes.add(TracingExample.class);
         classes.add(PartitioningBatchWriter.class);
+        classes.add(GetAll.class);
+        classes.add(GetByRange.class);
+        classes.add(GetByList.class);
         classes.add(GetByKey.class);
-        classes.add(Scan.class);
         classes.add(PeopleInjector.class);
         System.out.printf("%d java classes available:\n", classes.size());
         for(Class c: classes)

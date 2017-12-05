@@ -1,47 +1,53 @@
 .DEFAULT_GOAL=help
 .PHONY: help cross-language sequential-batch-writer
+PACKAGE=project.industrial
 PORT_THRIFT_SERVER=42424
-TABLE_PEOPLE=people
-GET_KEY=famous_people_4
+GET_KEY=4
+
 
 ###############################################################
 ###   PLEASE APPEND YOUR RULES AT THE END OF THE MAKEFILE   ###
-##############################################################
+###############################################################
 
 
 get_all: ## Scan all the rows of given table
-	accumulo project.industrial.Scan \
+	accumulo $(PACKAGE).mining.GetAll \
 	-i $$INSTANCE \
 	-u root \
 	-p $$ACCUMULO_PASSWORD \
 	-t $$ACCUMULO_DEFAULT_TABLE
 
 
-get_key: partitioning ## Returns the row which corresponds to the given rowId
-
 get_range:  ## Returns all rows where row IDs are in the range
-	@echo "Inserting some basic data: 'make partitioning'"
-	@$(MAKE) partitioning > /dev/null
-
-	accumulo project.industrial.GetKey \
+	accumulo $(PACKAGE).mining.GetByRange \
 	-i $$INSTANCE \
 	-u root \
 	-p $$ACCUMULO_PASSWORD \
-	-t $(TABLE_PEOPLE) \
-	--rowId $(GET_KEY)
-	@echo ""
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	--startAt 101 \
+	--endAt 253
+
+
+get_list:  ## Returns the row where row IDs are in the list
+	accumulo $(PACKAGE).mining.GetByList \
+	-i $$INSTANCE \
+	-u root \
+	-p $$ACCUMULO_PASSWORD \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	--id $(GET_KEY) \
+	--id 89 \
+	--id 52 \
+	--id 426 \
+	--id 3214 \
 
 
 get_key:  ## Returns the row which corresponds to the given rowId
-	@echo "Inserting some basic data: 'make partitioning'"
-	@$(MAKE) partitioning > /dev/null
-	accumulo project.industrial.GetKey \
+	accumulo $(PACKAGE).mining.GetByKey \
 	-i $$INSTANCE \
 	-u root \
 	-p $$ACCUMULO_PASSWORD \
-	-t $(TABLE_PEOPLE) \
-	--rowId $(GET_KEY)
-	@echo ""
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	--id $(GET_KEY)
 	
 
 sequential-batch-writer: ## This is a example on how write a rule
@@ -59,11 +65,11 @@ start_thrift_server: ## Start the accumulo thrift server
 
 
 partitioning: ## Write some data if a given prefix
-	accumulo project.industrial.PartitioningBatchWriter \
+	accumulo $(PACKAGE).PartitioningBatchWriter \
 	-i $$INSTANCE \
 	-u root \
 	-p $$ACCUMULO_PASSWORD \
-	--table $(TABLE_PEOPLE) \
+	--table $$ACCUMULO_DEFAULT_TABLE \
 	--prefix "famous_people"
 
 cross-language: start_thrift_server ## Optional feature: Other programming languages to interact with accumulo
@@ -82,12 +88,21 @@ cross-language: start_thrift_server ## Optional feature: Other programming langu
 	python examples/analytics.py
 
 
+###############################################################
+###   USEFUL RULES   ###
+###############################################################
+
+
 inject_data: ## Inject some data into accumulo
-	accumulo project.industrial.PeopleInjector \
+	accumulo $(PACKAGE).injectors.PeopleInjector \
 	-i $$INSTANCE \
-	-t $(TABLE_PEOPLE) \
+	-t $$ACCUMULO_DEFAULT_TABLE \
 	-p $$ACCUMULO_PASSWORD \
 	-u root
+
+
+delete_table: ## Delete the default table
+	accumulo shell -u root -p $$ACCUMULO_PASSWORD -e "deletetable $$ACCUMULO_DEFAULT_TABLE"
 
 
 help: ## Show this help
