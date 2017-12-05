@@ -2,7 +2,6 @@ package project.industrial;
 
 import project.industrial.injectors.PeopleInjector;
 import project.industrial.mining.GetAll;
-import project.industrial.mining.GetByKey;
 import project.industrial.examples.*;
 import project.industrial.mining.GetByList;
 import project.industrial.mining.GetByRange;

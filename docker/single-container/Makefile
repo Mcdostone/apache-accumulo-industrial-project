@@ -42,7 +42,7 @@ get_list:  ## Returns the row where row IDs are in the list
 
 
 get_key:  ## Returns the row which corresponds to the given rowId
-	accumulo $(PACKAGE).mining.GetByKey \
+	accumulo $(PACKAGE).GetByKey \
 	-i $$INSTANCE \
 	-u root \
 	-p $$ACCUMULO_PASSWORD \
