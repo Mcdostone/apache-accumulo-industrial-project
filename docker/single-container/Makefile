@@ -1,6 +1,9 @@
 .DEFAULT_GOAL=help
 .PHONY: help cross-language sequential-batch-writer
 PORT_THRIFT_SERVER=42424
+TABLE_PEOPLE=people
+GET_KEY=famous_people_4
+
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -18,7 +21,17 @@ start_thrift_server: ## Start the accumulo thrift server
 	accumulo proxy -p $$ACCUMULO_HOME/proxy/proxy.properties & \
 	sleep 5; \
 
+get_key: partitioning ## Returns the row which corresponds to the given rowId
+	accumulo project.industrial.GetKey \
+	-i $$INSTANCE \
+	-u root \
+	-p $$ACCUMULO_PASSWORD \
+	-t $(TABLE_PEOPLE) \
+	--rowId $(GET_KEY);
+
+
 scan_table: ## Scan all the rows of given table
+	@if -z echo $(rowId); then \
 	accumulo project.industrial.Scan \
 	-i $$INSTANCE \
 	-u root \
@@ -30,7 +43,7 @@ partitioning: ## Write some data if a given prefix
 	-i $$INSTANCE \
 	-u root \
 	-p $$ACCUMULO_PASSWORD \
-	--table "people" \
+	--table $(TABLE_PEOPLE) \
 	--prefix "famous_people"
 
 cross-language: start_thrift_server ## Optional feature: Other programming languages to interact with accumulo
