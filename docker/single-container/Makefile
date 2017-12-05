@@ -17,9 +17,12 @@ get_all: ## Scan all the rows of given table
 	-t $$ACCUMULO_DEFAULT_TABLE
 
 
+get_key: partitioning ## Returns the row which corresponds to the given rowId
+
 get_range:  ## Returns all rows where row IDs are in the range
 	@echo "Inserting some basic data: 'make partitioning'"
 	@$(MAKE) partitioning > /dev/null
+
 	accumulo project.industrial.GetKey \
 	-i $$INSTANCE \
 	-u root \
