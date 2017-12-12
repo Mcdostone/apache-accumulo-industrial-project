@@ -77,7 +77,8 @@ print_info() {
 create_default_table() {
     if [ ! -z "$ACCUMULO_DEFAULT_TABLE" ]; then
         log info "Creating the default table '$ACCUMULO_DEFAULT_TABLE'"
-        accumulo shell -u root -p $ACCUMULO_PASSWORD -e "createtable $ACCUMULO_DEFAULT_TABLE"
+        accumulo shell -u root -p $ACCUMULO_PASSWORD -e \
+        "createtable $ACCUMULO_DEFAULT_TABLE -prop table.iterator.scan.vers.opt.maxVersions=3"
     else
         log warn "There is no default table to create"
     fi
