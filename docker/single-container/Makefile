@@ -132,6 +132,13 @@ inject_column: ## Inject the column 'gender' into the table
 	-p $$ACCUMULO_PASSWORD \
 	-u root
 
+updateRow: ## Update a row
+	accumulo $(PACKAGE).Update \
+	-i $$INSTANCE \
+	-u root \
+	-p $$ACCUMULO_PASSWORD \
+	--table $$ACCUMULO_DEFAULT_TABLE
+
 
 ###############################################################
 ###   USEFUL RULES   ###
