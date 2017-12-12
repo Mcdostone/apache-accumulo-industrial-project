@@ -87,6 +87,13 @@ cross-language: start_thrift_server ## Optional feature: Other programming langu
 	echo "Execute 'python examples/analytics.py'"; \
 	python examples/analytics.py
 
+addTwice: ## Add two identical rows
+	accumulo $(PACKAGE).AddTwice \
+	-i $$INSTANCE \
+	-u root \
+	-p $$ACCUMULO_PASSWORD \
+	--table $$ACCUMULO_DEFAULT_TABLE
+
 
 ###############################################################
 ###   USEFUL RULES   ###
