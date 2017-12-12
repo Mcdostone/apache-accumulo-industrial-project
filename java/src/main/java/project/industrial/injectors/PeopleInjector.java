@@ -47,8 +47,8 @@ public class PeopleInjector {
         String line;
         int countLine = 1;
         try {
+            reader.readLine();
             while((line = reader.readLine()) != null) {
-                reader.readLine();
                 String[] data = line.split("\t");
                 this.bw.addMutations(createMutations(countLine, data));
                 countLine++;
