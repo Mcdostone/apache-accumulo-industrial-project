@@ -58,14 +58,33 @@ delete_row: ## Deletes rows matching range, column family and colum qualifier
 	--ranges -row_10,row_20-row_30,row_70-
 	--colfam colfam
 	--colqual colqual_2
+	
+get_regex: ## Returns row matching the given regex
+	accumulo $(PACKAGE).mining.GetByRegex \
+	-i $$INSTANCE \
+	-u root \
+	-p $$ACCUMULO_PASSWORD \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	--row .*4.*
+	--colfam col.*
+	--colqual .*1.*
+	--value .*3.*
 
 sequential-batch-writer: ## This is a example on how write a rule
-	accumulo org.apache.accumulo.examples.simple.client.SequentialBatchWriter -i $$INSTANCE \
+	accumulo org.apache.accumulo.examples.simple.client.SequentialBatchWriter\
+	-i $$INSTANCE \
 	-t $$ACCUMULO_DEFAULT_TABLE \
 	-p $$ACCUMULO_PASSWORD \
 	-u root \
 	--size 50 --num 100 
 
+set_ttl: ## Set a time-to-live for a given table. After that, all rows will be deleted
+	accumulo $(PACKAGE).SetTTL \
+	-i $$INSTANCE \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	-p $$ACCUMULO_PASSWORD \
+	-u root \
+	-ttl 30000
 
 start_thrift_server: ## Start the accumulo thrift server
 	@sed -i "s/50096/$(PORT_THRIFT_SERVER)/" pyaccumulo/settings.py
