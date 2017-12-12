@@ -48,9 +48,9 @@ public class InsertWithBatchWriter {
       connector.tableOperations().create(opts.getTableName());
     BatchWriter bw = mtbw.getBatchWriter(opts.getTableName());
 
-    Text colf = new Text("colfam");
+    Text colf = new Text("colfam2");
     System.out.println("writing ...");
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 100000; i++) {
       Mutation m = new Mutation(new Text(String.format("row_%d", i)));
       for (int j = 0; j < 5; j++) {
         m.put(colf, new Text(String.format("colqual_%d", j)), new Value((String.format("value_%d_%d", i, j)).getBytes()));

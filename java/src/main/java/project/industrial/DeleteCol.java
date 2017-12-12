@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
-import project.industrial.DeleteRow.Opts;
+import project.industrial.GeneralDelete.Opts;
 
 public class DeleteCol {
 	

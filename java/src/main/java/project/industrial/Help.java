@@ -2,10 +2,10 @@ package project.industrial;
 
 import project.industrial.injectors.AddColumn;
 import project.industrial.injectors.PeopleInjector;
-import project.industrial.mining.GetAll;
 import project.industrial.examples.*;
 import project.industrial.mining.GetByList;
 import project.industrial.mining.GetByRange;
+import project.industrial.mining.GeneralScan;
 
 import java.io.IOException;
 import java.util.ArrayList;
