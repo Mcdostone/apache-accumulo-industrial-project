@@ -11,7 +11,7 @@ GET_KEY=4
 
 
 get_all: ## Scan all the rows of given table
-	accumulo $(PACKAGE).mining.GetAll \
+	accumulo $(PACKAGE).mining.GeneralScan \
 	-i $$INSTANCE \
 	-u root \
 	-p $$ACCUMULO_PASSWORD \
@@ -49,6 +49,15 @@ get_key:  ## Returns the row which corresponds to the given rowId
 	-t $$ACCUMULO_DEFAULT_TABLE \
 	--id $(GET_KEY)
 	
+delete_row: ## Deletes rows matching range, column family and colum qualifier
+	accumulo $(PACKAGE).GeneralDelete \
+	-i $$INSTANCE \
+	-u root \
+	-p $$ACCUMULO_PASSWORD \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	--ranges -row_10,row_20-row_30,row_70-
+	--colfam colfam
+	--colqual colqual_2
 
 sequential-batch-writer: ## This is a example on how write a rule
 	accumulo org.apache.accumulo.examples.simple.client.SequentialBatchWriter -i $$INSTANCE \
