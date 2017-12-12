@@ -1,9 +1,13 @@
 package project.industrial;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.cli.ScannerOpts;
 import org.apache.accumulo.core.client.*;
 import org.apache.accumulo.core.data.Range;
+import org.apache.hadoop.io.Text;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
@@ -15,10 +19,12 @@ public class Scan {
 	 * Optional arguments for the Scan class
 	 */
 	public static class Opts extends ClientOnRequiredTable {
-	    @Parameter(names = "--min", description = "minimum row that will be scanned")
-	    String min = "";
-	    @Parameter(names = "--max", description = "maximum row that will be scanned")
-	    String max = "";
+		@Parameter(names = "--ranges", description = "',' delimited list of row ranges 'min-max' that will be deleted")
+	    String ranges = "";
+	    @Parameter(names = "--colfam", description = "column family of row that will be deleted")
+	    String colfam = "";
+	    @Parameter(names = "--colqual", description = "column qualifier row that will be deleted")
+	    String colqual = "";
 	  }
 	
 	private static Logger logger = Logger.getLogger(Scan.class);
@@ -34,7 +40,7 @@ public class Scan {
 	    opts.parseArgs(Scan.class.getName(), args, sOpts);
 
 	    Connector connector = opts.getConnector();
-	    Scanner scanner = connector.createScanner(opts.getTableName(), opts.auths);
+	    BatchScanner scanner = connector.createBatchScanner(opts.getTableName(), opts.auths, 2);
 
 
 	    /*
@@ -42,6 +48,7 @@ public class Scan {
 	     *  So there is nothing to change for a full scan
 	     */
 	    
+	    /*
 	    System.out.println("Scanning " + opts.getTableName());
 	    if (!opts.min.equals("")) {
 	    	if (!opts.max.equals("")) {
@@ -59,6 +66,50 @@ public class Scan {
 	    		System.out.println("scanning to row " + opts.max);
 	    	}
 	    }
+	 */   
+	    
+	 // Get the ranges
+	    
+	    Collection<Range> ranges = new ArrayList<Range>();
+	    
+	    if(opts.ranges.equals("")) {
+	    	ranges.add(new Range());
+	    }
+	    else {
+	    	String[] splitRanges = opts.ranges.split(",");
+		    int i;
+		    for (i=0; i < splitRanges.length; i++ ) {
+		    	String[] array = splitRanges[i].split("-");
+		    	Text min = null;
+		    	Text max = null;
+		    	if (!splitRanges[i].startsWith("-")) {
+		    		min = new Text(array[0]);
+		    		if (array.length > 1) {
+		    			max = new Text(array[1]);
+		    		}
+		    	}
+		    	else {
+		    		if (array.length < 3) {
+		    			max = new Text(array[1]);
+		    		}
+		    	}
+		    	ranges.add(new Range(min, max));
+		    }
+	    }
+	    
+		scanner.setRanges(ranges);
+		
+		// restrict to colqual and colfam if specified
+		if (opts.colqual.equals("")) {
+			if (opts.colfam.equals("")) {
+			}
+			else {
+				scanner.fetchColumnFamily(new Text(opts.colfam));
+			}
+		}
+		else {
+			scanner.fetchColumn(new Text(opts.colfam), new Text(opts.colqual));
+		}
 	    
 	    // Printing all the scanned rows
 	    System.out.println("Results ->");

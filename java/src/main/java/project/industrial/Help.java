@@ -30,6 +30,8 @@ public class Help {
         classes.add(PartitioningBatchWriter.class);
         classes.add(GetByKey.class);
         classes.add(Scan.class);
+        classes.add(DeleteRow.class);
+        classes.add(DeleteCol.class);
         classes.add(PeopleInjector.class);
         System.out.printf("%d java classes available:\n", classes.size());
         for(Class c: classes)
