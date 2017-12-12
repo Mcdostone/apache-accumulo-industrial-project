@@ -1,7 +1,11 @@
 package project.industrial;
 
-import project.industrial.mining.GetByKey;
+import project.industrial.injectors.AddColumn;
+import project.industrial.injectors.PeopleInjector;
+import project.industrial.mining.GetAll;
 import project.industrial.examples.*;
+import project.industrial.mining.GetByList;
+import project.industrial.mining.GetByRange;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +20,6 @@ import java.util.List;
 public class Help {
 
     public static void main(String[] args) throws IOException {
-        // Disable logger
         List<Class<?>> classes = new ArrayList<>();
         classes.add(Flush.class);
         classes.add(RandomBatchScanner.class);
@@ -28,11 +31,15 @@ public class Help {
         classes.add(TraceDumpExample.class);
         classes.add(TracingExample.class);
         classes.add(PartitioningBatchWriter.class);
+        classes.add(AddColumn.class);
+        classes.add(GetByRange.class);
+        classes.add(GetByList.class);
         classes.add(GetByKey.class);
         classes.add(GeneralScan.class);
         classes.add(GeneralDelete.class);
         classes.add(DeleteCol.class);
         classes.add(PeopleInjector.class);
+        classes.add(AddTwice.class);
         System.out.printf("%d java classes available:\n", classes.size());
         for(Class c: classes)
             System.out.printf("\t%s\n", c.getName());

@@ -17,13 +17,14 @@ ENV ACCUMULO_MONITOR_BIND_ALL="true"
 ADD ./*.tar.gz ./
 
 RUN apk add --update --no-cache bash git python python-dev py-pip build-base; \
-    apk add --update --no-cache libxtst libxi libxrender bash-completion; \
+    apk add --update --no-cache libxtst libxi libxrender bash-completion maven; \
     sed -i 's?mktemp -d /tmp/accumulo-native.XXXX?mktemp -d /tmp/accumulo-native.XXXXXX?g' ${ACCUMULO_HOME}/bin/build_native_library.sh; \
     ${ACCUMULO_HOME}/bin/build_native_library.sh; \
     cp ${ACCUMULO_HOME}/conf/examples/${ACCUMULO_MEM}/standalone/* ${ACCUMULO_HOME}/conf; \
     echo -e "\nexport ACCUMULO_MONITOR_BIND_ALL=\"true\"" >> ${ACCUMULO_HOME}/conf/accumulo-env.sh; \
     cp ${ZOOKEEPER_HOME}/conf/zoo_sample.cfg ${ZOOKEEPER_HOME}/conf/zoo.cfg; \
-    ln -s ${ACCUMULO_HOME}/bin/start-all.sh /usr/bin/accumulo-start-all-sh
+    ln -s ${ACCUMULO_HOME}/bin/start-all.sh /usr/bin/accumulo-start-all-sh; \
+    git clone https://github.com/apache/accumulo-testing.git
 
 ADD ./entrypoint.sh /usr/bin/
 ADD ./reminder.sh /usr/bin/

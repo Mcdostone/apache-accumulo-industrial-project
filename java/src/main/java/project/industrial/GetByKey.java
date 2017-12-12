@@ -1,4 +1,4 @@
-package project.industrial.mining;
+package project.industrial;
 
 import com.beust.jcommander.Parameter;
 import org.apache.accumulo.core.cli.ClientOnRequiredTable;
@@ -6,7 +6,6 @@ import org.apache.accumulo.core.cli.ScannerOpts;
 import org.apache.accumulo.core.client.*;
 import org.apache.accumulo.core.data.Range;
 import org.apache.log4j.Logger;
-import project.industrial.Printer;
 
 /**
  * Fetch logical row with a given rowId.
@@ -18,7 +17,7 @@ public class GetByKey {
 	private static Logger logger = Logger.getLogger(GetByKey.class);
 
 	static class Opts extends ClientOnRequiredTable {
-		@Parameter(names = "--rowId", required = true, description = "the rowId you want to to retrieve")
+		@Parameter(names = "--id", required = true, description = "the rowId you want to to retrieve")
 		String rowId = null;
 	}
 

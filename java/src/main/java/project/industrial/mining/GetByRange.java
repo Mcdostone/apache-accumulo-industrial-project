@@ -7,6 +7,7 @@ import org.apache.accumulo.core.client.*;
 import org.apache.accumulo.core.data.Range;
 import org.apache.hadoop.io.Text;
 import org.apache.log4j.Logger;
+import project.industrial.GetByKey;
 import project.industrial.Printer;
 
 /**
@@ -18,9 +19,9 @@ public class GetByRange {
     private static Logger logger = Logger.getLogger(GetByKey.class);
 
     static class Opts extends ClientOnRequiredTable {
-        @Parameter(names = "--start", required = true, description = "the beginning of range")
+        @Parameter(names = "--startAt", required = true, description = "the beginning of range")
         String start = null;
-        @Parameter(names = "--end", required = true, description = "the end of range")
+        @Parameter(names = "--endAt", required = true, description = "the end of range")
         String end = null;
         @Parameter(names = "--filter", description = "Filter by column name cf:cq")
         String filter = null;
