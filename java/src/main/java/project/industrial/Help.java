@@ -32,10 +32,12 @@ public class Help {
         classes.add(TracingExample.class);
         classes.add(PartitioningBatchWriter.class);
         classes.add(AddColumn.class);
-        classes.add(GetAll.class);
         classes.add(GetByRange.class);
         classes.add(GetByList.class);
         classes.add(GetByKey.class);
+        classes.add(GeneralScan.class);
+        classes.add(GeneralDelete.class);
+        classes.add(DeleteCol.class);
         classes.add(PeopleInjector.class);
         classes.add(AddTwice.class);
         classes.add(Update.class);
