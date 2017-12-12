@@ -1,5 +1,6 @@
 package project.industrial;
 
+import project.industrial.injectors.AddColumn;
 import project.industrial.injectors.PeopleInjector;
 import project.industrial.mining.GetAll;
 import project.industrial.examples.*;
@@ -19,7 +20,6 @@ import java.util.List;
 public class Help {
 
     public static void main(String[] args) throws IOException {
-        // Disable logger
         List<Class<?>> classes = new ArrayList<>();
         classes.add(Flush.class);
         classes.add(RandomBatchScanner.class);
@@ -31,6 +31,7 @@ public class Help {
         classes.add(TraceDumpExample.class);
         classes.add(TracingExample.class);
         classes.add(PartitioningBatchWriter.class);
+        classes.add(AddColumn.class);
         classes.add(GetAll.class);
         classes.add(GetByRange.class);
         classes.add(GetByList.class);
