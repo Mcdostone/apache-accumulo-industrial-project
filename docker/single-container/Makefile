@@ -57,6 +57,7 @@ sequential-batch-writer: ## This is a example on how write a rule
 	-u root \
 	--size 50 --num 100 
 
+
 start_thrift_server: ## Start the accumulo thrift server
 	@sed -i "s/50096/$(PORT_THRIFT_SERVER)/" pyaccumulo/settings.py
 	@sed -i "s/secret/$$ACCUMULO_PASSWORD/" pyaccumulo/settings.py	
@@ -71,6 +72,7 @@ partitioning: ## Write some data if a given prefix
 	-p $$ACCUMULO_PASSWORD \
 	--table $$ACCUMULO_DEFAULT_TABLE \
 	--prefix "famous_people"
+
 
 cross-language: start_thrift_server ## Optional feature: Other programming languages to interact with accumulo
 	@if [ ! -d pyaccumulo ]; then \
@@ -95,10 +97,17 @@ addTwice: ## Add two identical rows
 	--table $$ACCUMULO_DEFAULT_TABLE
 
 
+inject_column: ## Inject the column 'gender' into the table
+	accumulo $(PACKAGE).injectors.AddColumn \
+	-i $$INSTANCE \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	-p $$ACCUMULO_PASSWORD \
+	-u root
+
+
 ###############################################################
 ###   USEFUL RULES   ###
 ###############################################################
-
 
 inject_data: ## Inject some data into accumulo
 	accumulo $(PACKAGE).injectors.PeopleInjector \

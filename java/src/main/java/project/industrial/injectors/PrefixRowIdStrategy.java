@@ -7,7 +7,6 @@ public class PrefixRowIdStrategy implements RowIdStrategy{
         this.prefix = prefix;
     }
 
-
     @Override
     public String getRowId(String rowId) {
         return String.format("%s_%s", this.prefix, rowId);
