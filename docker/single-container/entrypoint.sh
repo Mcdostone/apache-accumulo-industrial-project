@@ -52,6 +52,7 @@ start_hdfs() {
 start_accumulo() {
     log INFO "Initialize accumulo"
     echo "accumulo init --instance-name $INSTANCE --password $ACCUMULO_PASSWORD"
+    sleep 10
     accumulo init --instance-name $INSTANCE --password $ACCUMULO_PASSWORD
     if [ $? -ne 0 ]; then
         log warn "Cannot initialize accumulo"
