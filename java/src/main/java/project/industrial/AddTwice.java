@@ -21,21 +21,20 @@ public class AddTwice {
 
     public static void main( String[] args) throws AccumuloException, AccumuloSecurityException, TableExistsException, TableNotFoundException{
         logger.info("IN");
-
         ClientOnRequiredTable opts = new ClientOnRequiredTable();
         BatchWriterOpts bwOpts = new BatchWriterOpts();
         opts.parseArgs(InsertWithBatchWriter.class.getName(), args, bwOpts);
         Connector connector = opts.getConnector();
-        if (!connector.tableOperations().exists(opts.getTableName()))
-            connector.tableOperations().create(opts.getTableName());
 
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
         Mutation mut1= new Mutation(new Text("azerty2"));
         Mutation mut2 = new Mutation(new Text("azerty2"));
         Mutation mut3 = new Mutation(new Text("azerty2"));
-        mut1.put("CF1","CQ1",123456, "foo");
+        mut1.put("CF1","CQ1",123456, "foo1");
         mut2.put("CF1","CQ1",123456, "foo2");
+        mut3.put("CF1","CQ1",123456, "foo4");
         mut3.put("CF1","CQ1",123456, "foo3");
+
         bw.addMutation(mut1);
         bw.addMutation(mut2);
         bw.addMutation(mut3);
