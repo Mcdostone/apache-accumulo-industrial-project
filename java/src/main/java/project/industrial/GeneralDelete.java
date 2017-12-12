@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
-public class DeleteRow {
+public class GeneralDelete {
 
 	/**
 	 * Example : -u root -p root -i accumulo -t my_table -ranges row_7910-row_7920,row_7940-,-row_10 --colfam colfam --colqual colqual_2
@@ -38,7 +38,7 @@ public class DeleteRow {
 	    String colqual = "";
 	  }
 	
-	private static Logger logger = Logger.getLogger(DeleteRow.class);
+	private static Logger logger = Logger.getLogger(GeneralDelete.class);
 
 	/**
 	   * Delete rows in an Accumulo table.
@@ -47,7 +47,7 @@ public class DeleteRow {
 	  public static void main(String[] args) throws AccumuloException, AccumuloSecurityException, TableNotFoundException {
 		Opts opts = new Opts();
 		BatchWriterOpts bwOpts = new BatchWriterOpts();
-	    opts.parseArgs(DeleteRow.class.getName(), args, bwOpts);
+	    opts.parseArgs(GeneralDelete.class.getName(), args, bwOpts);
 
 	    Connector connector = opts.getConnector();
 

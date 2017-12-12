@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
-public class Scan {
+public class GeneralScan {
 
 
 	/**
@@ -27,7 +27,7 @@ public class Scan {
 	    String colqual = "";
 	  }
 	
-	private static Logger logger = Logger.getLogger(Scan.class);
+	private static Logger logger = Logger.getLogger(GeneralScan.class);
 
 	/**
 	   * Scans an Accumulo table using a {@link Scanner}.
@@ -37,7 +37,7 @@ public class Scan {
 	  public static void main(String[] args) throws AccumuloException, AccumuloSecurityException, TableNotFoundException {
 		Opts opts = new Opts();
 	    ScannerOpts sOpts = new ScannerOpts();
-	    opts.parseArgs(Scan.class.getName(), args, sOpts);
+	    opts.parseArgs(GeneralScan.class.getName(), args, sOpts);
 
 	    Connector connector = opts.getConnector();
 	    BatchScanner scanner = connector.createBatchScanner(opts.getTableName(), opts.auths, 2);
