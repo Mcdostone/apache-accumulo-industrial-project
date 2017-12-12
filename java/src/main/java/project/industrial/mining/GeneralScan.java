@@ -1,4 +1,4 @@
-package project.industrial;
+package project.industrial.mining;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +11,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
+
+import project.industrial.Printer;
 
 public class GeneralScan {
 
@@ -41,32 +43,6 @@ public class GeneralScan {
 
 	    Connector connector = opts.getConnector();
 	    BatchScanner scanner = connector.createBatchScanner(opts.getTableName(), opts.auths, 2);
-
-
-	    /*
-	     *  By default, the range is (-Inf, +Inf)
-	     *  So there is nothing to change for a full scan
-	     */
-	    
-	    /*
-	    System.out.println("Scanning " + opts.getTableName());
-	    if (!opts.min.equals("")) {
-	    	if (!opts.max.equals("")) {
-	    		scanner.setRange(new Range(opts.min, opts.max));
-	    		System.out.println("Scanning from row : " + opts.min + " to row : " + opts.max);
-	    	}
-	    	else {
-	    		scanner.setRange(new Range(opts.min, null));
-	    		System.out.println("Scanning from row : " + opts.min);
-	    	}
-	    }
-	    else {
-	    	if (!opts.max.equals("")) {
-	    		scanner.setRange(new Range(null,opts.max));
-	    		System.out.println("scanning to row " + opts.max);
-	    	}
-	    }
-	 */   
 	    
 	 // Get the ranges
 	    

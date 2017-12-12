@@ -25,12 +25,12 @@ public class GeneralDelete {
 	/**
 	 * Example : -u root -p root -i accumulo -t my_table -ranges row_7910-row_7920,row_7940-,-row_10 --colfam colfam --colqual colqual_2
 	 * 
-	 * Optional arguments for the DeleteRow class : restrict the rows to delete.
+	 * Optional arguments for the GeneralDelete class : restrict the rows to delete.
 	 * with no --colqual : delete all the rows matching ranges and colfam
 	 * with no --colfam : delete all the rows matching ranges
 	 */
 	public static class Opts extends ClientOnRequiredTable {
-	    @Parameter(names = "-ranges", required = true,   description = "',' delimited list of row ranges 'min-max' that will be deleted")
+	    @Parameter(names = "--ranges", description = "',' delimited list of row ranges 'min-max' that will be deleted")
 	    String ranges = "";
 	    @Parameter(names = "--colfam", description = "column family of row that will be deleted")
 	    String colfam = "";
