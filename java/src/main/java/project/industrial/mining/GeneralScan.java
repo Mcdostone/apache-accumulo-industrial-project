@@ -43,7 +43,7 @@ public class GeneralScan {
 
 	    Connector connector = opts.getConnector();
 	    BatchScanner scanner = connector.createBatchScanner(opts.getTableName(), opts.auths, 2);
-	    
+
 	 // Get the ranges
 	    
 	    Collection<Range> ranges = new ArrayList<Range>();
