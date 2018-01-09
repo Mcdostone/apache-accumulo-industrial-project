@@ -33,8 +33,7 @@ From the documentation [https://accumulo.apache.org/1.8/accumulo_user_manual.htm
 
 ### OpenTSDB
 
-[https://github.com/ericnewton/accumulo-opentsdb]()https://github.com/ericnewton/accumulo-opentsdb
-
+[https://github.com/ericnewton/accumulo-opentsdb](https://github.com/ericnewton/accumulo-opentsdb)
 
 ## Configure your TSDB in accumulo:
 
