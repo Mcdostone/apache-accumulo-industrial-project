@@ -1,0 +1,7 @@
+# Configuration d'Accumulo pour envoyer ses métriques dans Graphite
+
+## Dans ACCUMULO_HOME/conf/hadoop-metrics2-accumulo.properties :
+
+- décommenter tous les sink que l'on veut
+
+- décommenter les lignes de configuration Graphite. C'est là que l'on peut modifier l'adresse et le port du serveur
