@@ -6,5 +6,6 @@ public class Help {
         project.industrial.features.Help.main(args);
         System.out.println();
         project.industrial.benchmark.Help.main(args);
+        System.out.println();
     }
 }

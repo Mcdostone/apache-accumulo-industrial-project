@@ -27,7 +27,8 @@ public class CSVMutationBuilderStrategy implements MutationBuilderStrategy {
 
     @Override
     public Mutation buildMutation(String data) {
-        Mutation mutation = new Mutation();
+        String key = String.format("%s_%s", data.split(" ")[0], data.split(" ")[1]);
+        Mutation mutation = new Mutation(key);
         mutation.put(new Text(this.cf), new Text(this.cq), new ColumnVisibility(), new Value(data));
         return mutation;
     }

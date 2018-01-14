@@ -40,4 +40,9 @@ public class InjectorTask implements Task {
         @Parameter(names = "--csv", required = true, description = "The CSV file containing data you want to store")
         String csv = null;
     }
+
+    public static void main(String[] args) throws Exception {
+        Task task = new InjectorTask(args);
+        task.execute();
+    }
 }
