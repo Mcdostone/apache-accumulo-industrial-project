@@ -28,7 +28,7 @@ inject_data: ## Inject some data into accumulo
 
 
 download_dataset: ## Download the dataset from github
-	-wget -nc $(DATASET_URL) .
+	wget $(DATASET_URL) .
 
 
 delete_table: ## Delete the default table
