@@ -1,8 +1,6 @@
 package project.industrial.benchmark.scenarios;
 
-import com.beust.jcommander.Parameter;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
-import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
 import project.industrial.benchmark.core.CSVInjector;
@@ -14,7 +12,7 @@ public class DataRateInjectionScenario extends Scenario {
     private Injector injector;
 
     public DataRateInjectionScenario(Injector injector) {
-        super("Data rate injection", 1000);
+        super("Data rate injection");
         this.injector = injector;
         this.injector.prepareMutations();
     }
@@ -24,26 +22,20 @@ public class DataRateInjectionScenario extends Scenario {
         long begin = System.currentTimeMillis();
         this.injector.inject();
         long end = System.currentTimeMillis();
-        this.checkDuration(begin, end);
+        this.checkMaxDuration(1000, begin, end);
     }
 
     public static void main(String[] args) throws Exception {
-        Opts opts = new Opts();
+        InjectorOpts opts = new InjectorOpts();
         BatchWriterOpts bwOpts = new BatchWriterOpts();
         opts.parseArgs(DataRateInjectionScenario.class.getName(), args, bwOpts);
         Connector connector = opts.getConnector();
+
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
+
         Injector injector = new CSVInjector(bw, opts.csv);
         Scenario scenario = new DataRateInjectionScenario(injector);
-        try {
-            scenario.action();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
+        scenario.action();
     }
 
-    static class Opts extends ClientOnRequiredTable {
-        @Parameter(names = "--csv", required = true, description = "The CSV file containing data you want to store")
-        String csv = null;
-    }
 }

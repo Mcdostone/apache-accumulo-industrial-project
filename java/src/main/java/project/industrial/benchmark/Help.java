@@ -1,5 +1,6 @@
 package project.industrial.benchmark;
 
+import project.industrial.benchmark.scenarios.DataAvailabilityTimeScenario;
 import project.industrial.benchmark.scenarios.DataRateInjectionScenario;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class Help {
     public static void main(String[] args) {
         List<Class<?>> classes = new ArrayList<>();
         classes.add(DataRateInjectionScenario.class);
+        classes.add(DataAvailabilityTimeScenario.class);
         System.out.printf("%d java classes available for the benchmark:\n", classes.size());
         for(Class c: classes)
             System.out.printf("\t%s\n", c.getName());

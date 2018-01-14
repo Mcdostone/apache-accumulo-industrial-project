@@ -1,5 +1,5 @@
 .DEFAULT_GOAL=help
-.PHONY: help cross-language sequential-batch-writer
+.PHONY: help create_table delete_table reset_table download_dataset
 PACKAGE_ROOT=project.industrial
 PACKAGE=$(PACKAGE_ROOT).benchmark
 PORT_THRIFT_SERVER=42424
@@ -20,6 +20,15 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-p $$ACCUMULO_PASSWORD \
 	--csv $(DATASET_FILE) \
 	-u root
+
+data_availability_time_scenario: ## test availability of data after injection, 10s for key access, 10min for mining
+	accumulo $(PACKAGE).scenarios.DataAvailabilityTimeScenario \
+	-i $$INSTANCE \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	-p $$ACCUMULO_PASSWORD \
+	--csv $(DATASET_FILE) \
+	--key 57562 \
+	-u root
 	
 
 ###############################################################
@@ -29,6 +38,9 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 
 download_dataset: ## Download the dataset from github
 	wget $(DATASET_URL) .
+
+
+reset_table: delete_table create_table ## Delete and create the table
 
 
 delete_table: ## Delete the default table

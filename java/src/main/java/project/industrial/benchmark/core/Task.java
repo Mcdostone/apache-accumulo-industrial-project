@@ -1,5 +1,7 @@
 package project.industrial.benchmark.core;
 
-public interface Task extends Runnable {
+import java.util.concurrent.Callable;
+
+public interface Task extends Callable {
 
 }

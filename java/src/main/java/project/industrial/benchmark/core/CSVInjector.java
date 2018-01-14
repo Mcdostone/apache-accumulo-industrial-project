@@ -42,6 +42,7 @@ public class CSVInjector implements Injector {
         try {
             reader = new BufferedReader(new FileReader(csvFile));
             while((line = reader.readLine()) != null) {
+                line.substring(0, line.length() - 2);
                 this.mutations.add(this.mutationBuilder.buildMutation(String.valueOf(countLine), line));
                 totalChars += line.length();
                 countLine++;
