@@ -13,8 +13,8 @@ DATASET_FILE=$(join $(DIR), $(notdir $(DATASET_URL)))
 ###############################################################
 
 
-inject_data: ## Inject some data into accumulo
-	accumulo $(PACKAGE).tasks.InjectorTask \
+data_rate_injection_scenario: ## test the data rate injection, 80000 objects per second
+	accumulo $(PACKAGE).scenarios.DataRateInjectionScenario \
 	-i $$INSTANCE \
 	-t $$ACCUMULO_DEFAULT_TABLE \
 	-p $$ACCUMULO_PASSWORD \
