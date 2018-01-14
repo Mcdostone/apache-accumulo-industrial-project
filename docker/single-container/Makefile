@@ -1,6 +1,6 @@
 .DEFAULT_GOAL=help
 .PHONY: help cross-language sequential-batch-writer
-PACKAGE=project.industrial
+PACKAGE=project.industrial.features
 PORT_THRIFT_SERVER=42424
 GET_KEY=4
 
