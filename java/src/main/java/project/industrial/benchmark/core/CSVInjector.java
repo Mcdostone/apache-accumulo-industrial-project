@@ -63,9 +63,15 @@ public class CSVInjector implements Injector {
 
     public int inject() throws MutationsRejectedException {
         this.bw.addMutations(this.mutations);
-        this.bw.flush();
-        this.bw.close();
         return this.mutations.size();
+    }
+
+    public void flush() throws MutationsRejectedException {
+        this.bw.flush();
+    }
+
+    public void close() throws MutationsRejectedException {
+        this.bw.close();
     }
 
 }

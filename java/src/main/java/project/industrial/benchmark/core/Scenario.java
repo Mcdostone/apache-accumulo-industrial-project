@@ -12,26 +12,19 @@ public abstract class Scenario {
         this.name = name;
     }
 
-    public void assertMaxDuration(long expected, long begin, long end) throws ScenarioNotRespectedException {
-        long duration = end - begin;
-        if(duration > expected) {
-            String message = String.format(
-                    "Problem with the '%s' scenario, expected to be finished in %d ms but took %d ms",
-                    this.name,
-                    expected,
-                    duration
-            );
+    public void assertTrue(String message, boolean condition) throws Exception {
+        if(!condition)
             throw new ScenarioNotRespectedException(message);
-        }
-        else {
-            logger.info(String.format("Task finished in %d ms < %d", duration, expected));
-        }
     }
 
-    public void assertEquals(Object expected, Object given, String message) throws Exception {
-        if(!expected.equals(given)) {
-            logger.debug(String.format("Expected %s, given %s", expected, given));
-            throw new ScenarioNotRespectedException(message);
+    public void assertFalse(String message, boolean condition) throws Exception {
+        this.assertTrue(message, !condition);
+    }
+
+    public void assertEquals(String message, Object expected, Object given) throws Exception {
+        if(!given.equals(expected)) {
+            String err = String.format("Expected %s, given %s", expected, given);
+            throw new ScenarioNotRespectedException(message + " " + err);
         }
     }
 

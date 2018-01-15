@@ -23,9 +23,8 @@ public class GetAllTask implements Task {
     public Object call() throws Exception {
         int count = 0;
         logger.info("Executing a full scan");
-        for (Map.Entry<Key,Value> entry : scanner) {
+        for (Map.Entry<Key,Value> entry : scanner)
             count++;
-        }
         return count;
     }
 }

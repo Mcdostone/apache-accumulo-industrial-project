@@ -9,20 +9,35 @@ import project.industrial.benchmark.core.Scenario;
 
 public class DataRateInjectionScenario extends Scenario {
 
+    private final long nbInjectionsPerSecond;
     private Injector injector;
 
     public DataRateInjectionScenario(Injector injector) {
+        this(injector, 80000);
+    }
+
+    public DataRateInjectionScenario(Injector injector, long nbInjectionsPerSecond) {
         super("Data rate injection");
         this.injector = injector;
         this.injector.prepareMutations();
+        this.nbInjectionsPerSecond = nbInjectionsPerSecond;
     }
 
     @Override
     public void action() throws Exception {
         long begin = System.currentTimeMillis();
-        this.injector.inject();
+        int nbInjections = this.injector.inject();
+        this.injector.close();
         long end = System.currentTimeMillis();
-        this.assertMaxDuration(1000, begin, end);
+
+        long duration = end - begin;
+        long currentInjectionsPerSecond = nbInjections * 1000 / duration;
+        logger.info(String.format("Inserted %d in %d ms", nbInjections, duration));
+
+        boolean checkNbInsertions = currentInjectionsPerSecond >= this.nbInjectionsPerSecond;
+        this.assertTrue(String.format("Should insert %d object/s but have %d", this.nbInjectionsPerSecond, currentInjectionsPerSecond),
+                checkNbInsertions);
+
         this.cut();
     }
 

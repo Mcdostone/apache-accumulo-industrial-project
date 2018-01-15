@@ -24,4 +24,10 @@ public interface Injector {
      * @param builder
      */
     public void setMutationBuilderStrategy(MutationBuilderStrategy builder);
+
+
+    public void close() throws MutationsRejectedException;
+
+    public void flush() throws MutationsRejectedException;
+
 }
