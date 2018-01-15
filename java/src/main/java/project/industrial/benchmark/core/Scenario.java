@@ -1,15 +1,28 @@
 package project.industrial.benchmark.core;
 
+import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public abstract class Scenario {
 
     protected String name;
+    protected ScheduledExecutorService executorService;
     protected static Logger logger = LoggerFactory.getLogger(Scenario.class);
 
     public Scenario(String name) {
+        this(name, 1);
+    }
+
+    public Scenario(String name, int corePoolSize) {
         this.name = name;
+        this.executorService = new ScheduledThreadPoolExecutor(corePoolSize);
     }
 
     public void assertTrue(String message, boolean condition) throws Exception {
@@ -19,6 +32,15 @@ public abstract class Scenario {
 
     public void assertFalse(String message, boolean condition) throws Exception {
         this.assertTrue(message, !condition);
+    }
+
+    public int countResults(Iterator<Map.Entry<Key, Value>> iterator) {
+        int count = 0;
+        while(iterator.hasNext()) {
+            count++;
+            iterator.next();
+        }
+        return count;
     }
 
     public void assertEquals(String message, Object expected, Object given) throws Exception {

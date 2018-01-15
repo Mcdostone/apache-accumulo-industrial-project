@@ -4,8 +4,8 @@ import com.beust.jcommander.Parameter;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.*;
-import project.industrial.benchmark.core.CSVInjector;
-import project.industrial.benchmark.core.Injector;
+import project.industrial.benchmark.injectors.CSVInjector;
+import project.industrial.benchmark.injectors.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

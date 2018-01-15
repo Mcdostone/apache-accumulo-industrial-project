@@ -6,29 +6,26 @@ import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import project.industrial.benchmark.core.Task;
 
+import java.util.Iterator;
 import java.util.Map;
 
-public class GetKeyTask implements Task {
+public class GetByKeyTask implements ReaderTask {
 
     private final String keyToSearch;
-    private static final Logger logger = LoggerFactory.getLogger(GetKeyTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(GetByKeyTask.class);
 
     private Scanner scanner;
 
-    public GetKeyTask(Scanner scanner, String key) {
+    public GetByKeyTask(Scanner scanner, String key) {
         this.scanner = scanner;
         this.keyToSearch = key;
+        this.scanner.setRange(Range.exact(this.keyToSearch));
     }
 
     @Override
-    public Object call() throws Exception {
+    public Iterator<Map.Entry<Key, Value>> call() throws Exception {
         logger.info(String.format("Looking for data with key '%s'", this.keyToSearch));
-        scanner.setRange(Range.exact(this.keyToSearch));
-        for (Map.Entry<Key,Value> entry : scanner) {
-                return entry;
-        }
-        return null;
+        return this.scanner.iterator();
     }
 }
