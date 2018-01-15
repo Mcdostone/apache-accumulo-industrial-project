@@ -7,6 +7,11 @@ GET_KEY=4
 DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 DATASET_URL=https://raw.githubusercontent.com/Mcdostone/industrial-project/master/benchmark/datasets/people_descriptions.csv
 DATASET_FILE=$(join $(DIR), $(notdir $(DATASET_URL)))
+ifeq ($(DEBUG),1)
+OPTS = --debug
+else
+OPTS = 
+endif
 
 ###############################################################
 ###   PLEASE APPEND YOUR RULES AT THE END OF THE MAKEFILE   ###
@@ -19,7 +24,8 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-t $$ACCUMULO_DEFAULT_TABLE \
 	-p $$ACCUMULO_PASSWORD \
 	--csv $(DATASET_FILE) \
-	-u root
+	-u root \
+	$(OPTS)
 
 data_availability_time_scenario: ## test availability of data after injection, 10s for key access, 10min for mining
 	accumulo $(PACKAGE).scenarios.DataAvailabilityTimeScenario \
@@ -28,36 +34,40 @@ data_availability_time_scenario: ## test availability of data after injection, 1
 	-p $$ACCUMULO_PASSWORD \
 	--csv $(DATASET_FILE) \
 	--key 57562 \
-	-u root
+	-u root \
+	$(OPTS)
 
 data_rate_during_fullscan_scenario: ## test the data rate during a fullscan, must be 1 000 000 objects/s
 	accumulo $(PACKAGE).scenarios.DataRateDuringFullScanScenario \
 	-i $$INSTANCE \
 	-t $$ACCUMULO_DEFAULT_TABLE \
 	-p $$ACCUMULO_PASSWORD \
-	--csv $(DATASET_FILE) \
-	-u root
+	-u root \
+	$(OPTS)
 
 time_key_access_scenario: ## test the time for getting an object by key access, must be finished before 100ms
-	accumulo $(PACKAGE).scenarios.TimeForGettingObjectByKeyScenario \
+	accumulo $(PACKAGE).scenarios.TimeGetByKeyScenario \
 	-i $$INSTANCE \
 	-t $$ACCUMULO_DEFAULT_TABLE \
 	-p $$ACCUMULO_PASSWORD \
-	-u root
+	-u root \
+	$(OPTS)
 
 time_list_keys_access_scenario: ## test the time for getting a lists of objets by keys, must be finished before 2s
-	accumulo $(PACKAGE).scenarios.TimeForGettingObjectByKeyScenario \
+	accumulo $(PACKAGE).scenarios.TimeGetByKeysListScenario \
 	-i $$INSTANCE \
 	-t $$ACCUMULO_DEFAULT_TABLE \
 	-p $$ACCUMULO_PASSWORD \
-	-u root
+	-u root \
+	$(OPTS)
 
 sandbox_scenario: ## Some cool scenario
 	accumulo $(PACKAGE).scenarios.SandboxScenario \
 	-i $$INSTANCE \
 	-t $$ACCUMULO_DEFAULT_TABLE \
 	-p $$ACCUMULO_PASSWORD \
-	-u root
+	-u root \
+	$(OPTS)
 
 inject_data: ## Inject some data from a CSV
 	accumulo $(PACKAGE).injectors.CSVInjector \
@@ -65,8 +75,8 @@ inject_data: ## Inject some data from a CSV
 	-t $$ACCUMULO_DEFAULT_TABLE \
 	-p $$ACCUMULO_PASSWORD \
 	--csv $(DATASET_FILE) \
-	-u root
-
+	-u root \
+	$(OPTS)
 
 ###############################################################
 ###   USEFUL RULES   ###

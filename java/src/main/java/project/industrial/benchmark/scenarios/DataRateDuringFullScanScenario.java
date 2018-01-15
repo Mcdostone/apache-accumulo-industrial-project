@@ -6,7 +6,6 @@ import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.tasks.AbstractFullScanTask;
-import project.industrial.benchmark.tasks.FullScanTask;
 import project.industrial.benchmark.tasks.MeasureTimeForObjectAccessFullScanTask;
 
 import java.io.BufferedWriter;
@@ -14,17 +13,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+/**
+ * This scenario checks the data rate during a full scan.
+ * We should retrieve 1 000 000 objects per second during a full scan.
+ *
+ * @author Yann Prono
+ */
 public class DataRateDuringFullScanScenario extends Scenario {
 
-    private AbstractFullScanTask fullScan;
+    private AbstractFullScanTask<List<Long>> fullScan;
     private final long durationBetweenTwoAccesses;
 
-    public DataRateDuringFullScanScenario(AbstractFullScanTask fullScan) {
+    public DataRateDuringFullScanScenario(AbstractFullScanTask<List<Long>> fullScan) {
         super("Data rate of object during a full scan");
         this.fullScan = fullScan;
         this.durationBetweenTwoAccesses = (long) (1.0/1000000.0);
@@ -32,14 +36,14 @@ public class DataRateDuringFullScanScenario extends Scenario {
 
     @Override
     public void action() throws Exception {
-        ScheduledFuture futurMeasurements = this.executorService.schedule(this.fullScan, 0, TimeUnit.SECONDS);
-        this.processMeasurements((List<Long>) futurMeasurements.get());
+        ScheduledFuture<List<Long>> futurMeasurements = this.executorService.schedule(this.fullScan, 0, TimeUnit.SECONDS);
+        this.processMeasurements(futurMeasurements.get());
         this.executorService.shutdown();
         this.cut();
     }
 
-    public void processMeasurements(List<Long> measurements) throws Exception {
-        this.writeDataInFile(measurements);
+    private void processMeasurements(List<Long> measurements) throws Exception {
+        this.saveResultsInCSV(measurements.stream().map(String::valueOf).collect(Collectors.toList()));
         long countMeasurementsRespected = measurements.stream()
                 .filter(measure -> measure <= this.durationBetweenTwoAccesses)
                 .count();
@@ -50,19 +54,6 @@ public class DataRateDuringFullScanScenario extends Scenario {
         );
     }
 
-    private void writeDataInFile(List<Long> measurements) throws IOException {
-        String filename = Paths.get(
-                System.getProperty("user.dir"),
-                DataRateDuringFullScanScenario.class.getSimpleName() + ".csv"
-        ).toString();
-        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
-        measurements.stream().forEach(measurement -> {
-            try { bw.write(String.valueOf(measurement) + "\n"); }
-            catch (IOException e) { e.printStackTrace(); }
-        });
-        bw.close();
-    }
-
     public static void main(String[] args) throws Exception {
         ClientOnRequiredTable opts = new ClientOnRequiredTable();
         BatchWriterOpts bwOpts = new BatchWriterOpts();
@@ -71,7 +62,7 @@ public class DataRateDuringFullScanScenario extends Scenario {
 
         Scanner sc = connector.createScanner(opts.getTableName(), opts.auths);
 
-        AbstractFullScanTask getAll = new MeasureTimeForObjectAccessFullScanTask(sc);
+        AbstractFullScanTask<List<Long>> getAll = new MeasureTimeForObjectAccessFullScanTask(sc);
         Scenario scenario = new DataRateDuringFullScanScenario(getAll);
         scenario.action();
     }

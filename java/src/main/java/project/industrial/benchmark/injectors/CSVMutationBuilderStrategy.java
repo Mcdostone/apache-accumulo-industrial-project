@@ -16,7 +16,6 @@ public class CSVMutationBuilderStrategy implements MutationBuilderStrategy {
     private final String cf;
     private RowIdBuilderStrategy rowIdBuilderStrategy;
 
-
     public CSVMutationBuilderStrategy() {
         this("columnFamily", "columnQualifier");
     }

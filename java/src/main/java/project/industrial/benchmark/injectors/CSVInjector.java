@@ -1,12 +1,13 @@
 package project.industrial.benchmark.injectors;
 
 import org.apache.accumulo.core.cli.BatchWriterOpts;
-import org.apache.accumulo.core.client.*;
+import org.apache.accumulo.core.client.BatchWriter;
+import org.apache.accumulo.core.client.Connector;
+import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.data.Mutation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.MutationBuilderStrategy;
-import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.scenarios.DataRateInjectionScenario;
 import project.industrial.benchmark.scenarios.InjectorOpts;
 
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * CSV Injector reads the first column of a CSV file and prepare mutations for
+ * CSV Injector reads the first column of a CSV file to create a list of mutations for
  * the accumulo writer.
  *
  * @author Yann Prono
@@ -32,6 +33,10 @@ public class CSVInjector implements Injector {
     private MutationBuilderStrategy mutationBuilder;
     private List<String> data;
 
+    /**
+     * @param bw The BatchWriter that inject objects
+     * @param csvFile Filename of the CSV file
+     */
     public CSVInjector(BatchWriter bw, String csvFile) {
         this.csvFile = csvFile;
         this.bw = bw;

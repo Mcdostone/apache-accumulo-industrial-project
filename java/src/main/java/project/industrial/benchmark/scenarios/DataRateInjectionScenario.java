@@ -7,6 +7,12 @@ import project.industrial.benchmark.injectors.CSVInjector;
 import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.core.Scenario;
 
+/**
+ * This scenario checks the data rate injection in accumulo.
+ * We should inject 80000 objects per second
+ *
+ * @author Yann Prono
+ */
 public class DataRateInjectionScenario extends Scenario {
 
     private final long nbInjectionsPerSecond;
