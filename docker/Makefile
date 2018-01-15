@@ -37,7 +37,7 @@ transfer_jar:  ## Transfer the generated jar into the currently running containe
 		echo "There is currently no accumulo container running"; \
 	else \
 	 	$(MAKE) build_java; \
-		docker cp $$(pwd)/../java/target/features-accumulo-1.0-jar-with-dependencies.jar $$CONTAINER_ID:/opt/accumulo-$(ACCUMULO_VERSION)/lib/ext/; \
+		docker cp $$(pwd)/../java/target/sandbox-accumulo-1.0-jar-with-dependencies.jar $$CONTAINER_ID:/opt/accumulo-$(ACCUMULO_VERSION)/lib/ext/; \
 	fi	
 
 run: # Run the container with accumulo
@@ -47,7 +47,8 @@ run: # Run the container with accumulo
 		-p 50070:50070 \
 		-p 9995:9995 \
 		--name pi-accumulo \
-		-v $$(pwd)/single-container/Makefile:/opt/Makefile:rw \
+		-v $$(pwd)/single-container/features/Makefile:/opt/features/Makefile:rw \
+		-v $$(pwd)/single-container/benchmark/Makefile:/opt/benchmark/Makefile:rw \
 		pi-accumulo:latest bash
 		#-v $$(pwd)/../java/target/:$(ACCUMULO_HOME)/lib/ext/:rw
 
