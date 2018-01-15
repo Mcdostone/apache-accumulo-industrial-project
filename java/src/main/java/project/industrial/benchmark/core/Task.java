@@ -1,8 +1,7 @@
 package project.industrial.benchmark.core;
 
-import org.apache.accumulo.core.client.MutationsRejectedException;
+import java.util.concurrent.Callable;
 
-public interface Task {
+public interface Task extends Callable {
 
-    public void execute() throws MutationsRejectedException, Exception;
 }

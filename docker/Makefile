@@ -37,8 +37,16 @@ transfer_jar:  ## Transfer the generated jar into the currently running containe
 		echo "There is currently no accumulo container running"; \
 	else \
 	 	$(MAKE) build_java; \
-		docker cp $$(pwd)/../java/target/features-accumulo-1.0-jar-with-dependencies.jar $$CONTAINER_ID:/opt/accumulo-$(ACCUMULO_VERSION)/lib/ext/; \
+		docker cp $$(pwd)/../java/target/sandbox-accumulo-1.0-jar-with-dependencies.jar $$CONTAINER_ID:/opt/accumulo-$(ACCUMULO_VERSION)/lib/ext/; \
 	fi	
+
+transfer_dataset:  ## Transfer the dataset to the current running container
+	@CONTAINER_ID=$$(docker ps -aqf "name=pi-accumulo"); \
+	if [ -z "$$CONTAINER_ID" ]; then \
+		echo "There is currently no accumulo container running"; \
+	else \
+		docker cp $$(pwd)/../benchmark/datasets/*.csv $$CONTAINER_ID:/opt/benchmark; \
+	fi
 
 run: # Run the container with accumulo
 	docker run \

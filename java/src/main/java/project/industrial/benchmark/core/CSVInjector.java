@@ -35,6 +35,7 @@ public class CSVInjector implements Injector {
 
     @Override
     public void prepareMutations() {
+        logger.info("Prepare mutations from the CSV file");
         BufferedReader reader;
         int countLine = 0;
         String line;
@@ -42,7 +43,8 @@ public class CSVInjector implements Injector {
         try {
             reader = new BufferedReader(new FileReader(csvFile));
             while((line = reader.readLine()) != null) {
-                this.mutations.add(this.mutationBuilder.buildMutation(line));
+                line = line.substring(0, line.length() - 1);
+                this.mutations.add(this.mutationBuilder.buildMutation(String.valueOf(countLine), line));
                 totalChars += line.length();
                 countLine++;
             }
@@ -59,9 +61,16 @@ public class CSVInjector implements Injector {
         this.mutationBuilder = builder;
     }
 
-    public void inject() throws MutationsRejectedException {
+    public int inject() throws MutationsRejectedException {
         this.bw.addMutations(this.mutations);
+        return this.mutations.size();
+    }
+
+    public void flush() throws MutationsRejectedException {
         this.bw.flush();
+    }
+
+    public void close() throws MutationsRejectedException {
         this.bw.close();
     }
 

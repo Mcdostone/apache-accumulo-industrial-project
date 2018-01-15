@@ -12,7 +12,7 @@ public interface Injector {
     /**
      * inject all mutations to accumulo
      */
-    public void inject() throws MutationsRejectedException;
+    public int inject() throws MutationsRejectedException;
 
     /**
      * Prepare a list of mutations before the injection
@@ -24,4 +24,10 @@ public interface Injector {
      * @param builder
      */
     public void setMutationBuilderStrategy(MutationBuilderStrategy builder);
+
+
+    public void close() throws MutationsRejectedException;
+
+    public void flush() throws MutationsRejectedException;
+
 }
