@@ -35,6 +35,7 @@ public class CSVInjector implements Injector {
 
     @Override
     public void prepareMutations() {
+        logger.info("Prepare mutations from the CSV file");
         BufferedReader reader;
         int countLine = 0;
         String line;
@@ -60,10 +61,11 @@ public class CSVInjector implements Injector {
         this.mutationBuilder = builder;
     }
 
-    public void inject() throws MutationsRejectedException {
+    public int inject() throws MutationsRejectedException {
         this.bw.addMutations(this.mutations);
         this.bw.flush();
         this.bw.close();
+        return this.mutations.size();
     }
 
 }

@@ -12,7 +12,7 @@ public abstract class Scenario {
         this.name = name;
     }
 
-    public void checkMaxDuration(long expected, long begin, long end) throws ScenarioNotRespectedException {
+    public void assertMaxDuration(long expected, long begin, long end) throws ScenarioNotRespectedException {
         long duration = end - begin;
         if(duration > expected) {
             String message = String.format(
@@ -24,8 +24,20 @@ public abstract class Scenario {
             throw new ScenarioNotRespectedException(message);
         }
         else {
-            logger.info(String.format("Scenario '%s' finished in %d ms",this.name, duration));
+            logger.info(String.format("Scenario '%s' finished in %d ms", this.name, duration));
         }
+    }
+
+    public void assertEquals(Object expected, Object given, String message) throws Exception {
+        if(expected.equals(given))
+            logger.debug(String.format("Scenario '%s' finished",this.name));
+        else
+            logger.error(String.format("Expected %s, given %s", expected, given));
+            throw new ScenarioNotRespectedException(message);
+    }
+
+    public void cut() {
+        logger.info(String.format("Scenario '%s' finished",this.name));
     }
 
     public abstract void action() throws Exception;

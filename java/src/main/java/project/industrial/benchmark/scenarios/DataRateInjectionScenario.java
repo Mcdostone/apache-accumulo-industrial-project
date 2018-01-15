@@ -22,7 +22,8 @@ public class DataRateInjectionScenario extends Scenario {
         long begin = System.currentTimeMillis();
         this.injector.inject();
         long end = System.currentTimeMillis();
-        this.checkMaxDuration(1000, begin, end);
+        this.assertMaxDuration(1000, begin, end);
+        this.cut();
     }
 
     public static void main(String[] args) throws Exception {
