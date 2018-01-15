@@ -8,6 +8,7 @@
 
 # Lancer le daemon graphite
 
+``` bash
 docker run -d\
  --name graphite\
  --restart=always\
@@ -17,7 +18,10 @@ docker run -d\
  -p 8125:8125/udp\
  -p 8126:8126\
  graphiteapp/graphite-statsd
+```
 
 # Lancer le daemon grafana 
 
+``` bash
 docker run -d -p 3000:3000 grafana/grafana
+```
