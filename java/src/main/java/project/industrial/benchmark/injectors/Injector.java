@@ -1,7 +1,8 @@
-package project.industrial.benchmark.core;
+package project.industrial.benchmark.injectors;
 
 
 import org.apache.accumulo.core.client.MutationsRejectedException;
+import project.industrial.benchmark.core.MutationBuilderStrategy;
 
 /**
  * Interface representing an injector for accumulo.
