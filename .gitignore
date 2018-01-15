@@ -1,2 +1,3 @@
 scripts/zookeeper.out
 **/*.tar.gz
+**/*.DS_Store

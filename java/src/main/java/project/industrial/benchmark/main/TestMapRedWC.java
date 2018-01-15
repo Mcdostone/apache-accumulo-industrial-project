@@ -14,18 +14,6 @@ package project.industrial.benchmark.main;
         import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
         import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-     /*   import java.util.ArrayList;
-        import java.util.Collection;
-        import org.apache.accumulo.core.cli.ClientOnRequiredTable;
-        import org.apache.accumulo.core.cli.ScannerOpts;
-        import org.apache.accumulo.core.client.*;
-        import org.apache.accumulo.core.data.Range;
-        import org.apache.hadoop.io.Text;
-        import org.apache.log4j.Logger;
-        import com.beust.jcommander.Parameter;
-        import project.industrial.features.Printer;
-*/
-
 
 public class TestMapRedWC {
     public static class TokenizerMapper
@@ -35,7 +23,8 @@ public class TestMapRedWC {
         private Text word = new Text();
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            StringTokenizer itr = new StringTokenizer(value.toString().replace(";", " "));
+            StringTokenizer itr = new StringTokenizer(value.toString().replace(";", " ")); // for CSV file
+            // StringTokenizer itr = new StringTokenizer(value.toString(); Otherwise
             while (itr.hasMoreTokens()) {
                 word.set(itr.nextToken());
                 context.write(word, one);
@@ -96,7 +85,7 @@ public class TestMapRedWC {
        // FileInputFormat.addInputPath(job, new Path("hdfs:/path/to/file"));
        // FileInputFormat.addInputPath(job, new Path(args[0]));
         //FileOutputFormat.setOutputPath(job, new Path(args[1]));
-        FileOutputFormat.setOutputPath(job, new Path(inputFilePath));
+        FileInputFormat.addInputPath(job, new Path(inputFilePath));
         FileOutputFormat.setOutputPath(job, new Path(outputFilePath));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
