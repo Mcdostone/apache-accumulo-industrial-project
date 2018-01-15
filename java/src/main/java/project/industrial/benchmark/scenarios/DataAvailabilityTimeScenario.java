@@ -40,7 +40,7 @@ public class DataAvailabilityTimeScenario extends Scenario {
     public void action() throws Exception {
         int countInsertions = this.injector.inject();
         int delayKey = 10 * 1000;
-        int delayMining = 10;
+        int delayMining = 1;
         logger.info(String.format("Data is inserted, executing getKeyTask in %d ms and getAllTask in %d min", delayKey, delayMining));
 
         long begin = System.currentTimeMillis();

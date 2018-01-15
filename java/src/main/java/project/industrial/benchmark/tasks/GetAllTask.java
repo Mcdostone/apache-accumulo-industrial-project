@@ -24,7 +24,7 @@ public class GetAllTask implements Task {
         int count = 0;
         logger.info("Executing a full scan");
         for (Map.Entry<Key,Value> entry : scanner) {
-                count++;
+            count++;
         }
         return count;
     }
