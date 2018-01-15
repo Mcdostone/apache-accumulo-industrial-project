@@ -27,6 +27,7 @@ public class DataAvailabilityTimeScenario extends Scenario {
     private final ScheduledExecutorService executorService;
     private final GetAllTask getAllTask;
 
+
     public DataAvailabilityTimeScenario(Injector injector, GetKeyTask getKeyTask, GetAllTask getAllTask) {
         super("Data availability time");
         this.injector = injector;
@@ -39,28 +40,33 @@ public class DataAvailabilityTimeScenario extends Scenario {
     @Override
     public void action() throws Exception {
         int countInsertions = this.injector.inject();
+        this.injector.close();
         int delayKey = 10 * 1000;
-        int delayMining = 1;
-        logger.info(String.format("Data is inserted, executing getKeyTask in %d ms and getAllTask in %d min", delayKey, delayMining));
+        int delayMining = 1000 * 20;
 
+        logger.info(String.format("Data is inserted, executing getKeyTask in %d ms and getAllTask in %d ms", delayKey, delayMining));
         long begin = System.currentTimeMillis();
         ScheduledFuture futurKey = this.executorService.schedule(this.getKeyTask, delayKey, TimeUnit.MILLISECONDS);
-        ScheduledFuture futurMining = this.executorService.schedule(this.getAllTask, delayMining, TimeUnit.MINUTES);
+        ScheduledFuture futurMining = this.executorService.schedule(this.getAllTask, delayMining, TimeUnit.MILLISECONDS);
+
         this.testResultKey(begin, System.currentTimeMillis(), futurKey.get());
         this.testResultMining(countInsertions, (Integer) futurMining.get());
+
         this.executorService.shutdown();
         this.cut();
     }
 
     private void testResultMining(int expected, int nbInsertions) throws Exception {
-        this.assertEquals(expected, nbInsertions, "The full scan doesn't retrieve all data inserted");
+        this.assertEquals("Should retrieve all data inserted", expected, nbInsertions);
     }
 
     public void testResultKey(long begin, long end, Object o) throws Exception {
         if(o == null)
             throw new ScenarioNotRespectedException("data was not found");
+
+        long duration = end - begin;
+        logger.info(String.format("Data found in %d ms", duration));
         logger.info(o.toString());
-        this.assertMaxDuration(10 * 1000, begin, end);
     }
 
     static class Opts extends InjectorOpts {
