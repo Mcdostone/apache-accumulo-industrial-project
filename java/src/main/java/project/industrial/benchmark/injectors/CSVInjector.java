@@ -1,11 +1,14 @@
 package project.industrial.benchmark.injectors;
 
-import org.apache.accumulo.core.client.BatchWriter;
-import org.apache.accumulo.core.client.MutationsRejectedException;
+import org.apache.accumulo.core.cli.BatchWriterOpts;
+import org.apache.accumulo.core.client.*;
 import org.apache.accumulo.core.data.Mutation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.MutationBuilderStrategy;
+import project.industrial.benchmark.core.Scenario;
+import project.industrial.benchmark.scenarios.DataRateInjectionScenario;
+import project.industrial.benchmark.scenarios.InjectorOpts;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -84,6 +87,20 @@ public class CSVInjector implements Injector {
 
     public void close() throws MutationsRejectedException {
         this.bw.close();
+    }
+
+    public static void main(String[] args) throws Exception {
+        InjectorOpts opts = new InjectorOpts();
+        BatchWriterOpts bwOpts = new BatchWriterOpts();
+        opts.parseArgs(DataRateInjectionScenario.class.getName(), args, bwOpts);
+        Connector connector = opts.getConnector();
+
+        BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
+
+        Injector injector = new CSVInjector(bw, opts.csv);
+        injector.prepareMutations();
+        injector.inject();
+        injector.close();
     }
 
 }

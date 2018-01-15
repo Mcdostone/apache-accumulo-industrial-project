@@ -5,6 +5,7 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import project.industrial.benchmark.core.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +17,9 @@ import java.util.Map;
  *
  * @author Yann Prono
  */
-public class MeasureTimeForObjectAccessFullScanTask extends FullScanTask {
+public class MeasureTimeForObjectAccessFullScanTask extends AbstractFullScanTask<List<Long>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(FullScanTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(MeasureTimeForObjectAccessFullScanTask.class);
 
     public MeasureTimeForObjectAccessFullScanTask(ScannerBase scanner) {
         super(scanner);
@@ -28,7 +29,7 @@ public class MeasureTimeForObjectAccessFullScanTask extends FullScanTask {
     /**
      * @return List of long, containing the duration for obtaining an object
      */
-    public Object call() throws Exception {
+    public List<Long> call() throws Exception {
         List<Long> measures = new ArrayList<>();
         logger.info("Executing a full scan");
         long beginTime = System.nanoTime();

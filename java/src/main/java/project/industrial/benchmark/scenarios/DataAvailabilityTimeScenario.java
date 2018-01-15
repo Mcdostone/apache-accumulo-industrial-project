@@ -1,7 +1,6 @@
 package project.industrial.benchmark.scenarios;
 
 import com.beust.jcommander.Parameter;
-import com.sun.org.apache.xpath.internal.SourceTree;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
@@ -12,7 +11,7 @@ import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.core.ScenarioNotRespectedException;
 import project.industrial.benchmark.tasks.FullScanTask;
-import project.industrial.benchmark.tasks.GetKeyTask;
+import project.industrial.benchmark.tasks.GetByKeyTask;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,18 +20,15 @@ import java.util.concurrent.TimeUnit;
 
 public class DataAvailabilityTimeScenario extends Scenario {
 
-    private final GetKeyTask getKeyTask;
+    private final GetByKeyTask getByKeyTask;
     private final Injector injector;
-    private final ScheduledExecutorService executorService;
     private final FullScanTask getAllTask;
 
-
-    public DataAvailabilityTimeScenario(Injector injector, GetKeyTask getKeyTask, FullScanTask getAllTask) {
-        super("Data availability time");
+    public DataAvailabilityTimeScenario(Injector injector, GetByKeyTask getByKeyTask, FullScanTask getAllTask) {
+        super("Data availability time", 2);
         this.injector = injector;
-        this.getKeyTask = getKeyTask;
+        this.getByKeyTask = getByKeyTask;
         this.getAllTask = getAllTask;
-        this.executorService = Executors.newScheduledThreadPool(2);
         this.injector.prepareMutations();
     }
 
@@ -43,9 +39,9 @@ public class DataAvailabilityTimeScenario extends Scenario {
         int delayKey = 10 * 1000;
         int delayMining = 1000 * 20;
 
-        logger.info(String.format("Data is inserted, executing getKeyTask in %d ms and getAllTask in %d ms", delayKey, delayMining));
+        logger.info(String.format("Data is inserted, executing getByKeyTask in %d ms and getAllTask in %d ms", delayKey, delayMining));
         long begin = System.currentTimeMillis();
-        ScheduledFuture futurKey = this.executorService.schedule(this.getKeyTask, delayKey, TimeUnit.MILLISECONDS);
+        ScheduledFuture futurKey = this.executorService.schedule(this.getByKeyTask, delayKey, TimeUnit.MILLISECONDS);
         ScheduledFuture futurMining = this.executorService.schedule(this.getAllTask, delayMining, TimeUnit.MILLISECONDS);
 
         this.testResultKey(begin, System.currentTimeMillis(), futurKey.get());
@@ -84,7 +80,7 @@ public class DataAvailabilityTimeScenario extends Scenario {
         Scanner sc1 = connector.createScanner(opts.getTableName(), opts.auths);
         sc1.setRange(new Range());
 
-        GetKeyTask getKey = new GetKeyTask(sc, opts.key);
+        GetByKeyTask getKey = new GetByKeyTask(sc, opts.key);
         Injector injector = new CSVInjector(bw, opts.csv);
         FullScanTask getAll = new FullScanTask(sc1);
         Scenario scenario = new DataAvailabilityTimeScenario(injector, getKey, getAll);

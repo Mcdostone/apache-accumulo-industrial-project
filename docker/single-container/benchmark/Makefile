@@ -38,6 +38,35 @@ data_rate_during_fullscan_scenario: ## test the data rate during a fullscan, mus
 	--csv $(DATASET_FILE) \
 	-u root
 
+time_key_access_scenario: ## test the time for getting an object by key access, must be finished before 100ms
+	accumulo $(PACKAGE).scenarios.TimeForGettingObjectByKeyScenario \
+	-i $$INSTANCE \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	-p $$ACCUMULO_PASSWORD \
+	-u root
+
+time_list_keys_access_scenario: ## test the time for getting a lists of objets by keys, must be finished before 2s
+	accumulo $(PACKAGE).scenarios.TimeForGettingObjectByKeyScenario \
+	-i $$INSTANCE \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	-p $$ACCUMULO_PASSWORD \
+	-u root
+
+sandbox_scenario: ## Some cool scenario
+	accumulo $(PACKAGE).scenarios.SandboxScenario \
+	-i $$INSTANCE \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	-p $$ACCUMULO_PASSWORD \
+	-u root
+
+inject_data: ## Inject some data from a CSV
+	accumulo $(PACKAGE).injectors.CSVInjector \
+	-i $$INSTANCE \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	-p $$ACCUMULO_PASSWORD \
+	--csv $(DATASET_FILE) \
+	-u root
+
 
 ###############################################################
 ###   USEFUL RULES   ###

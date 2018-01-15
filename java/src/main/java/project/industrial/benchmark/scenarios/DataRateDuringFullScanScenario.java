@@ -1,12 +1,11 @@
 package project.industrial.benchmark.scenarios;
 
 import org.apache.accumulo.core.cli.BatchWriterOpts;
-import org.apache.accumulo.core.client.BatchWriter;
+import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import project.industrial.benchmark.core.Scenario;
-import project.industrial.benchmark.injectors.CSVInjector;
-import project.industrial.benchmark.injectors.Injector;
+import project.industrial.benchmark.tasks.AbstractFullScanTask;
 import project.industrial.benchmark.tasks.FullScanTask;
 import project.industrial.benchmark.tasks.MeasureTimeForObjectAccessFullScanTask;
 
@@ -22,25 +21,17 @@ import java.util.concurrent.TimeUnit;
 
 public class DataRateDuringFullScanScenario extends Scenario {
 
-    private FullScanTask fullScan;
-    private Injector injector;
-    private final ScheduledExecutorService executorService;
+    private AbstractFullScanTask fullScan;
     private final long durationBetweenTwoAccesses;
 
-    public DataRateDuringFullScanScenario(Injector injector, FullScanTask fullScan) {
+    public DataRateDuringFullScanScenario(AbstractFullScanTask fullScan) {
         super("Data rate of object during a full scan");
-        this.injector = injector;
         this.fullScan = fullScan;
-        this.executorService = new ScheduledThreadPoolExecutor(1);
         this.durationBetweenTwoAccesses = (long) (1.0/1000000.0);
     }
 
     @Override
     public void action() throws Exception {
-        this.injector.prepareMutations();
-        this.injector.inject();
-        this.injector.close();
-
         ScheduledFuture futurMeasurements = this.executorService.schedule(this.fullScan, 0, TimeUnit.SECONDS);
         this.processMeasurements((List<Long>) futurMeasurements.get());
         this.executorService.shutdown();
@@ -73,17 +64,15 @@ public class DataRateDuringFullScanScenario extends Scenario {
     }
 
     public static void main(String[] args) throws Exception {
-        InjectorOpts opts = new InjectorOpts();
+        ClientOnRequiredTable opts = new ClientOnRequiredTable();
         BatchWriterOpts bwOpts = new BatchWriterOpts();
         opts.parseArgs(DataRateInjectionScenario.class.getName(), args, bwOpts);
         Connector connector = opts.getConnector();
 
-        BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
         Scanner sc = connector.createScanner(opts.getTableName(), opts.auths);
 
-        Injector injector = new CSVInjector(bw, opts.csv);
-        FullScanTask getAll = new MeasureTimeForObjectAccessFullScanTask(sc);
-        Scenario scenario = new DataRateDuringFullScanScenario(injector, getAll);
+        AbstractFullScanTask getAll = new MeasureTimeForObjectAccessFullScanTask(sc);
+        Scenario scenario = new DataRateDuringFullScanScenario(getAll);
         scenario.action();
     }
 }
