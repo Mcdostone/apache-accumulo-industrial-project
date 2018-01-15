@@ -1,20 +1,19 @@
 package project.industrial.benchmark.scenarios;
 
 import com.beust.jcommander.Parameter;
+import com.sun.org.apache.xpath.internal.SourceTree;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
-import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Range;
-import project.industrial.benchmark.core.CSVInjector;
-import project.industrial.benchmark.core.Injector;
+import project.industrial.benchmark.injectors.CSVInjector;
+import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.core.ScenarioNotRespectedException;
-import project.industrial.benchmark.tasks.GetAllTask;
+import project.industrial.benchmark.tasks.FullScanTask;
 import project.industrial.benchmark.tasks.GetKeyTask;
 
-import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -25,10 +24,10 @@ public class DataAvailabilityTimeScenario extends Scenario {
     private final GetKeyTask getKeyTask;
     private final Injector injector;
     private final ScheduledExecutorService executorService;
-    private final GetAllTask getAllTask;
+    private final FullScanTask getAllTask;
 
 
-    public DataAvailabilityTimeScenario(Injector injector, GetKeyTask getKeyTask, GetAllTask getAllTask) {
+    public DataAvailabilityTimeScenario(Injector injector, GetKeyTask getKeyTask, FullScanTask getAllTask) {
         super("Data availability time");
         this.injector = injector;
         this.getKeyTask = getKeyTask;
@@ -87,7 +86,7 @@ public class DataAvailabilityTimeScenario extends Scenario {
 
         GetKeyTask getKey = new GetKeyTask(sc, opts.key);
         Injector injector = new CSVInjector(bw, opts.csv);
-        GetAllTask getAll = new GetAllTask(sc1);
+        FullScanTask getAll = new FullScanTask(sc1);
         Scenario scenario = new DataAvailabilityTimeScenario(injector, getKey, getAll);
         scenario.action();
     }

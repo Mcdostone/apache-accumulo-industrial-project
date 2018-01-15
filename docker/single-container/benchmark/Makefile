@@ -29,7 +29,15 @@ data_availability_time_scenario: ## test availability of data after injection, 1
 	--csv $(DATASET_FILE) \
 	--key 57562 \
 	-u root
-	
+
+data_rate_during_fullscan_scenario: ## test the data rate during a fullscan, must be 1 000 000 objects/s
+	accumulo $(PACKAGE).scenarios.DataRateDuringFullScanScenario \
+	-i $$INSTANCE \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	-p $$ACCUMULO_PASSWORD \
+	--csv $(DATASET_FILE) \
+	-u root
+
 
 ###############################################################
 ###   USEFUL RULES   ###
@@ -39,17 +47,13 @@ data_availability_time_scenario: ## test availability of data after injection, 1
 download_dataset: ## Download the dataset from github
 	wget $(DATASET_URL) .
 
-
 reset_table: delete_table create_table ## Delete and create the table
-
 
 delete_table: ## Delete the default table
 	accumulo shell -u root -p $$ACCUMULO_PASSWORD -e "deletetable $$ACCUMULO_DEFAULT_TABLE"
 
-
 create_table: ## Create the default table
 	accumulo shell -u root -p $$ACCUMULO_PASSWORD -e "createtable $$ACCUMULO_DEFAULT_TABLE"
-
 
 list_classes: ## show all java classes available
 	@if [ ! -z "$(ls -A $$ACCUMULO_HOME/lib/ext)" ]; then \
@@ -58,7 +62,6 @@ list_classes: ## show all java classes available
 		echo -e "accumulo $(PACKAGE_ROOT).Help\n"; \
 		accumulo $(PACKAGE_ROOT).Help; \
 	fi
-
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

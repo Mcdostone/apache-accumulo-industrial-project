@@ -1,9 +1,10 @@
-package project.industrial.benchmark.core;
+package project.industrial.benchmark.injectors;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.Text;
+import project.industrial.benchmark.core.MutationBuilderStrategy;
 
 /**
  * MutationBuilderStrategy for a CSV file;
@@ -13,22 +14,22 @@ public class CSVMutationBuilderStrategy implements MutationBuilderStrategy {
 
     private final String cq;
     private final String cf;
+    private RowIdBuilderStrategy rowIdBuilderStrategy;
 
 
     public CSVMutationBuilderStrategy() {
-        this.cf = "columnFamily";
-        this.cq = "columnQualifier";
+        this("columnFamily", "columnQualifier");
     }
 
     public CSVMutationBuilderStrategy(String cf, String cq) {
         this.cf = cf;
         this.cq = cq;
+        this.rowIdBuilderStrategy = new IncrementorRowIdIBuilderStrategy();
     }
 
     @Override
-    public Mutation buildMutation(String data) {
-        String key = String.format("%s_%s", data.split(" ")[0], data.split(" ")[1]);
-        return this.buildMutation(key, this.cf, this.cq, data);
+    public Mutation buildMutation(String value) {
+        return this.buildMutation(this.rowIdBuilderStrategy.buildRowId(), this.cf, this.cq, value);
     }
 
     public Mutation buildMutation(String key, String cf, String cq, String value) {
@@ -41,4 +42,10 @@ public class CSVMutationBuilderStrategy implements MutationBuilderStrategy {
     public Mutation buildMutation(String key, String value) {
         return this.buildMutation(key, this.cf, this.cq, value);
     }
+
+    @Override
+    public void setRowKeyBuilderStrategy(RowIdBuilderStrategy rowKeyBuilderStrategy) {
+        this.rowIdBuilderStrategy = rowKeyBuilderStrategy;
+    }
+
 }

@@ -9,13 +9,12 @@ import project.industrial.benchmark.core.Task;
 
 import java.util.Map;
 
-public class GetAllTask implements Task {
+public class FullScanTask implements Task {
 
-    private static final Logger logger = LoggerFactory.getLogger(GetAllTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(FullScanTask.class);
+    protected ScannerBase scanner;
 
-    private ScannerBase scanner;
-
-    public GetAllTask(ScannerBase scanner) {
+    public FullScanTask(ScannerBase scanner) {
         this.scanner = scanner;
     }
 
@@ -23,8 +22,9 @@ public class GetAllTask implements Task {
     public Object call() throws Exception {
         int count = 0;
         logger.info("Executing a full scan");
-        for (Map.Entry<Key,Value> entry : scanner)
+        for (Map.Entry<Key,Value> entry : this.scanner)
             count++;
         return count;
     }
+
 }

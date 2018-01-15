@@ -26,9 +26,8 @@ public class GetKeyTask implements Task {
     public Object call() throws Exception {
         logger.info(String.format("Looking for data with key '%s'", this.keyToSearch));
         scanner.setRange(Range.exact(this.keyToSearch));
-        for (Map.Entry<Key,Value> entry : scanner) {
+        for (Map.Entry<Key,Value> entry : scanner)
                 return entry;
-        }
         return null;
     }
 }
