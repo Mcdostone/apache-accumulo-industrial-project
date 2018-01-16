@@ -26,7 +26,7 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	--csv $(DATASET_FILE) \
 	-u root \
 	$(OPTS)
-
+	
 data_availability_time_scenario: ## test availability of data after injection, 10s for key access, 10min for mining
 	accumulo $(PACKAGE).scenarios.DataAvailabilityTimeScenario \
 	-i $$INSTANCE \
