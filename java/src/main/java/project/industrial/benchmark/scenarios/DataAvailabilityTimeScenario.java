@@ -42,6 +42,7 @@ public class DataAvailabilityTimeScenario extends Scenario {
     public void action() throws Exception {
         int countInsertions = this.injector.inject();
         this.injector.close();
+        logger.info(String.format("%d objects currently injected", countInsertions));
         int delayKey = 10 * 1000;
         int delayMining = 1000 * 20;
 

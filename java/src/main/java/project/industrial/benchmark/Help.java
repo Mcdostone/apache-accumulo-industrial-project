@@ -2,6 +2,7 @@ package project.industrial.benchmark;
 
 import project.industrial.benchmark.injectors.CSVInjector;
 import project.industrial.benchmark.scenarios.*;
+import project.industrial.benchmark.tasks.InjectorLoopTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,10 @@ public class Help {
         classes.add(DataRateDuringFullScanScenario.class);
         classes.add(TimeGetByKeyScenario.class);
         classes.add(TimeGetByKeysListScenario.class);
+        classes.add(ConcurrentActionsScenario.class);
         classes.add(SandboxScenario.class);
         classes.add(CSVInjector.class);
+        classes.add(InjectorLoopTask.class);
         System.out.printf("%d java classes available for the benchmark:\n", classes.size());
         for(Class c: classes)
             System.out.printf("\t%s\n", c.getName());

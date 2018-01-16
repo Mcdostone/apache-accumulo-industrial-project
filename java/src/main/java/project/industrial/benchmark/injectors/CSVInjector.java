@@ -69,11 +69,9 @@ public class CSVInjector implements Injector {
 
     @Override
     public void prepareMutations() {
-        logger.info("Prepare mutations");
         this.mutations = this.data.stream()
                 .map(line -> this.mutationBuilder.buildMutation(line))
                 .collect(Collectors.toList());
-        logger.info(String.format("%d mutations has been created", this.mutations.size()));
     }
 
     @Override

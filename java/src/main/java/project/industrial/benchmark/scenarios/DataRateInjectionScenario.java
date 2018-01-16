@@ -33,6 +33,7 @@ public class DataRateInjectionScenario extends Scenario {
     public void action() throws Exception {
         long begin = System.currentTimeMillis();
         int nbInjections = this.injector.inject();
+        logger.info(String.format("%d objects currently injected", nbInjections));
         this.injector.close();
         long end = System.currentTimeMillis();
 

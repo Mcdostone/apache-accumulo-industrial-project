@@ -61,6 +61,14 @@ time_list_keys_access_scenario: ## test the time for getting a lists of objets b
 	-u root \
 	$(OPTS)
 
+concurrent_actions_scenario: ## The last important scenario, lot of actions of concurrency.
+	accumulo $(PACKAGE).scenarios.ConcurrentActionsScenario \
+	-i $$INSTANCE \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	-p $$ACCUMULO_PASSWORD \
+	-u root \
+	$(OPTS)
+
 sandbox_scenario: ## Some cool scenario
 	accumulo $(PACKAGE).scenarios.SandboxScenario \
 	-i $$INSTANCE \
@@ -71,6 +79,15 @@ sandbox_scenario: ## Some cool scenario
 
 inject_data: ## Inject some data from a CSV
 	accumulo $(PACKAGE).injectors.CSVInjector \
+	-i $$INSTANCE \
+	-t $$ACCUMULO_DEFAULT_TABLE \
+	-p $$ACCUMULO_PASSWORD \
+	--csv $(DATASET_FILE) \
+	-u root \
+	$(OPTS)
+
+inject_huge_amount_data: ## Inject 60 000 000 000 objects
+	accumulo $(PACKAGE).tasks.InjectorLoopTask \
 	-i $$INSTANCE \
 	-t $$ACCUMULO_DEFAULT_TABLE \
 	-p $$ACCUMULO_PASSWORD \
