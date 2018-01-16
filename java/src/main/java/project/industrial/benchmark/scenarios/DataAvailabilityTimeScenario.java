@@ -9,7 +9,7 @@ import org.apache.accumulo.core.client.ScannerBase;
 import org.apache.accumulo.core.data.Range;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.core.ScenarioNotRespectedException;
-import project.industrial.benchmark.injectors.CSVInjector;
+import project.industrial.benchmark.injectors.CSVValueInjector;
 import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.tasks.FullScanTask;
 import project.industrial.benchmark.tasks.GetByKeyTask;
@@ -91,7 +91,7 @@ public class DataAvailabilityTimeScenario extends Scenario {
             opts.key = askInput("Type the key you want to retrieve:");
 
         GetByKeyTask getKey = new GetByKeyTask(sc, opts.key);
-        Injector injector = new CSVInjector(bw, opts.csv);
+        Injector injector = new CSVValueInjector(bw, opts.csv);
         FullScanTask getAll = new FullScanTask(sc1);
         Scenario scenario = new DataAvailabilityTimeScenario(injector, getKey, getAll);
         scenario.action();

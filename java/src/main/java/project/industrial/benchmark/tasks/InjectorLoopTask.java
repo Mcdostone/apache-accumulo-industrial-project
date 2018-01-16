@@ -5,9 +5,8 @@ import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.core.Task;
-import project.industrial.benchmark.injectors.CSVInjector;
+import project.industrial.benchmark.injectors.CSVValueInjector;
 import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.scenarios.ConcurrentActionsScenario;
 import project.industrial.benchmark.scenarios.InjectorOpts;
@@ -64,7 +63,7 @@ public class InjectorLoopTask implements Task {
 
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
 
-        Injector injector = new CSVInjector(bw, opts.csv);
+        Injector injector = new CSVValueInjector(bw, opts.csv);
         InjectorLoopTask injectorTask = new InjectorLoopTask(injector);
         injectorTask.call();
     }

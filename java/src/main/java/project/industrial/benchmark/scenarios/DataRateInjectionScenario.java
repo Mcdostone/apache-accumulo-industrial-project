@@ -3,7 +3,7 @@ package project.industrial.benchmark.scenarios;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
-import project.industrial.benchmark.injectors.CSVInjector;
+import project.industrial.benchmark.injectors.CSVValueInjector;
 import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.core.Scenario;
 
@@ -56,7 +56,7 @@ public class DataRateInjectionScenario extends Scenario {
 
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
 
-        Injector injector = new CSVInjector(bw, opts.csv);
+        Injector injector = new CSVValueInjector(bw, opts.csv);
         Scenario scenario = new DataRateInjectionScenario(injector);
         scenario.action();
     }
