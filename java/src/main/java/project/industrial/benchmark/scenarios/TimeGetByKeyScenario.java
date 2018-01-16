@@ -16,6 +16,7 @@ import project.industrial.benchmark.tasks.ReaderTask;
 /**
  * This scenario check the duration for getting an object with a given key.
  * The time for accessing to an object by key must be lower or equals than 100ms.
+ * We assume that there are some objects stored in accumulo !
  *
  * @author Yann Prono
  */

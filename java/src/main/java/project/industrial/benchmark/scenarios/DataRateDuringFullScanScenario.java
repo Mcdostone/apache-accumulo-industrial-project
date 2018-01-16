@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * This scenario checks the data rate during a full scan.
  * We should retrieve 1 000 000 objects per second during a full scan.
- *
+ * We assume that there are some objects stored in accumulo !
  * @author Yann Prono
  */
 public class DataRateDuringFullScanScenario extends Scenario {

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
  * This scenario measures the duration for getting a set of objects
  * depending on a given list of keys.
  * For a list of 2000 keys, you should retrieve all associated objects in maximum 2 seconds
+ * We assume that there are some objects stored in accumulo !
  * @author Yann Prono
  */
 public class TimeGetByKeysListScenario extends Scenario {
