@@ -1,11 +1,22 @@
 package project.industrial.benchmark.tasks;
 
-import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.client.ScannerBase;
 import project.industrial.benchmark.core.Task;
 
-import java.util.Iterator;
-import java.util.Map;
+/**
+ * Basic class for task which reads data in accumulo cluster
+ *
+ * @author Yann Prono
+ */
+public abstract class ReaderTask implements Task<ScannerBase> {
 
-public interface ReaderTask extends Task<Iterator<Map.Entry<Key, Value>>> {
+    protected final ScannerBase scanner;
+
+    public ReaderTask(ScannerBase scanner) {
+        this.scanner = scanner;
+    }
+
+    public ScannerBase getScanner() {
+        return this.scanner;
+    }
 }

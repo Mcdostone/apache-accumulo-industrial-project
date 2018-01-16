@@ -4,27 +4,34 @@ import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
+import org.apache.accumulo.core.client.ScannerBase;
 import org.apache.accumulo.core.data.Range;
 import project.industrial.benchmark.core.Scenario;
-import project.industrial.benchmark.tasks.FullScanTask;
+import project.industrial.benchmark.tasks.GetByKeyTask;
+import project.industrial.benchmark.tasks.ReaderTask;
 
 import java.util.concurrent.Executors;
 
+/**
+ * Used to do some tests
+ * @author Yann Prono
+ */
 public class SandboxScenario extends Scenario {
 
-    private final FullScanTask getAllTask;
+    private final ReaderTask task;
 
-    public SandboxScenario(FullScanTask getAllTask) {
+    public SandboxScenario(ReaderTask task) {
         super("Sandbox");
-        this.getAllTask = getAllTask;
+        this.task = task;
         this.executorService = Executors.newScheduledThreadPool(2);
     }
 
     @Override
     public void action() throws Exception {
-        logger.info("Before call");
-        this.getAllTask.call();
-        logger.info("After call");
+        ScannerBase s = this.task.call();
+        this.showResults(s.iterator());
+        Thread.sleep(5000);
+        this.showResults(s.iterator());
         this.executorService.shutdown();
         this.cut();
     }
@@ -38,8 +45,8 @@ public class SandboxScenario extends Scenario {
         Scanner sc = connector.createScanner(opts.getTableName(), opts.auths);
         sc.setRange(new Range());
 
-        FullScanTask getAll = new FullScanTask(sc);
-        Scenario scenario = new SandboxScenario(getAll);
+        ReaderTask get = new GetByKeyTask(sc, "45678");
+        Scenario scenario = new SandboxScenario(get);
         scenario.action();
     }
 }

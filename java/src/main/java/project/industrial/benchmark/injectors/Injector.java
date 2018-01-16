@@ -20,13 +20,6 @@ public interface Injector {
      */
     public void prepareMutations();
 
-    /**
-     * Set the mutationBuilder with a new one.
-     * @param builder
-     */
-    public void setMutationBuilderStrategy(MutationBuilderStrategy builder);
-
-
     public void close() throws MutationsRejectedException;
 
     public void flush() throws MutationsRejectedException;

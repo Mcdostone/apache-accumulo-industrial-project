@@ -3,10 +3,16 @@ package project.industrial.benchmark.scenarios;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
-import project.industrial.benchmark.injectors.CSVInjector;
+import project.industrial.benchmark.injectors.CSVValueInjector;
 import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.core.Scenario;
 
+/**
+ * This scenario checks the data rate injection in accumulo.
+ * We should inject 80000 objects per second
+ *
+ * @author Yann Prono
+ */
 public class DataRateInjectionScenario extends Scenario {
 
     private final long nbInjectionsPerSecond;
@@ -27,6 +33,7 @@ public class DataRateInjectionScenario extends Scenario {
     public void action() throws Exception {
         long begin = System.currentTimeMillis();
         int nbInjections = this.injector.inject();
+        logger.info(String.format("%d objects currently injected", nbInjections));
         this.injector.close();
         long end = System.currentTimeMillis();
 
@@ -49,7 +56,7 @@ public class DataRateInjectionScenario extends Scenario {
 
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
 
-        Injector injector = new CSVInjector(bw, opts.csv);
+        Injector injector = new CSVValueInjector(bw, opts.csv);
         Scenario scenario = new DataRateInjectionScenario(injector);
         scenario.action();
     }

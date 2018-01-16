@@ -4,10 +4,11 @@ import com.beust.jcommander.Parameter;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.*;
-import project.industrial.benchmark.injectors.CSVInjector;
+import project.industrial.benchmark.injectors.CSVValueInjector;
 import project.industrial.benchmark.injectors.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class Main {
 
@@ -30,7 +31,7 @@ public class Main {
         }
 
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
-        Injector injector = new CSVInjector(bw, opts.csv);
+        Injector injector = new CSVValueInjector(bw, opts.csv);
         injector.prepareMutations();
         injector.inject();
     }
