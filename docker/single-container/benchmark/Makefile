@@ -67,6 +67,14 @@ inject_data: ## Inject some data from a CSV
 	--csv $(DATASET_FILE) \
 	-u root
 
+testMapRedWC: ## Map Reduce WordCount on a file
+	accumulo $(PACKAGE).main.TestMapRedWC \
+	--i  /accumulo/wordcount \
+	--o /accumulo/wordcount/output
+testread: ## read a table
+	accumulo $(PACKAGE).main.ReadTst \
+	--colF columnFamily \
+	--colQ columnQualifier
 
 ###############################################################
 ###   USEFUL RULES   ###

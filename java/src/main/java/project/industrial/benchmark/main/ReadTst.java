@@ -24,7 +24,7 @@ public class ReadTst {
         Option Cf = new Option("colF", "Column Family", true, "Column Family");
         Cf.setRequired(true);
         options.addOption(Cf);
-        Option Cq = new Option("colQ", "Column Qualifier", true, "Column QUalifier");
+        Option Cq = new Option("colQ", "Column Qualifier", true, "Column Qualifier");
         Cq.setRequired(true);
         options.addOption(Cq);
         CommandLineParser parser = new GnuParser();
@@ -47,22 +47,22 @@ public class ReadTst {
     Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "ReadTst");
         job.setInputFormatClass(AccumuloInputFormat.class);
-        AccumuloInputFormat.setInputTableName(job, "trace");
+        AccumuloInputFormat.setInputTableName(job, "my_table");
         ClientConfiguration zkiConfig = new ClientConfiguration().withInstance("accumulo")
                 .withZkHosts("localhost:2181");
         AccumuloInputFormat.setZooKeeperInstance(job, zkiConfig);
         AccumuloInputFormat.setConnectorInfo(job, "root", new PasswordToken("root"));
-        List<Pair<Text, Text>> columns = new ArrayList<>();
 
+        List<Pair<Text, Text>> columns = new ArrayList<>();
         columns.add(new Pair(new Text(CF), new Text(CQ)));
         AccumuloInputFormat.fetchColumns(job, columns); // optional
         System.out.println(columns.toString());
         List<Range> ranges = new ArrayList<>();
         ranges.add(new Range("a", "p"));
-        AccumuloInputFormat.setRanges(job, ranges); // optional
-        AccumuloInputFormat.setScanIsolation(job, true); // optional
+       // AccumuloInputFormat.setRanges(job, ranges); // optional
+       // AccumuloInputFormat.setScanIsolation(job, true); // optional
       //  AccumuloInputFormat.setScanAuthorizations(job, auths); // optional
         System.out.println("done");
-        System.out.println(ranges);
+   //     System.out.println(ranges);
     }
 }

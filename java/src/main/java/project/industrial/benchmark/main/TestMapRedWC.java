@@ -3,6 +3,8 @@ package project.industrial.benchmark.main;
         import java.io.IOException;
         import java.util.StringTokenizer;
 
+        import org.apache.accumulo.core.client.ClientConfiguration;
+        import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
         import org.apache.commons.cli.*;
         import org.apache.hadoop.conf.Configuration;
         import org.apache.hadoop.fs.Path;
@@ -23,7 +25,7 @@ public class TestMapRedWC {
         private Text word = new Text();
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            StringTokenizer itr = new StringTokenizer(value.toString().replace(";", " ")); // for CSV file
+            StringTokenizer itr = new StringTokenizer(value.toString().replace(",", " ")); // for CSV file
             // StringTokenizer itr = new StringTokenizer(value.toString(); Otherwise
             while (itr.hasMoreTokens()) {
                 word.set(itr.nextToken());
@@ -88,5 +90,13 @@ public class TestMapRedWC {
         FileInputFormat.addInputPath(job, new Path(inputFilePath));
         FileOutputFormat.setOutputPath(job, new Path(outputFilePath));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
+
+     /*   job.setInputFormatClass(AccumuloInputFormat.class);
+        ClientConfiguration zkiConfig = new ClientConfiguration() .withInstance(args[0])
+                .withZkHosts(args[1]);
+        AccumuloInputFormat.setInputTableName(job, WikipediaConstants.ARTICLES_TABLE); List<Pair<Text,Text>> columns = new ArrayList<>();
+        columns.add(new Pair(WikipediaConstants.CONTENTS_FAMILY_TEXT, new Text("")));
+        AccumuloInputFormat.fetchColumns(job, columns); AccumuloInputFormat.setZooKeeperInstance(job, zkiConfig); AccumuloInputFormat.setConnectorInfo(job, args[2], new PasswordToken(args[3]));
+*/
     }
 }
