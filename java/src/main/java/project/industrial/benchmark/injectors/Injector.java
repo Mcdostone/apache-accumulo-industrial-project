@@ -2,7 +2,10 @@ package project.industrial.benchmark.injectors;
 
 
 import org.apache.accumulo.core.client.MutationsRejectedException;
-import project.industrial.benchmark.core.MutationBuilderStrategy;
+import org.apache.accumulo.core.data.Mutation;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface representing an injector for accumulo.
@@ -15,10 +18,9 @@ public interface Injector {
      */
     public int inject() throws MutationsRejectedException;
 
-    /**
-     * Prepare a list of mutations before the injection
-     */
-    public void prepareMutations();
+    public void addMutation(Mutation mutation);
+
+    public void addMutations(Collection<Mutation> mutations);
 
     public void close() throws MutationsRejectedException;
 

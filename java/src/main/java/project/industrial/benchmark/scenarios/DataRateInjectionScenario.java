@@ -3,9 +3,10 @@ package project.industrial.benchmark.scenarios;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
-import project.industrial.benchmark.injectors.CSVValueInjector;
-import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.core.Scenario;
+import project.industrial.benchmark.injectors.AbstractCSVInjector;
+import project.industrial.benchmark.injectors.Injector;
+import project.industrial.benchmark.injectors.SimpleCSVInjector;
 
 /**
  * This scenario checks the data rate injection in accumulo.
@@ -25,26 +26,13 @@ public class DataRateInjectionScenario extends Scenario {
     public DataRateInjectionScenario(Injector injector, long nbInjectionsPerSecond) {
         super("Data rate injection");
         this.injector = injector;
-        this.injector.prepareMutations();
         this.nbInjectionsPerSecond = nbInjectionsPerSecond;
     }
 
     @Override
     public void action() throws Exception {
-        long begin = System.currentTimeMillis();
-        int nbInjections = this.injector.inject();
-        logger.info(String.format("%d objects currently injected", nbInjections));
+        this.injector.inject();
         this.injector.close();
-        long end = System.currentTimeMillis();
-
-        long duration = end - begin;
-        long currentInjectionsPerSecond = nbInjections * 1000 / duration;
-        logger.info(String.format("Inserted %d in %d ms", nbInjections, duration));
-
-        boolean checkNbInsertions = currentInjectionsPerSecond >= this.nbInjectionsPerSecond;
-        this.assertTrue(String.format("Should insert %d object/s but have %d", this.nbInjectionsPerSecond, currentInjectionsPerSecond),
-                checkNbInsertions);
-
         this.cut();
     }
 
@@ -56,7 +44,8 @@ public class DataRateInjectionScenario extends Scenario {
 
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
 
-        Injector injector = new CSVValueInjector(bw, opts.csv);
+        AbstractCSVInjector injector = new SimpleCSVInjector(bw, opts.csv);
+        injector.loadData();
         Scenario scenario = new DataRateInjectionScenario(injector);
         scenario.action();
     }

@@ -47,12 +47,12 @@ public abstract class Scenario {
      * @param condition Condition to check
      * @throws Exception
      */
-    public void assertTrue(String message, boolean condition) throws Exception {
+    public void assertTrue(String message, boolean condition) {
         if(!condition)
-            throw new ScenarioNotRespectedException(message);
+            System.err.println(message);
     }
 
-    public void assertFalse(String message, boolean condition) throws Exception {
+    public void assertFalse(String message, boolean condition) {
         this.assertTrue(message, !condition);
     }
 
