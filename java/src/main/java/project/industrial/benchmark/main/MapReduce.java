@@ -46,6 +46,21 @@ public class MapReduce extends Configured implements Tool {
         }
     }
 
+    /*public static class IntSumReducer
+            extends Reducer<Text,IntWritable,Text,IntWritable> {
+        private IntWritable result = new IntWritable();
+        public void reduce(Text key, Iterable<IntWritable> values,
+                           Context context
+        ) throws IOException, InterruptedException {
+            int sum = 0;
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+            result.set(sum);
+           context.write(key, result);
+        }
+    }*/
+
     public int run(String[] args) throws IOException, InterruptedException, ClassNotFoundException, AccumuloSecurityException {
         Job job = Job.getInstance(getConf());
         job.setJobName(this.getClass().getSimpleName() + "_" + System.currentTimeMillis());
@@ -56,7 +71,7 @@ public class MapReduce extends Configured implements Tool {
         job.setInputFormatClass(AccumuloInputFormat.class);
         opts.setAccumuloConfigs(job);
 
-        // cQ cF
+        /**  cQ cF  **/
         HashSet<Pair<Text,Text>> columnsToFetch = new HashSet<>();
         for (String col : opts.columns.split(",")) {
             System.out.println("col: " + col);
@@ -73,16 +88,21 @@ public class MapReduce extends Configured implements Tool {
             System.out.println("Not Empty");}
             else{System.out.println("EMPTY");}
 
+
+
         job.setMapperClass(TTFMapper.class);
         job.setMapOutputKeyClass(NullWritable.class);
         job.setMapOutputValueClass(Text.class);
 
-        job.setNumReduceTasks(0);
+        job.setNumReduceTasks(0); // Pas de Reduce
 
         job.setOutputFormatClass(TextOutputFormat.class);
         TextOutputFormat.setOutputPath(job, new Path(opts.output));
 
+        long startTime = System.currentTimeMillis();
         job.waitForCompletion(true);
+        System.out.println("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
+                + " seconds");
         return job.isSuccessful() ? 0 : 1;
     }
 
