@@ -2,7 +2,7 @@
 PACKAGE_ROOT=project.industrial
 PACKAGE=$(PACKAGE_ROOT).benchmark
 DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-DATASET_URL=https://raw.githubusercontent.com/Mcdostone/industrial-project/master/benchmark/datasets/people_descriptions.csv
+DATASET_URL=https://raw.githubusercontent.com/Mcdostone/industrial-project/master/benchmark/datasets/log_access.csv
 DATASET_FILE=$(join $(DIR), $(notdir $(DATASET_URL)))
 ifeq ($(DEBUG),1)
 OPTS = --debug
