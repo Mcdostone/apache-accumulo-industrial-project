@@ -134,6 +134,7 @@ public abstract class Scenario {
     public void finish() {
         this.executorService.shutdown();
         logger.info(String.format("Scenario '%s' finished",this.name));
+        MetricsManager.getInstance().report();
     }
 
     /**

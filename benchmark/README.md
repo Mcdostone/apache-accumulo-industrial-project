@@ -86,13 +86,13 @@ PYTHONPATH=/opt/graphite/webapp gunicorn wsgi--workers=4 --bind=127.0.0.1:8080--
 ### With docker
 ```bash
 docker run -d\
---restart=always\
--p 80:80\
--p 2003-2004:2003-2004\
--p 2023-2024:2023-2024\
--p 8125:8125/udp\
--p 8126:8126\
-graphiteapp/graphite-statsd
+ --restart=always\
+ -p 80:80\
+ -p 2003-2004:2003-2004\
+ -p 2023-2024:2023-2024\
+ -p 8125:8125/udp\
+ -p 8126:8126\
+ graphiteapp/graphite-statsd
 ```
 
 

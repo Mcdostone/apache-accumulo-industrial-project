@@ -1,8 +1,13 @@
 package project.industrial.benchmark.core;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -13,17 +18,17 @@ import java.util.concurrent.TimeUnit;
 
 public class MetricsManager {
 
+    private static final Logger logger = LoggerFactory.getLogger(MetricsManager.class);
     private final static MetricRegistry METRIC_REGISTRY = new MetricRegistry();
     private static GraphiteReporter graphiteReporter;
     private static MetricsManager metricsManager;
 
     private MetricsManager(String scenarioName) {
-        MetricsManager.initGraphiteReporter(scenarioName);
-    }
-
-    private MetricsManager() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'.000Z'");
-        MetricsManager.initGraphiteReporter(sdf.format(new Date()));
+        if(scenarioName == null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
+            scenarioName = sdf.format(new Date());
+        }
+            MetricsManager.initReporters(scenarioName);
     }
 
     public void report() {
@@ -38,8 +43,18 @@ public class MetricsManager {
         return METRIC_REGISTRY;
     }
 
+    public static void initReporters(String scenarioName) {
+        initGraphiteReporter(scenarioName);
+        initConsoleReporter(scenarioName);
+    }
+
     public void close() {
         graphiteReporter.close();
+    }
+
+    private static void initConsoleReporter(String scenarioName) {
+        final ConsoleReporter consoleReporter = ConsoleReporter.forRegistry(getMetricRegistry()).build();
+        consoleReporter.start(10, TimeUnit.SECONDS);
     }
 
     private static void initGraphiteReporter(String scenarioName) {
@@ -50,6 +65,7 @@ public class MetricsManager {
                 InetSocketAddress address = new InetSocketAddress(prop.getProperty("graphite.server"),
                         Integer.parseInt(prop.getProperty("graphite.port"))
                 );
+                logger.info(prop.toString());
                 final Graphite graphite = new Graphite(address);
                 graphiteReporter = GraphiteReporter.forRegistry(METRIC_REGISTRY)
                         .prefixedWith(prop.getProperty("graphite.prefix") + "." + scenarioName)
@@ -67,29 +83,30 @@ public class MetricsManager {
     }
 
     public static void initInstance(String prefix) {
+        logger.info("Init metricManager");
         metricsManager = new MetricsManager(prefix);
     }
 
     public static MetricsManager getInstance() {
         if(metricsManager == null) {
-            System.err.println("You forger to call MetricsManager.initInstance(\"my_prefix\")");
+            System.err.println("You forget to call MetricsManager.initInstance(\"my_prefix\")");
             System.exit(1);
         }
         return metricsManager;
     }
 
     public static void main(String[] args) throws InterruptedException {
-        MetricsManager metricsManager = new MetricsManager();
-        MetricRegistry metricRegistry = metricsManager.getMetricRegistry();
+        MetricsManager.initInstance(null);
+        MetricRegistry metricRegistry = MetricsManager.getMetricRegistry();
         final ConsoleReporter consoleReporter = ConsoleReporter.forRegistry(metricRegistry).build();
         consoleReporter.start(10, TimeUnit.SECONDS);
-        Meter requests = metricRegistry.meter("requests");
-        for(int i = 0; i < 60; i++) {
-            requests.mark();
+        Counter requests = metricRegistry.counter("requests");
+        for(int i = 0; i < 20; i++) {
+            requests.inc();
             Thread.sleep(1000);
         }
-        metricsManager.report();
 
+        MetricsManager.getInstance().report();
     }
 
 }
