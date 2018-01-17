@@ -1,5 +1,6 @@
 package project.industrial.benchmark.core;
 
+import com.codahale.metrics.Counter;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.slf4j.Logger;
@@ -60,12 +61,12 @@ public abstract class Scenario {
      * @return Number of elements in the iterator.
      */
     public int countResults(Iterator<Map.Entry<Key, Value>> iterator) {
-        int count = 0;
+        Counter countObjects = MetricsManager.getMetricRegistry().counter("count_data_retrieved");
         while(iterator.hasNext()) {
-            count++;
+            countObjects.inc();
             iterator.next();
         }
-        return count;
+        return (int) countObjects.getCount();
     }
 
     /**

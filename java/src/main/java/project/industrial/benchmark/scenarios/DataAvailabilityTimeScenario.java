@@ -7,9 +7,12 @@ import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.client.ScannerBase;
 import org.apache.accumulo.core.data.Range;
+import project.industrial.benchmark.core.MetricsManager;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.core.ScenarioNotRespectedException;
+import project.industrial.benchmark.injectors.AbstractCSVInjector;
 import project.industrial.benchmark.injectors.Injector;
+import project.industrial.benchmark.injectors.PeopleCSVInjector;
 import project.industrial.benchmark.tasks.FullScanTask;
 import project.industrial.benchmark.tasks.GetByKeyTask;
 
@@ -47,12 +50,19 @@ public class DataAvailabilityTimeScenario extends Scenario {
         logger.info(String.format("Data is inserted, executing getByKeyTask in %d ms and getAllTask in %d ms", delayKey, delayMining));
         long begin = System.currentTimeMillis();
         // Here, we schedule a key access
-        ScheduledFuture futurKey = this.executorService.schedule(this.getByKeyTask, delayKey, TimeUnit.MILLISECONDS);
+        ScheduledFuture futurKey = this.executorService.schedule(
+                this.getByKeyTask,
+                delayKey,
+                TimeUnit.MILLISECONDS
+        );
         // we schedule the full scan
-        ScheduledFuture<ScannerBase> futurMining = this.executorService.schedule(this.getAllTask, delayMining, TimeUnit.MILLISECONDS);
+        ScheduledFuture<ScannerBase> futurMining = this.executorService.schedule(
+                this.getAllTask,
+                delayMining,
+                TimeUnit.MILLISECONDS
+        );
         this.testResultKey(begin, System.currentTimeMillis(), futurKey.get());
         this.testResultMining(countInsertions,  this.countResults(futurMining.get().iterator()));
-        this.executorService.shutdown();
     }
 
     private void testResultMining(int expected, int nbInsertions) throws Exception {
@@ -74,6 +84,9 @@ public class DataAvailabilityTimeScenario extends Scenario {
     }
 
     public static void main(String[] args) throws Exception {
+        String name = "Data availability time";
+        MetricsManager.initInstance(name);
+
         Opts opts = new Opts();
         BatchWriterOpts bwOpts = new BatchWriterOpts();
         opts.parseArgs(DataRateInjectionScenario.class.getName(), args, bwOpts);
@@ -84,9 +97,16 @@ public class DataAvailabilityTimeScenario extends Scenario {
         Scanner sc1 = connector.createScanner(opts.getTableName(), opts.auths);
         sc1.setRange(new Range());
 
+        AbstractCSVInjector injector = new PeopleCSVInjector(bw, opts.csv);
+        injector.loadData();
+
         if(opts.key == null)
             opts.key = askInput("Type the key you want to retrieve:");
 
         GetByKeyTask getKey = new GetByKeyTask(sc, opts.key);
+        FullScanTask getAll = new FullScanTask(sc1);
+        Scenario s = new DataAvailabilityTimeScenario(injector, getKey, getAll);
+        s.run();
+        s.finish();
     }
 }

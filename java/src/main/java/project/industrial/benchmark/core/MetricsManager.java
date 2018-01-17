@@ -24,11 +24,8 @@ public class MetricsManager {
     private static MetricsManager metricsManager;
 
     private MetricsManager(String scenarioName) {
-        if(scenarioName == null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
-            scenarioName = sdf.format(new Date());
-        }
-            MetricsManager.initReporters(scenarioName);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
+        MetricsManager.initReporters(scenarioName + "_" + sdf.format(new Date()));
     }
 
     public void report() {

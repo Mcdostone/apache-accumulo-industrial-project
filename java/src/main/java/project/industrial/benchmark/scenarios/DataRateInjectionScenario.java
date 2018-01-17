@@ -7,6 +7,7 @@ import project.industrial.benchmark.core.MetricsManager;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.injectors.AbstractCSVInjector;
 import project.industrial.benchmark.injectors.Injector;
+import project.industrial.benchmark.injectors.PeopleCSVInjector;
 import project.industrial.benchmark.injectors.SimpleCSVInjector;
 
 /**
@@ -41,7 +42,7 @@ public class DataRateInjectionScenario extends Scenario {
         Connector connector = opts.getConnector();
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
 
-        AbstractCSVInjector injector = new SimpleCSVInjector(bw, opts.csv);
+        AbstractCSVInjector injector = new PeopleCSVInjector(bw, opts.csv);
         injector.loadData();
 
         Scenario scenario = new DataRateInjectionScenario(name, injector);

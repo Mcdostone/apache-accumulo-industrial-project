@@ -1,7 +1,9 @@
 package project.industrial.benchmark;
 
-import project.industrial.benchmark.scenarios.*;
-import project.industrial.benchmark.tasks.InjectorLoopTask;
+import project.industrial.benchmark.core.MetricsManager;
+import project.industrial.benchmark.scenarios.DataAvailabilityTimeScenario;
+import project.industrial.benchmark.scenarios.DataRateInjectionScenario;
+import project.industrial.benchmark.scenarios.SandboxScenario;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +20,13 @@ public class Help {
         List<Class<?>> classes = new ArrayList<>();
         classes.add(DataRateInjectionScenario.class);
         classes.add(DataAvailabilityTimeScenario.class);
-        classes.add(DataRateDuringFullScanScenario.class);
-        classes.add(TimeGetByKeyScenario.class);
-        classes.add(TimeGetByKeysListScenario.class);
-        classes.add(ConcurrentActionsScenario.class);
+        // classes.add(DataRateDuringFullScanScenario.class);
+        // classes.add(TimeGetByKeyScenario.class);
+        // classes.add(TimeGetByKeysListScenario.class);
+        // classes.add(ConcurrentActionsScenario.class);
         classes.add(SandboxScenario.class);
-        classes.add(InjectorLoopTask.class);
+        classes.add(MetricsManager.class);
+        // classes.add(InjectorLoopTask.class);
         System.out.printf("%d java classes available for the benchmark:\n", classes.size());
         for(Class c: classes)
             System.out.printf("\t%s\n", c.getName());
