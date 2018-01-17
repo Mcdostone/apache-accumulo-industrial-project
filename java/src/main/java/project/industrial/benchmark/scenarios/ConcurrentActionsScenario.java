@@ -52,6 +52,6 @@ public class ConcurrentActionsScenario extends Scenario {
 
     public static void main(String[] args) throws Exception {
         Scenario scenario = new ConcurrentActionsScenario();
-        scenario.action();
+//        scenario.action();
     }
 }

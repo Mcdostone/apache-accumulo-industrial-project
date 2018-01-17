@@ -24,4 +24,5 @@ public class SimpleCSVInjector extends AbstractCSVInjector {
         mutations.add(m);
         return mutations;
     }
+
 }

@@ -68,6 +68,5 @@ public class TimeGetByKeyScenario extends Scenario {
             opts.rowId = Scenario.askInput("Key of object you want to retrieve:");
 
         Scenario scenario = new TimeGetByKeyScenario(sc, opts.rowId);
-        scenario.action();
     }
 }

@@ -52,7 +52,6 @@ public class TimeGetByKeysListScenario extends Scenario {
                 this.executorService.schedule(this.getByListTask, 0, TimeUnit.SECONDS);
         this.checkResults(future.get().iterator());
         this.saveResultsInCSV(future.get().iterator());
-        this.cut();
     }
 
     private void checkResults(Iterator<Map.Entry<Key, Value>> iterator) throws Exception {
@@ -110,6 +109,5 @@ public class TimeGetByKeysListScenario extends Scenario {
         BatchScanner scanner = connector.createBatchScanner(opts.getTableName(), opts.auths, bsOpts.scanThreads);
         GetByKeysListTask getByList = new GetByKeysListTask(scanner, keysRange);
         Scenario scenario = new TimeGetByKeysListScenario(getByList, keysRange);
-        scenario.action();
     }
 }

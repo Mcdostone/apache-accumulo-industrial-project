@@ -22,12 +22,11 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public abstract class Scenario {
 
-    /** A user-friendly name for the scenario */
-    private String name;
+    /** A name for the scenario, used in graphite */
+    protected String name;
     /** Useful for scheduling some callables */
     protected ScheduledExecutorService executorService;
     protected static Logger logger = LoggerFactory.getLogger(Scenario.class);
-
 
     public Scenario(String name) {
         this(name, 1);
@@ -125,10 +124,14 @@ public abstract class Scenario {
         return sc.nextLine().trim();
     }
 
+    public void run() throws Exception {
+        this.action();
+    }
+
     /**
      * Close the scenario (like at the end of a shooting)
      */
-    public void cut() {
+    public void finish() {
         this.executorService.shutdown();
         logger.info(String.format("Scenario '%s' finished",this.name));
     }
@@ -139,6 +142,6 @@ public abstract class Scenario {
      * Action contains your operations (actors) and your measurements (filmmaker)
      * @throws Exception
      */
-    public abstract void action() throws Exception;
+    protected abstract void action() throws Exception;
 
 }

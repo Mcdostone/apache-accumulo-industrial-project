@@ -53,7 +53,6 @@ public class DataAvailabilityTimeScenario extends Scenario {
         this.testResultKey(begin, System.currentTimeMillis(), futurKey.get());
         this.testResultMining(countInsertions,  this.countResults(futurMining.get().iterator()));
         this.executorService.shutdown();
-        this.cut();
     }
 
     private void testResultMining(int expected, int nbInsertions) throws Exception {
@@ -89,10 +88,5 @@ public class DataAvailabilityTimeScenario extends Scenario {
             opts.key = askInput("Type the key you want to retrieve:");
 
         GetByKeyTask getKey = new GetByKeyTask(sc, opts.key);
-/*        Injector injector = new CSVValueInjector(bw, opts.csv);
-        FullScanTask getAll = new FullScanTask(sc1);
-        Scenario scenario = new DataAvailabilityTimeScenario(injector, getKey, getAll);
-        scenario.action();
-        */
     }
 }

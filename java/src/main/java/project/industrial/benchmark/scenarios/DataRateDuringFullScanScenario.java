@@ -39,7 +39,6 @@ public class DataRateDuringFullScanScenario extends Scenario {
         ScheduledFuture<List<Long>> futurMeasurements = this.executorService.schedule(this.fullScan, 0, TimeUnit.SECONDS);
         this.processMeasurements(futurMeasurements.get());
         this.executorService.shutdown();
-        this.cut();
     }
 
     private void processMeasurements(List<Long> measurements) throws Exception {
@@ -64,6 +63,5 @@ public class DataRateDuringFullScanScenario extends Scenario {
 
         AbstractFullScanTask<List<Long>> getAll = new MeasureTimeForObjectAccessFullScanTask(sc);
         Scenario scenario = new DataRateDuringFullScanScenario(getAll);
-        scenario.action();
     }
 }

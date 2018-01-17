@@ -1,10 +1,13 @@
 package project.industrial.benchmark.injectors;
 
+import com.codahale.metrics.Counter;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.data.Mutation;
+import org.apache.accumulo.server.metrics.Metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import project.industrial.benchmark.core.MetricsManager;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -20,8 +23,10 @@ public abstract class AbstractCSVInjector implements Injector {
     private List<String> data;
     private String filename;
 
+
     public AbstractCSVInjector(BatchWriter bw, String filename) {
-        this.injector = new SimpleInjector(bw);
+        Counter c = MetricsManager.getMetricRegistry().counter("count_injections");
+        this.injector = new InjectorWithMetrics(bw, c);
         this.filename = filename;
         this.data = new ArrayList<>();
     }

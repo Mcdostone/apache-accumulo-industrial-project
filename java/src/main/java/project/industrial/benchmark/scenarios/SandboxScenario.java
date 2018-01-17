@@ -33,7 +33,6 @@ public class SandboxScenario extends Scenario {
         Thread.sleep(5000);
         this.showResults(s.iterator());
         this.executorService.shutdown();
-        this.cut();
     }
 
     public static void main(String[] args) throws Exception {
@@ -47,6 +46,5 @@ public class SandboxScenario extends Scenario {
 
         ReaderTask get = new GetByKeyTask(sc, "45678");
         Scenario scenario = new SandboxScenario(get);
-        scenario.action();
     }
 }

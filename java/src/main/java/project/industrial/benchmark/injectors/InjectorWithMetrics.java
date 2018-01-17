@@ -1,5 +1,6 @@
 package project.industrial.benchmark.injectors;
 
+import com.codahale.metrics.Counter;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.data.Mutation;
@@ -10,26 +11,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class SimpleInjector implements Injector {
+public class InjectorWithMetrics implements Injector {
 
-    private static final Logger logger = LoggerFactory.getLogger(SimpleInjector.class);
+    private static final Logger logger = LoggerFactory.getLogger(InjectorWithMetrics.class);
+    private final Counter counter;
     private List<Mutation> mutations;
     private final BatchWriter bw;
 
-    public SimpleInjector(BatchWriter bw) {
+    public InjectorWithMetrics(BatchWriter bw, Counter counter) {
         this.bw = bw;
         this.mutations = new ArrayList<>();
+        this.counter = counter;
     }
 
     @Override
     public int inject() throws MutationsRejectedException {
         logger.info(String.format("Injecting %d mutations", this.mutations.size()));
-        int countInjections = 0;
         for(Mutation m: this.mutations) {
             this.bw.addMutation(m);
-            countInjections++;
+            this.counter.inc();
         }
-        return countInjections;
+        return (int) this.counter.getCount();
     }
 
     @Override
