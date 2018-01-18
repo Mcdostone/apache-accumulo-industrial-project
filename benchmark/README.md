@@ -5,8 +5,19 @@ For you benchmark, we used graphite for storing metrics, Diamond for polling sys
 and grafana to visualize results.
 
 ## Overview of the cluster
-3 VMs
- - 
+
+
+Machine  | VM
+---       | ---
+[145.239.142.186](145.239.142.186) | [37.59.123.111 (Metrics)](37.59.123.111)
+[145.239.142.185](145.239.142.185) | [37.59.123.118 (injector)](37.59.123.118)
+[145.239.142.188](145.239.142.188) | [37.59.123.138 (scanner)](37.59.123.138)
+ | [145.239.142.187](145.239.142.187) |
+
+
+ <p align="center">
+	<img width="90%" src="https://raw.githubusercontent.com/Mcdostone/industrial-project/master/schemas/overview_cluster.png" alt="Amazing book!"/>
+</p>
 
 
 ## Configure your TSDB in accumulo:
