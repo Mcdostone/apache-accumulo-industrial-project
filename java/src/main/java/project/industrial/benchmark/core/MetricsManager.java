@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MetricsManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(MetricsManager.class);
     private static boolean reportersInit = false;
     private final static MetricRegistry METRIC_REGISTRY = new MetricRegistry();
     private static final List<ScheduledReporter> reporters = new ArrayList<>();
@@ -54,7 +53,7 @@ public class MetricsManager {
     private static ScheduledReporter initCsvReporter(String scenarioName) {
         final CsvReporter consoleReporter = CsvReporter.forRegistry(getMetricRegistry())
                 .build(new File("."));
-        consoleReporter.start(1, TimeUnit.SECONDS);
+        consoleReporter.start(20, TimeUnit.SECONDS);
         return consoleReporter;
     }
 
