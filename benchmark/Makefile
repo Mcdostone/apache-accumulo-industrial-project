@@ -11,7 +11,7 @@ OPTS = --debug
 else
 OPTS = 
 endif
-JAVA_RUN=java -cp /root/sandbox-accumulo-1.0-jar-with-dependencies.jar 
+JAVA_RUN=java -cp /root/sandbox-accumulo-1.0-jar-with-dependencies.jar
 ZOOKEEPERS=145.239.142.185,145.239.142.187,145.239.142.188
 INSTANCE=accumulo
 ACCUMULO_TABLE=test
@@ -26,7 +26,7 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	--csv $(DATASET_FILE) \
+	--csv $(BIG_DATASET_URL) \
 	$(OPTS)
 
 

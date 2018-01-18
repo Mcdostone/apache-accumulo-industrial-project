@@ -71,11 +71,12 @@ public class MetricsManager {
 
             graphiteReporter = GraphiteReporter.forRegistry(getMetricRegistry())
                     .prefixedWith(prop.getProperty("graphite.prefix") + "." + scenarioName)
+                    .convertRatesTo(TimeUnit.SECONDS)
+                    .convertDurationsTo(TimeUnit.MILLISECONDS)
                     .build(graphite);
                 graphiteReporter.start(
                         Long.parseLong(prop.getProperty("graphite.polling.period")),
                         TimeUnit.valueOf(prop.getProperty("graphite.polling.timeUnit")));
-            System.out.println(graphite.isConnected());
         } catch (IOException e) { e.printStackTrace(); }
 
         return graphiteReporter;
@@ -87,13 +88,10 @@ public class MetricsManager {
         initReporters("loul");
         Counter requests = getMetricRegistry().counter("requests");
         requests.inc();
+        Thread.sleep(60*1000);
         requests.inc();
         requests.inc();
-        Thread.sleep(1000);
-        requests.inc();
-        Thread.sleep(1000);
-        requests.inc();
-        Thread.sleep(1000);
+        Thread.sleep(60 * 1000);
         requests.inc();
         Thread.sleep(1000);
         requests.inc();
