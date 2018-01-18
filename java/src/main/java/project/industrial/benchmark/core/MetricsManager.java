@@ -1,109 +1,104 @@
 package project.industrial.benchmark.core;
 
-import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.*;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
+import com.codahale.metrics.graphite.PickledGraphite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 public class MetricsManager {
 
     private static final Logger logger = LoggerFactory.getLogger(MetricsManager.class);
+    private static boolean reportersInit = false;
     private final static MetricRegistry METRIC_REGISTRY = new MetricRegistry();
-    private static GraphiteReporter graphiteReporter;
-    private static MetricsManager metricsManager;
-
-    private MetricsManager(String scenarioName) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
-        MetricsManager.initReporters(scenarioName + "_" + sdf.format(new Date()));
-    }
-
-    public void report() {
-        if(graphiteReporter == null) {
-            System.err.println("You forget to call 'MetricsManager.initGraphiteReport()' at the beginning of the class");
-            System.exit(1);
-        }
-        graphiteReporter.report();
-    }
+    private static final List<ScheduledReporter> reporters = new ArrayList<>();
 
     public static MetricRegistry getMetricRegistry() {
         return METRIC_REGISTRY;
     }
 
+    public static void initReporters(Class cls) { initReporters(cls.getSimpleName()); }
+
     public static void initReporters(String scenarioName) {
-        initGraphiteReporter(scenarioName);
-        initConsoleReporter(scenarioName);
+        if(!reportersInit) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
+            String name = sdf.format(new Date());
+            if(scenarioName != null)
+                name = scenarioName + "_" + name;
+            reporters.add(initGraphiteReporter(name));
+            reporters.add(initCsvReporter(name));
+            reportersInit = true;
+        }
+        else
+            System.err.println("You can call 'initReporters' only once!");
     }
 
-    public void close() {
-        graphiteReporter.close();
+    public static void close() {
+        reporters.forEach(r -> {
+            r.report();
+            r.close();
+        });
     }
 
-    private static void initConsoleReporter(String scenarioName) {
-        final ConsoleReporter consoleReporter = ConsoleReporter.forRegistry(getMetricRegistry()).build();
-        consoleReporter.start(10, TimeUnit.SECONDS);
+    private static ScheduledReporter initCsvReporter(String scenarioName) {
+        final CsvReporter consoleReporter = CsvReporter.forRegistry(getMetricRegistry())
+                .build(new File("."));
+        consoleReporter.start(1, TimeUnit.SECONDS);
+        return consoleReporter;
     }
 
-    private static void initGraphiteReporter(String scenarioName) {
-        if (graphiteReporter == null) {
-            Properties prop = new Properties();
-            try {
-                prop.load(MetricRegistry.class.getResourceAsStream("/metrics.properties"));
-                InetSocketAddress address = new InetSocketAddress(prop.getProperty("graphite.server"),
-                        Integer.parseInt(prop.getProperty("graphite.port"))
-                );
-                logger.info(prop.toString());
-                final Graphite graphite = new Graphite(address);
-                graphiteReporter = GraphiteReporter.forRegistry(METRIC_REGISTRY)
-                        .prefixedWith(prop.getProperty("graphite.prefix") + "." + scenarioName)
-                        .convertRatesTo(TimeUnit.SECONDS)
-                        .convertDurationsTo(TimeUnit.MILLISECONDS)
-                        .filter(MetricFilter.ALL)
-                        .build(graphite);
+    private static ScheduledReporter initGraphiteReporter(String scenarioName) {
+        Properties prop = new Properties();
+        GraphiteReporter graphiteReporter = null;
+        try {
+            prop.load(MetricRegistry.class.getResourceAsStream("/metrics.properties"));
+            InetSocketAddress address = new InetSocketAddress(
+                    prop.getProperty("graphite.server"),
+                    Integer.parseInt(prop.getProperty("graphite.port"))
+            );
+
+            final PickledGraphite graphite = new PickledGraphite(address);
+
+            graphiteReporter = GraphiteReporter.forRegistry(getMetricRegistry())
+                    .prefixedWith(prop.getProperty("graphite.prefix") + "." + scenarioName)
+                    .build(graphite);
                 graphiteReporter.start(
-                        Integer.parseInt(prop.getProperty("graphite.polling.period")),
+                        Long.parseLong(prop.getProperty("graphite.polling.period")),
                         TimeUnit.valueOf(prop.getProperty("graphite.polling.timeUnit")));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+            System.out.println(graphite.isConnected());
+        } catch (IOException e) { e.printStackTrace(); }
+
+        return graphiteReporter;
     }
 
-    public static void initInstance(String prefix) {
-        logger.info("Init metricManager");
-        metricsManager = new MetricsManager(prefix);
-    }
 
-    public static MetricsManager getInstance() {
-        if(metricsManager == null) {
-            System.err.println("You forget to call MetricsManager.initInstance(\"my_prefix\")");
-            System.exit(1);
-        }
-        return metricsManager;
-    }
 
     public static void main(String[] args) throws InterruptedException {
-        MetricsManager.initInstance(null);
-        MetricRegistry metricRegistry = MetricsManager.getMetricRegistry();
-        final ConsoleReporter consoleReporter = ConsoleReporter.forRegistry(metricRegistry).build();
-        consoleReporter.start(10, TimeUnit.SECONDS);
-        Counter requests = metricRegistry.counter("requests");
-        for(int i = 0; i < 20; i++) {
-            requests.inc();
-            Thread.sleep(1000);
-        }
-
-        MetricsManager.getInstance().report();
+        initReporters("loul");
+        Counter requests = getMetricRegistry().counter("requests");
+        requests.inc();
+        requests.inc();
+        requests.inc();
+        Thread.sleep(1000);
+        requests.inc();
+        Thread.sleep(1000);
+        requests.inc();
+        Thread.sleep(1000);
+        requests.inc();
+        Thread.sleep(1000);
+        requests.inc();
+        close();
     }
 
 }

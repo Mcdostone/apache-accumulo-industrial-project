@@ -41,7 +41,7 @@ public class DataRateDuringFullScanScenario extends Scenario {
     public static void main(String[] args) throws Exception {
         // Always start by this !
         String name = "data_rate_during_full_scan";
-        MetricsManager.initInstance(name);
+        MetricsManager.initReporters(name);
 
         ClientOnRequiredTable opts = new ClientOnRequiredTable();
         BatchWriterOpts bwOpts = new BatchWriterOpts();

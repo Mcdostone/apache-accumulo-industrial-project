@@ -1,10 +1,10 @@
 package project.industrial.benchmark.injectors;
 
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.Meter;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.data.Mutation;
-import org.apache.accumulo.server.metrics.Metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.MetricsManager;
@@ -25,13 +25,14 @@ public abstract class AbstractCSVInjector implements Injector {
 
 
     public AbstractCSVInjector(BatchWriter bw, String filename) {
-        Counter c = MetricsManager.getMetricRegistry().counter("count_injections");
-        this.injector = new InjectorWithMetrics(bw, c);
+        Meter meter = MetricsManager.getMetricRegistry().meter("rate_injections");
+        Counter count = MetricsManager.getMetricRegistry().counter("count_injections");
+        this.injector = new InjectorWithMetrics(bw, meter, count);
         this.filename = filename;
         this.data = new ArrayList<>();
     }
 
-    public void loadData() throws Exception {
+    public void loadData() {
         logger.info(String.format("Load '%s' in memory", this.filename));
         BufferedReader reader;
         int countLine = 0;
@@ -47,6 +48,10 @@ public abstract class AbstractCSVInjector implements Injector {
             e.printStackTrace();
         }
         logger.info(countLine + " rows has been loaded");
+
+    }
+
+    public void createMutationsFromData() {
         this.data.forEach(d -> this.injector.addMutations(this.parseLine(d)));
     }
 

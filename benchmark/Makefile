@@ -35,8 +35,9 @@ test_graphite: ## test communication between java code and graphite
 
 
 download_dataset: ## Download the dataset from github
-	wget $(DATASET_URL) .
-	wget $(BIG_DATASET_URL) .
+	rm -f *.csv
+	wget $(DATASET_URL)
+	wget $(BIG_DATASET_URL)
 	
 
 help: ## Show this help !

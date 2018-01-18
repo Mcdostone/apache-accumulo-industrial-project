@@ -20,8 +20,8 @@ public class DataRateInjectionScenario extends Scenario {
 
     private Injector injector;
 
-    public DataRateInjectionScenario(String name, Injector injector) {
-        super(name);
+    public DataRateInjectionScenario(Injector injector) {
+        super(DataRateInjectionScenario.class.getSimpleName());
         this.injector = injector;
     }
 
@@ -33,8 +33,7 @@ public class DataRateInjectionScenario extends Scenario {
 
     public static void main(String[] args) throws Exception {
         // Always start by this !
-        String name = "data_rate_injection";
-        MetricsManager.initInstance(name);
+        MetricsManager.initReporters(DataRateInjectionScenario.class);
 
         InjectorOpts opts = new InjectorOpts();
         BatchWriterOpts bwOpts = new BatchWriterOpts();
@@ -44,8 +43,11 @@ public class DataRateInjectionScenario extends Scenario {
 
         AbstractCSVInjector injector = new PeopleCSVInjector(bw, opts.csv);
         injector.loadData();
-
-        Scenario scenario = new DataRateInjectionScenario(name, injector);
+        injector.createMutationsFromData();
+        injector.createMutationsFromData();
+        injector.createMutationsFromData();
+        injector.createMutationsFromData();
+        Scenario scenario = new DataRateInjectionScenario(injector);
         scenario.run();
         scenario.finish();
     }
