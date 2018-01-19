@@ -1,7 +1,6 @@
 package project.industrial.benchmark;
 
 import project.industrial.benchmark.core.MetricsManager;
-import project.industrial.benchmark.main.CreateTable;
 import project.industrial.benchmark.scenarios.DataAvailabilityTimeScenario;
 import project.industrial.benchmark.scenarios.DataRateInjectionScenario;
 import project.industrial.benchmark.scenarios.SandboxScenario;
@@ -27,7 +26,6 @@ public class Help {
         // classes.add(ConcurrentActionsScenario.class);
         classes.add(SandboxScenario.class);
         classes.add(MetricsManager.class);
-        classes.add(CreateTable.class);
         // classes.add(InjectorLoopTask.class);
         System.out.printf("%d java classes available for the benchmark:\n", classes.size());
         for(Class c: classes)

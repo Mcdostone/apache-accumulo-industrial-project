@@ -26,8 +26,19 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	--batchThreads 20 \
+	--batchThreads 15 \
+	--batchMemory 1 \
 	--csv $(BIG_DATASET_FILE) \
+	$(OPTS)
+
+
+scan_table: ## full scan on a given table
+	$(JAVA_RUN) $(PACKAGE_ROOT).features.mining.GeneralScan \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
 	$(OPTS)
 
 
