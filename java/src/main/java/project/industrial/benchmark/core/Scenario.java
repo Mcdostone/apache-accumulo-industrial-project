@@ -5,6 +5,7 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import project.industrial.benchmark.scenarios.DataRateInjectionScenario;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -39,6 +40,7 @@ public abstract class Scenario {
      */
     public Scenario(String name, int corePoolSize) {
         this.name = name;
+        MetricsManager.initReporters(this.name);
         this.executorService = new ScheduledThreadPoolExecutor(corePoolSize);
     }
 

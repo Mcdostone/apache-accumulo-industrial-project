@@ -26,12 +26,12 @@ public class PeopleCSVInjector extends AbstractCSVInjector {
         // date, name, firstname, email, url, ip
         String[] parts = line.split(",");
         String key =  randomString() + "_" + parts[1] + "_" + parts[2];
-        mutations.add(this.buildMutation(key, "meta", "date", parts[0]));
-        mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
-        mutations.add(this.buildMutation(key, "identity", "firstname", parts[2]));
-        mutations.add(this.buildMutation(key, "meta", "email", parts[3]));
-        mutations.add(this.buildMutation(key, "access", "url", parts[4]));
-        mutations.add(this.buildMutation(key, "access", "ip", parts[5]));
+            mutations.add(this.buildMutation(key, "meta", "date", parts[0]));
+            mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
+            mutations.add(this.buildMutation(key, "identity", "firstname", parts[2]));
+            mutations.add(this.buildMutation(key, "meta", "email", parts[3]));
+            mutations.add(this.buildMutation(key, "access", "url", parts[4]));
+            mutations.add(this.buildMutation(key, "access", "ip", parts[5]));
         return mutations;
     }
 

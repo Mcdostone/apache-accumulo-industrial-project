@@ -32,7 +32,7 @@ public abstract class AbstractCSVInjector implements Injector {
         this.data = new ArrayList<>();
     }
 
-    public void loadData() {
+    public int loadData() {
         logger.info(String.format("Load '%s' in memory", this.filename));
         BufferedReader reader;
         int countLine = 0;
@@ -42,13 +42,13 @@ public abstract class AbstractCSVInjector implements Injector {
             while((line = reader.readLine()) != null) {
                 line = line.substring(0, line.length() - 1);
                 this.data.add(line);
-
-                countLine++; }
+                countLine++;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         logger.info(countLine + " rows has been loaded");
-
+        return countLine;
     }
 
     public void createMutationsFromData() {

@@ -3,12 +3,12 @@ package project.industrial.benchmark.scenarios;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
-import project.industrial.benchmark.core.MetricsManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.injectors.AbstractCSVInjector;
 import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.injectors.PeopleCSVInjector;
-import project.industrial.benchmark.injectors.SimpleCSVInjector;
 
 /**
  * This scenario checks the data rate injection in accumulo.
@@ -18,6 +18,7 @@ import project.industrial.benchmark.injectors.SimpleCSVInjector;
  */
 public class DataRateInjectionScenario extends Scenario {
 
+    private static final Logger logger = LoggerFactory.getLogger(DataRateInjectionScenario.class);
     private Injector injector;
 
     public DataRateInjectionScenario(Injector injector) {
@@ -32,9 +33,6 @@ public class DataRateInjectionScenario extends Scenario {
     }
 
     public static void main(String[] args) throws Exception {
-        // Always start by this !
-        MetricsManager.initReporters(DataRateInjectionScenario.class);
-
         InjectorOpts opts = new InjectorOpts();
         BatchWriterOpts bwOpts = new BatchWriterOpts();
         opts.parseArgs(DataRateInjectionScenario.class.getName(), args, bwOpts);
@@ -42,11 +40,22 @@ public class DataRateInjectionScenario extends Scenario {
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
 
         AbstractCSVInjector injector = new PeopleCSVInjector(bw, opts.csv);
-        injector.loadData();
-        injector.createMutationsFromData();
-        injector.createMutationsFromData();
-        injector.createMutationsFromData();
-        injector.createMutationsFromData();
+        int nbLines = injector.loadData();
+
+        int nbMutationsGenerations = (int) Math.ceil(5000000.0 / Long.valueOf(nbLines));
+        logger.info(String.format("Multiply this file by %d => %d lines",nbMutationsGenerations, nbLines * nbMutationsGenerations));
+        for(int generation = 1; generation <= nbMutationsGenerations; generation++) {
+            logger.info("multiplication number " + generation);
+            injector.createMutationsFromData();
+        }
+
+        logger.info(String.format(
+                "6 attributes for each line => %d * %d = %d entries/mutations",
+                nbLines * nbMutationsGenerations,
+                6,
+                nbLines * nbMutationsGenerations * 6)
+        );
+
         Scenario scenario = new DataRateInjectionScenario(injector);
         scenario.run();
         scenario.finish();
