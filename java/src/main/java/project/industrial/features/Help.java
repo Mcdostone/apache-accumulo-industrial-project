@@ -1,13 +1,12 @@
 package project.industrial.features;
 
+import project.industrial.examples.*;
 import project.industrial.features.injectors.AddColumn;
 import project.industrial.features.injectors.PeopleInjector;
-import project.industrial.examples.*;
+import project.industrial.features.mining.GeneralScan;
 import project.industrial.features.mining.GetByList;
 import project.industrial.features.mining.GetByRange;
-import project.industrial.features.mining.GeneralScan;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

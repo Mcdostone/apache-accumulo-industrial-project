@@ -1,35 +1,11 @@
 .DEFAULT_GOAL=help
-.PHONY: build_hadoop help download_zookeeper download_accumulo build run run_java clean build_java
-FLAGS = --network=host
-ZOOKEEPER_VERSION = 3.4.11
-HADOOP_VERSION = 2.9.0
+.PHONY: build_java transfer_jar transfer_dataset run clean help
 ACCUMULO_VERSION = 1.8.1
-ACCUMULO_HOME=/opt/accumulo-$(ACCUMULO_VERSION)
 
-download_zookeeper: ## Download zookeeper in zookeeper/ folder
-	-wget -nc http://apache.crihan.fr/dist/zookeeper/zookeeper-$(ZOOKEEPER_VERSION)/zookeeper-$(ZOOKEEPER_VERSION).tar.gz -P ./zookeeper
-
-download_accumulo: ## Download accumulor in accumulo/ folder
-	-wget -nc http://apache.crihan.fr/dist/accumulo/$(ACCUMULO_VERSION)/accumulo-$(ACCUMULO_VERSION)-bin.tar.gz  -O ./accumulo/accumulo-$(ACCUMULO_VERSION).tar.gz
-
-build_hadoop: ## Build the hadoop docker image
-	wget -nc http://www.eu.apache.org/dist/hadoop/common/stable/hadoop-${HADOOP_VERSION}.tar.gz -P ./hadoop
-	docker build $(FLAGS) \
-		-t \pi-hadoop:latest \
-		--build-arg HADOOP_VERSION=$(HADOOP_VERSION) \
-		 hadoop/
-
-build: build_hadoop download_accumulo download_zookeeper ## Build the single-container accumulo docker image
-	cp ./zookeeper/zookeeper-$(ZOOKEEPER_VERSION).tar.gz ./single-container/
-	cp ./accumulo/accumulo-$(ACCUMULO_VERSION).tar.gz ./single-container/
-	docker build $(FLAGS) \
-		-t pi-accumulo:latest \
-		--build-arg ACCUMULO_VERSION=$(ACCUMULO_VERSION) \
-		--build-arg ZOOKEEPER_VERSION=$(ZOOKEEPER_VERSION) \
-		single-container
 
 build_java: ## Generate the jar for features
 	mvn -f ../java/pom.xml -Pprod clean compile assembly:single
+
 
 transfer_jar:  ## Transfer the generated jar into the currently running container
 	@CONTAINER_ID=$$(docker ps -aqf "name=pi-accumulo"); \
@@ -38,7 +14,8 @@ transfer_jar:  ## Transfer the generated jar into the currently running containe
 	else \
 	 	$(MAKE) build_java; \
 		docker cp $$(pwd)/../java/target/sandbox-accumulo-1.0-jar-with-dependencies.jar $$CONTAINER_ID:/opt/accumulo-$(ACCUMULO_VERSION)/lib/ext/; \
-	fi	
+	fi
+
 
 transfer_dataset:  ## Transfer the dataset to the current running container
 	@CONTAINER_ID=$$(docker ps -aqf "name=pi-accumulo"); \
@@ -48,6 +25,7 @@ transfer_dataset:  ## Transfer the dataset to the current running container
 		docker cp $$(pwd)/../benchmark/datasets/*.csv $$CONTAINER_ID:/opt/benchmark; \
 	fi
 
+
 run: # Run the container with accumulo
 	docker run \
 		--rm \
@@ -55,14 +33,14 @@ run: # Run the container with accumulo
 		-p 50070:50070 \
 		-p 9995:9995 \
 		--name pi-accumulo \
-		-v $$(pwd)/single-container/features/Makefile:/opt/features/Makefile:rw \
-		-v $$(pwd)/single-container/benchmark/Makefile:/opt/benchmark/Makefile:rw \
-		pi-accumulo:latest bash
-		#-v $$(pwd)/../java/target/:$(ACCUMULO_HOME)/lib/ext/:rw
+		-v $$(pwd)/features/Makefile:/opt/features/Makefile:rw \
+		-v $$(pwd)/benchmark/Makefile:/opt/benchmark/Makefile:rw \
+		mcdostone/accumulo bash
+
 
 clean: ## Remove all archives files and docker images
-	rm -f accumulo/*.tar.gz zookeeper/*.tar.gz hadoop/*.tar.gz
 	docker rmi -f $$(docker images -aq)
+
 
 help: ## Show this help
 	#                    __                 ___      ___             

@@ -1,11 +1,72 @@
-# Benchmark Accumulo !
+# Benchmark!
 
-To do our benchmarking, our industrial supervisors
-adviced us to use [Grafana](https://grafana.com/), a tool for visualizing and monitoring systems.
 
-This tool is connected to a TSDB. A TSDB collects metrics and values that are sent to the monitored system. In our case, it's accumulo.
+For you benchmark, we used graphite for storing metrics, Diamond for polling system metrics of the cluster
+and grafana to visualize results.
 
-In grafana, the TSDB is called **data source**. Some TSDB are already compatible with grafana (see [http://docs.grafana.org/features/datasources/](http://docs.grafana.org/features/datasources/)) but we need to find the one which is compatible with accumulo.
+## Overview of the cluster
+
+
+Machine  | VM
+---       | ---
+[145.239.142.186](http://145.239.142.186) | [37.59.123.111 (Metrics)](http://37.59.123.111)
+[145.239.142.185 (monitor)](http://145.239.142.185:9995) | [37.59.123.118 (injector)](http://37.59.123.118)
+[145.239.142.188](http://145.239.142.188) | [37.59.123.138 (scanner)](http://37.59.123.138)
+ | [145.239.142.187](http://145.239.142.187) |
+
+
+ <p align="center">
+	<img width="90%" src="https://raw.githubusercontent.com/Mcdostone/industrial-project/master/schemas/overview_cluster.png" alt="Amazing book!"/>
+</p>
+
+
+## Configure your TSDB in accumulo:
+
+Follow the documentation from accumulo to connect your TSDB with accumulo: [link](https://github.com/apache/accumulo/blob/master/assemble/conf/templates/hadoop-metrics2-accumulo.properties)
+
+
+## Nginx configuration
+```nginx
+upstream graphite {
+    server 127.0.0.1:8080 fail_timeout=0;
+}
+
+server {
+    listen 80;
+    access_log /var/log/nginx/graphite.access.log;
+    error_log  /var/log/nginx/graphite.error.log;
+
+    location = /favicon.ico {
+        return 204;
+    }
+
+    # serve static content from the "content" directory
+    location /static {
+        alias /home/graphite/webapp/content;
+        expires max;
+    }
+
+    location / {
+        try_files $uri @graphite;
+    }
+
+    location @graphite {
+ 	proxy_pass_header Server;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_connect_timeout 10;
+        proxy_read_timeout 10;
+        proxy_pass http://graphite; 
+        add_header 'Access-Control-Allow-Origin' '37.59.123.111:3000';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST';
+        add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type';
+        add_header 'Access-Control-Allow-Credentials' 'true';   
+   }
+}
+
+```
 
 
 ## Metrics we want to monitor
@@ -17,98 +78,71 @@ In grafana, the TSDB is called **data source**. Some TSDB are already compatible
  The metrics available with Accumulo, piped to Graphite are :
  
  - Master :
-   -- FilesPendingReplicationAvgTime
-   -- FilesPendingReplicationNumOps
-   -- MaxReplicationThreadsAvgTime
-   -- MaxReplicationThreadsNumOps
-   -- NumPeersAvgTime
-   -- NumPeersNumOps
+   - FilesPendingReplicationAvgTime
+   - FilesPendingReplicationNumOps
+   - MaxReplicationThreadsAvgTime
+   - MaxReplicationThreadsNumOps
+   - NumPeersAvgTime
+   - NumPeersNumOps
    
   - Thrift :
-   -- Master :
-     -> ExecuteAvgTime
-     -> ExecuteNumOps
-     -> IdleAvgTime
-     -> IdleNumOps
-   -- SimpleGarbageCollector
-     -> ExecuteAvgTime
-     -> ExecuteNumOps
-     -> IdleAvgTime
-     -> IdleNumOps
-   -- Tabletserver
-     -> ExecuteAvgTime
-     -> ExecuteNumOps
-     -> IdleAvgTime
-     -> IdleNumOps
-     
-   - Tserver
-    -- MinorCompactions
-      -> MincAvgCount
-      -> MinclMaxCount
-      -> MinclMinCount
-      -> MincMaxCount
-      -> MincMinCount
-      -> MincNumOps
-      -> MincStdevCount
-      -> QueueAvgCount
-      -> QueuelMaxCount
-      -> QueuelMinCount
-      -> QueueMaxCount
-      -> QueueMinCount
-      -> QueueNumOps
-      -> QueueStdevCount  
-    -- Scans
-      -> ResultAvgCount
-      -> ResultlMaxCount
-      -> ResultlMinCount
-      -> ResultMaxCount
-      -> ResultMinCount
-      -> ResultNumOps
-      -> ResultStdevCount
-      -> ScanAvgCount
-      -> ScanlMaxCount
-      -> ScanlMinCount
-      -> ScanMaxCount
-      -> ScanMinCount
-      -> ScanNumOps
-      -> ScanStdevCount
-    -- General
-      -> ActiveMajCs
-      -> ActiveMinCs
-      -> Entries
-      -> EntriesInMem
-      -> FilesPerTablet
-      -> HoldTime
-      -> OnlineTablets
-      -> OpeningTablets
-      -> Queries
-      -> QueuedMajCs
-      -> QueuedMinCs
-      -> TotalMinCs
-      -> UnopenedTablets
-      
-
-
-## Some research about the perfect TSDB
-
-### Timely
-
-The NSA develops its own TSDB for accumulo. It semms to be compatible with grafana.
-
-Last update: 5 months ago
-
-[https://github.com/NationalSecurityAgency/timely](https://github.com/NationalSecurityAgency/timely)
-
-
-### Graphite
-
-From the documentation [https://accumulo.apache.org/1.8/accumulo_user_manual.html#_metrics](https://accumulo.apache.org/1.8/accumulo_user_manual.html#_metrics), it is possible to use graphite to store metrics from Hadoop and accumulo.
-
-
-### OpenTSDB
-
-[https://github.com/ericnewton/accumulo-opentsdb](https://github.com/ericnewton/accumulo-opentsdb)
-
-## Configure your TSDB in accumulo:
-
-https://github.com/apache/accumulo/blob/master/assemble/conf/templates/hadoop-metrics2-accumulo.properties
+    - Master :
+      - ExecuteAvgTime
+      - ExecuteNumOps
+      - IdleAvgTime
+      - IdleNumOps
+   - SimpleGarbageCollector
+      - ExecuteAvgTime
+      - ExecuteNumOps
+      - IdleAvgTime
+      - IdleNumOps
+    - Tabletserver
+      - ExecuteAvgTime
+      - ExecuteNumOps
+      - IdleAvgTime
+      - IdleNumOps
+  - Tserver
+    - MinorCompactions
+      - MincAvgCount
+      - MinclMaxCount
+      - MinclMinCount
+      - MincMaxCount
+      - MincMinCount
+      - MincNumOps
+      - MincStdevCount
+      - QueueAvgCount
+      - QueuelMaxCount
+      - QueuelMinCount
+      - QueueMaxCount
+      - QueueMinCount
+      - QueueNumOps
+      - QueueStdevCount  
+    - Scans
+      - ResultAvgCount
+      - ResultlMaxCount
+      - ResultlMinCount
+      - ResultMaxCount
+      - ResultMinCount
+      - ResultNumOps
+      - ResultStdevCount
+      - ScanAvgCount
+      - ScanlMaxCount
+      - ScanlMinCount
+      - ScanMaxCount
+      - ScanMinCount
+      - ScanNumOps
+      - ScanStdevCount
+    - General
+      - ActiveMajCs
+      - ActiveMinCs
+      - Entries
+      - EntriesInMem
+      - FilesPerTablet
+      - HoldTime
+      - OnlineTablets
+      - OpeningTablets
+      - Queries
+      - QueuedMajCs
+      - QueuedMinCs
+      - TotalMinCs
+      - UnopenedTablets

@@ -9,6 +9,8 @@ Organisation
     java/               # Contains the java project with all java classes written for our tests
     scripts/            # Contains shell scripts
     schemas/            # Contains all schemas explaining architectures (use draw.io to read them)
+    benchmark/          # Datasets and ome documentation about how to install the benchmark environment)
+    VMs/                # Explainations for the configuration of VMs)
 
 
 Ressources
