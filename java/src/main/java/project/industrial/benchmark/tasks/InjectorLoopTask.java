@@ -60,7 +60,10 @@ public class InjectorLoopTask implements Task {
         opts.parseArgs(ConcurrentActionsScenario.class.getName(), args, bwOpts);
         Connector connector = opts.getConnector();
 
-        BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
+        BatchWriter[] bws = new BatchWriter[6];
+        for(int i = 0; i < 6; i++)
+            bws[i] = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
+
 
 /*        Injector injector = new CSVValueInjector(bw, opts.csv);
         InjectorLoopTask injectorTask = new InjectorLoopTask(injector);

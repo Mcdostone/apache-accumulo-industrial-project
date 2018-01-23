@@ -32,29 +32,9 @@ public abstract class AbstractCSVInjector implements Injector {
         this.data = new ArrayList<>();
     }
 
-    public int loadData() {
-        logger.info(String.format("Load '%s' in memory", this.filename));
-        BufferedReader reader;
-        int countLine = 0;
-        String line;
-        try {
-            reader = new BufferedReader(new FileReader(this.filename));
-            while((line = reader.readLine()) != null) {
-                line = line.substring(0, line.length() - 1);
-                this.data.add(line);
-                countLine++;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        logger.info(countLine + " rows has been loaded");
-        return countLine;
-    }
-
     public void createMutationsFromData() {
         this.data.forEach(d -> this.injector.addMutations(this.parseLine(d)));
     }
-
 
     protected Mutation buildMutation(String key, String cf, String cq, String value) {
         Mutation m = new Mutation(key.trim());

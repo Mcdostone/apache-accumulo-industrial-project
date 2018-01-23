@@ -12,7 +12,6 @@ import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.core.ScenarioNotRespectedException;
 import project.industrial.benchmark.injectors.AbstractCSVInjector;
 import project.industrial.benchmark.injectors.Injector;
-import project.industrial.benchmark.injectors.PeopleCSVInjector;
 import project.industrial.benchmark.tasks.FullScanTask;
 import project.industrial.benchmark.tasks.GetByKeyTask;
 
@@ -97,7 +96,7 @@ public class DataAvailabilityTimeScenario extends Scenario {
         Scanner sc1 = connector.createScanner(opts.getTableName(), opts.auths);
         sc1.setRange(new Range());
 
-        AbstractCSVInjector injector = new PeopleCSVInjector(bw, opts.csv);
+/*        AbstractCSVInjector injector = new PeopleCSVInjector(bw, opts.csv);
         injector.loadData();
 
         if(opts.key == null)
@@ -108,5 +107,6 @@ public class DataAvailabilityTimeScenario extends Scenario {
         Scenario s = new DataAvailabilityTimeScenario(injector, getKey, getAll);
         s.run();
         s.finish();
+        */
     }
 }

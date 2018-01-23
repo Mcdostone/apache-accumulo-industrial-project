@@ -3,12 +3,16 @@ package project.industrial.benchmark.scenarios;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
+import org.apache.accumulo.core.data.Mutation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import project.industrial.benchmark.core.PeopleMutationBuilder;
 import project.industrial.benchmark.core.Scenario;
-import project.industrial.benchmark.injectors.AbstractCSVInjector;
 import project.industrial.benchmark.injectors.Injector;
-import project.industrial.benchmark.injectors.PeopleCSVInjector;
+import project.industrial.benchmark.injectors.MultiThreadedInjector;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This scenario checks the data rate injection in accumulo.
@@ -21,9 +25,13 @@ public class DataRateInjectionScenario extends Scenario {
     private static final Logger logger = LoggerFactory.getLogger(DataRateInjectionScenario.class);
     private Injector injector;
 
-    public DataRateInjectionScenario(Injector injector) {
+    public DataRateInjectionScenario(BatchWriter[] bw, String filename) {
         super(DataRateInjectionScenario.class.getSimpleName());
-        this.injector = injector;
+        this.injector = new MultiThreadedInjector(bw);
+        List<Mutation> mutations = PeopleMutationBuilder.buildFromCSV(filename);
+        Iterator<Mutation> iterator = mutations.iterator();
+        while (iterator.hasNext())
+            this.injector.addMutation(iterator.next());
     }
 
     @Override
@@ -37,26 +45,13 @@ public class DataRateInjectionScenario extends Scenario {
         BatchWriterOpts bwOpts = new BatchWriterOpts();
         opts.parseArgs(DataRateInjectionScenario.class.getName(), args, bwOpts);
         Connector connector = opts.getConnector();
-        BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
 
-        AbstractCSVInjector injector = new PeopleCSVInjector(bw, opts.csv);
-        int nbLines = injector.loadData();
+        int nbBatchwriters = 10;
+        BatchWriter[] batchWriters = new BatchWriter[nbBatchwriters];
+        for(int i = 0; i < nbBatchwriters; i++)
+            batchWriters[i] = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
 
-        int nbMutationsGenerations = (int) Math.ceil(5000000.0 / Long.valueOf(nbLines));
-        logger.info(String.format("Multiply this file by %d => %d lines",nbMutationsGenerations, nbLines * nbMutationsGenerations));
-        for(int generation = 1; generation <= nbMutationsGenerations; generation++) {
-            logger.info("multiplication number " + generation);
-            injector.createMutationsFromData();
-        }
-
-        logger.info(String.format(
-                "6 attributes for each line => %d * %d = %d entries/mutations",
-                nbLines * nbMutationsGenerations,
-                6,
-                nbLines * nbMutationsGenerations * 6)
-        );
-
-        Scenario scenario = new DataRateInjectionScenario(injector);
+        Scenario scenario = new DataRateInjectionScenario(batchWriters, opts.csv);
         scenario.run();
         scenario.finish();
     }

@@ -7,6 +7,7 @@ import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.data.Mutation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import project.industrial.benchmark.core.MetricsManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,14 +28,26 @@ public class InjectorWithMetrics implements Injector {
         this.counter = count;
     }
 
+    public InjectorWithMetrics(BatchWriter bw) {
+        this(bw,
+                MetricsManager.getMetricRegistry().meter("data_rate_injection"),
+                MetricsManager.getMetricRegistry().counter("count_injections")
+        );
+    }
+
     @Override
-    public int inject() throws MutationsRejectedException {
+    public int inject() {
         logger.info(String.format("Injecting %d mutations", this.mutations.size()));
-        for(Mutation m: this.mutations) {
-            this.measureRate.mark();
-            this.bw.addMutation(m);
+        long begin = System.currentTimeMillis();
+        this.mutations.forEach(m -> {
+            try {
+                this.measureRate.mark();
+                this.bw.addMutation(m);
+            }
+            catch (MutationsRejectedException e) { e.printStackTrace(); }
             this.counter.inc();
-        }
+        });
+        System.out.println((System.currentTimeMillis() - begin));
         return (int) this.counter.getCount();
     }
 
