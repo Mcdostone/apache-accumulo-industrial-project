@@ -29,6 +29,9 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-u $(ACCUMULO_USER) \
 	--csv $(BIG_DATASET_FILE) \
 	$(OPTS)
+	# --batchLatency 5000
+	# --batchMemory $$(echo $$((500 * 1024 * 1024)))
+	# --batchThreads 5
 
 
 scan_table: ## full scan on a given table
