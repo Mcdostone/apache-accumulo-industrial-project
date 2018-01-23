@@ -18,8 +18,7 @@ ACCUMULO_TABLE=test
 ACCUMULO_PASSWORD=root
 ACCUMULO_USER=root
 
-#--batchThreads 15 
-#--batchMemory $$(echo $$((250 * 1024 * 1024))) 
+
 data_rate_injection_scenario: ## test the data rate injection, 80000 objects per second
 	$(JAVA_RUN) $(PACKAGE).scenarios.DataRateInjectionScenario \
 	-i $(INSTANCE) \
@@ -29,9 +28,6 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-u $(ACCUMULO_USER) \
 	--csv $(BIG_DATASET_FILE) \
 	$(OPTS)
-	# --batchLatency 5000
-	# --batchMemory $$(echo $$((500 * 1024 * 1024)))
-	# --batchThreads 5
 
 
 scan_table: ## full scan on a given table
@@ -48,8 +44,17 @@ test_graphite: ## test communication between java code and graphite
 	$(JAVA_RUN) $(PACKAGE).core.MetricsManager 
 
 
-create_table: ## test the data rate injection, 80000 objects per second
+create_table: ## ask the name of the table to create
 	$(JAVA_RUN) $(PACKAGE).main.CreateTable \
+	-i $(INSTANCE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	$(OPTS)
+
+
+delete_table: ## ask the name of the table to delete
+	$(JAVA_RUN) $(PACKAGE).main.DeleteTable \
 	-i $(INSTANCE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
