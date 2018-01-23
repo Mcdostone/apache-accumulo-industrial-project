@@ -29,9 +29,6 @@ public class DataRateDuringFullScanScenario extends Scenario {
 
     @Override
     public void action() throws Exception {
-        ScheduledFuture<ScannerBase> futurResults = this.executorService.schedule(this.fullScan, 0, TimeUnit.SECONDS);
-        this.processResults(futurResults.get());
-        this.executorService.shutdown();
     }
 
     private void processResults(ScannerBase entries) {

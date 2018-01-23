@@ -5,12 +5,13 @@ import com.codahale.metrics.Meter;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.data.Mutation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.MetricsManager;
 
 import java.util.List;
 
+/**
+ * @author Yann Prono
+ */
 public class InjectorWithMetrics implements Injector {
 
     private final Injector injector;
@@ -34,12 +35,18 @@ public class InjectorWithMetrics implements Injector {
 
     @Override
     public int inject(Mutation m) throws MutationsRejectedException {
-        return this.injector.inject(m);
+        int count = this.injector.inject(m);
+        this.counter.inc();
+        this.meter.mark();
+        return count;
     }
 
     @Override
     public int inject(List<Mutation> mutations) throws MutationsRejectedException {
-        return this.injector.inject(mutations);
+        int count = this.injector.inject(mutations);
+        this.counter.inc(count);
+        this.meter.mark(count);
+        return count;
     }
 
     @Override

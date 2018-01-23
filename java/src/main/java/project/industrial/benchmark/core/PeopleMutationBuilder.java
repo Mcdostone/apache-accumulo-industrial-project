@@ -55,7 +55,7 @@ public class PeopleMutationBuilder implements MutationBuilder {
         } catch (IOException | MutationsRejectedException e) {
             e.printStackTrace();
         }
-        logger.info(countLine + " rows has been loaded");
+        logger.info(countLine + " lines read");
         return mutations;
     }
 

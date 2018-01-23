@@ -32,7 +32,7 @@ public class DataAvailabilityTimeScenario extends Scenario {
     private final FullScanTask getAllTask;
 
     public DataAvailabilityTimeScenario(Injector injector, GetByKeyTask getByKeyTask, FullScanTask getAllTask) {
-        super("Data availability time", 2);
+        super("Data availability time");
         this.injector = injector;
         this.getByKeyTask = getByKeyTask;
         this.getAllTask = getAllTask;
