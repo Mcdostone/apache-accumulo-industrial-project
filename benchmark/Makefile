@@ -18,7 +18,8 @@ ACCUMULO_TABLE=test
 ACCUMULO_PASSWORD=root
 ACCUMULO_USER=root
 
-
+#--batchThreads 15 
+#--batchMemory $$(echo $$((250 * 1024 * 1024))) 
 data_rate_injection_scenario: ## test the data rate injection, 80000 objects per second
 	$(JAVA_RUN) $(PACKAGE).scenarios.DataRateInjectionScenario \
 	-i $(INSTANCE) \
@@ -26,8 +27,6 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	--batchThreads 15 \
-	--batchMemory 1 \
 	--csv $(BIG_DATASET_FILE) \
 	$(OPTS)
 
@@ -55,12 +54,46 @@ create_table: ## test the data rate injection, 80000 objects per second
 	$(OPTS)
 
 
+check_metadata_problems: ## 
+	$(JAVA_RUN) org.apache.accumulo.server.util.CheckForMetadataProblems \
+	-i $(INSTANCE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	$(OPTS)
+
+
 download_dataset: ## Download the dataset from github
 	rm -f *.csv
 	wget $(DATASET_URL)
 	wget $(BIG_DATASET_URL)
 	
 
+sandbox: ## Test some stuff
+	$(JAVA_RUN) $(PACKAGE).scenarios.SandboxScenario \
+	-i $(INSTANCE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-t $(ACCUMULO_TABLE) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--batchThreads 15 \
+	--batchMemory $$(echo $$((250 * 1024 * 1024))) \
+	--csv $(BIG_DATASET_FILE) \
+	$(OPTS)
+
+
 help: ## Show this help !
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+
+sequential_batch_writer:
+	$(JAVA_RUN) $(PACKAGE_ROOT).examples.SequentialBatchWriter \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--num 1000000000 \
+	--size 60
+	
 
