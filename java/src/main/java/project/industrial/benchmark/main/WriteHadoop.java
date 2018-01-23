@@ -2,18 +2,6 @@ package project.industrial.benchmark.main;
 
 import com.beust.jcommander.Parameter;
 import org.apache.accumulo.core.cli.MapReduceClientOnRequiredTable;
-import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Value;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.util.Tool;
-import java.io.IOException;
-import java.io.BufferedOutputStream;
-import java.io.PrintStream;
-import java.util.Base64;
-import java.util.Collection;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.mapreduce.AccumuloFileOutputFormat;
 import org.apache.accumulo.core.client.mapreduce.lib.partition.RangePartitioner;
@@ -23,7 +11,6 @@ import org.apache.accumulo.core.util.TextUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FsShell;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -33,9 +20,13 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+//import project.industrial.benchmark.mapReduce.InjectMapRed;
 
-import com.beust.jcommander.Parameter;
-import project.industrial.benchmark.mapReduce.InjectMapRed;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Base64;
+import java.util.Collection;
 
 public class WriteHadoop extends Configured implements Tool {
 
@@ -109,7 +100,7 @@ public class WriteHadoop extends Configured implements Tool {
             job.setJarByClass(this.getClass());
             job.setInputFormatClass(TextInputFormat.class);
 
-            job.setMapperClass(InjectMapRed.MapClass.class);
+            job.setMapperClass(MapClass.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(Text.class);
 

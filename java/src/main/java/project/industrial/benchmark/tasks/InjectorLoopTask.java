@@ -40,7 +40,7 @@ public class InjectorLoopTask implements Task {
     public Object call() throws Exception {
         while (this.countInjections < this.maxInjections) {
             //this.injector.prepareMutations();
-            this.countInjections += this.injector.inject();
+            // this.countInjections += this.injector.inject();
             logger.info(String.format("%d objects currently injected", this.countInjections));
         }
         return null;

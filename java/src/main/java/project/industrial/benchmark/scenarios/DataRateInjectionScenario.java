@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.PeopleMutationBuilder;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.injectors.Injector;
+import project.industrial.benchmark.injectors.InjectorWithMetrics;
 import project.industrial.benchmark.injectors.MultiThreadedInjector;
+import project.industrial.benchmark.injectors.SimpleInjector;
 
 import java.util.Iterator;
 import java.util.List;
@@ -23,20 +25,19 @@ import java.util.List;
 public class DataRateInjectionScenario extends Scenario {
 
     private static final Logger logger = LoggerFactory.getLogger(DataRateInjectionScenario.class);
+    private final String filename;
     private Injector injector;
 
-    public DataRateInjectionScenario(BatchWriter[] bw, String filename) {
+    public DataRateInjectionScenario(BatchWriter bw, String filename) {
         super(DataRateInjectionScenario.class.getSimpleName());
-        this.injector = new MultiThreadedInjector(bw);
-        List<Mutation> mutations = PeopleMutationBuilder.buildFromCSV(filename);
-        Iterator<Mutation> iterator = mutations.iterator();
-        while (iterator.hasNext())
-            this.injector.addMutation(iterator.next());
+        this.filename = filename;
+        this.injector = new InjectorWithMetrics(bw);
     }
+
 
     @Override
     public void action() throws Exception {
-        this.injector.inject();
+        PeopleMutationBuilder.buildFromCSV(this.filename, this.injector);
         this.injector.close();
     }
 
@@ -46,12 +47,8 @@ public class DataRateInjectionScenario extends Scenario {
         opts.parseArgs(DataRateInjectionScenario.class.getName(), args, bwOpts);
         Connector connector = opts.getConnector();
 
-        int nbBatchwriters = 10;
-        BatchWriter[] batchWriters = new BatchWriter[nbBatchwriters];
-        for(int i = 0; i < nbBatchwriters; i++)
-            batchWriters[i] = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
-
-        Scenario scenario = new DataRateInjectionScenario(batchWriters, opts.csv);
+        BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
+        Scenario scenario = new DataRateInjectionScenario(bw, opts.csv);
         scenario.run();
         scenario.finish();
     }

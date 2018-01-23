@@ -130,3 +130,5 @@ savedVideos/
 /target/
 
 settings.properties
+
+*.csv

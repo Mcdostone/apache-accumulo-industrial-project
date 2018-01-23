@@ -1,8 +1,10 @@
 package project.industrial.benchmark.core;
 
+import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.data.Mutation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import project.industrial.benchmark.injectors.Injector;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -36,10 +38,10 @@ public class PeopleMutationBuilder implements MutationBuilder {
         return m;
     }
 
-    public static List<Mutation> buildFromCSV(String filename) {
+    public static List<Mutation> buildFromCSV(String filename, Injector injector) {
         List<Mutation> mutations = new ArrayList<>();
         PeopleMutationBuilder builder = new PeopleMutationBuilder();
-        logger.info(String.format("Load '%s' in memory", filename));
+        logger.info(String.format("Reading '%s' in memory", filename));
         BufferedReader reader;
         int countLine = 0;
         String line;
@@ -47,10 +49,10 @@ public class PeopleMutationBuilder implements MutationBuilder {
             reader = new BufferedReader(new FileReader(filename));
             while ((line = reader.readLine()) != null) {
                 line = line.substring(0, line.length() - 1);
-                mutations.addAll(builder.build(line));
+                injector.inject(builder.build(line));
                 countLine++;
             }
-        } catch (IOException e) {
+        } catch (IOException | MutationsRejectedException e) {
             e.printStackTrace();
         }
         logger.info(countLine + " rows has been loaded");

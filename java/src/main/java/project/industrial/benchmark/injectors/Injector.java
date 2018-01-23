@@ -13,14 +13,9 @@ import java.util.List;
  */
 public interface Injector {
 
-    /**
-     * inject all mutations to accumulo
-     */
-    public int inject() throws MutationsRejectedException;
+    public int inject(Mutation mutation) throws MutationsRejectedException;
 
-    public void addMutation(Mutation mutation);
-
-    public void addMutations(Collection<Mutation> mutations);
+    public int inject(List<Mutation> mutations) throws MutationsRejectedException;
 
     public void close() throws MutationsRejectedException;
 

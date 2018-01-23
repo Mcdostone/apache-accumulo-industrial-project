@@ -16,21 +16,16 @@ import java.util.List;
  */
 public class SandboxScenario extends Scenario {
 
-
     private Injector injector;
+
     public SandboxScenario(BatchWriter[] bw, String filename) {
         super(SandboxScenario.class.getSimpleName());
         this.injector = new MultiThreadedInjector(bw);
-        List<Mutation> mutations = PeopleMutationBuilder.buildFromCSV(filename);
-        Iterator<Mutation> iterator = mutations.iterator();
-        while (iterator.hasNext()) {
-            this.injector.addMutation(iterator.next());
-        }
     }
 
     @Override
     protected void action() throws Exception {
-        this.injector.inject();
+
     }
 
 

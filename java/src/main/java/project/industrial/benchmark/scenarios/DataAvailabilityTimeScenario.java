@@ -40,8 +40,7 @@ public class DataAvailabilityTimeScenario extends Scenario {
 
     @Override
     public void action() throws Exception {
-        int countInsertions = this.injector.inject();
-        this.injector.close();
+        /*this.injector.close();
         logger.info(String.format("%d objects currently injected", countInsertions));
         int delayKey = 10 * 1000;
         int delayMining = 1000 * 20;
@@ -62,6 +61,7 @@ public class DataAvailabilityTimeScenario extends Scenario {
         );
         this.testResultKey(begin, System.currentTimeMillis(), futurKey.get());
         this.testResultMining(countInsertions,  this.countResults(futurMining.get().iterator()));
+*/
     }
 
     private void testResultMining(int expected, int nbInsertions) throws Exception {

@@ -14,6 +14,6 @@ public class InjectorTask implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        return this.injector.inject();
+        return 0;// return this.injector.inject();
     }
 }
