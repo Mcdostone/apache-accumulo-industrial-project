@@ -21,8 +21,8 @@ public class TestMapRed {
         private Text word = new Text();
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-           StringTokenizer itr = new StringTokenizer(value.toString().replace(";", " ")); //POUR UN CVS
-          //  StringTokenizer itr = new StringTokenizer(value.toString());
+           StringTokenizer itr = new StringTokenizer(value.toString().replace(",", " ")); //POUR UN CVS
+            // StringTokenizer itr = new StringTokenizer(value.toString());
             while (itr.hasMoreTokens()) {
                 word.set(itr.nextToken());
                 context.write(word, one);
@@ -32,7 +32,6 @@ public class TestMapRed {
 
     public static class IntSumReducer
             extends Reducer<Text,IntWritable,Text,IntWritable> {
-       // private IntWritable result = new IntWritable();
        private IntWritable result = new IntWritable();
         public void reduce(Text key, Iterable<IntWritable> values,
                            Context context

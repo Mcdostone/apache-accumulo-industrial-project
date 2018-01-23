@@ -39,6 +39,16 @@ download_dataset: ## Download the dataset from github
 	wget $(DATASET_URL)
 	wget $(BIG_DATASET_URL)
 	
+read_MR_accumulo: ## scan a table and print results
+	$(JAVA_RUN) $(PACKAGE).main.MapReduce \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	--output ./resultMR \
+	--columns colfam1:colqual1 \
+	$(OPTS)
+
+
 
 help: ## Show this help !
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
