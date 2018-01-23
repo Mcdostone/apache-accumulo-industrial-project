@@ -4,14 +4,14 @@ PACKAGE=$(PACKAGE_ROOT).benchmark
 DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 DATASET_URL=https://raw.githubusercontent.com/Mcdostone/industrial-project/master/benchmark/datasets/log_access.csv
 BIG_DATASET_URL=https://raw.githubusercontent.com/Mcdostone/industrial-project/master/benchmark/datasets/big_log_access.csv
-
 DATASET_FILE=$(join $(DIR), $(notdir $(DATASET_URL)))
+BIG_DATASET_FILE=$(join $(DIR), $(notdir $(BIG_DATASET_URL)))
 ifeq ($(DEBUG),1)
 OPTS = --debug
 else
 OPTS = 
 endif
-JAVA_RUN=java -cp /root/sandbox-accumulo-1.0-jar-with-dependencies.jar
+JAVA_RUN=java -cp /root/sandbox-accumulo-1.0-jar-with-dependencies.jar -Xms15G
 ZOOKEEPERS=145.239.142.185,145.239.142.187,145.239.142.188
 INSTANCE=accumulo
 ACCUMULO_TABLE=test
@@ -26,12 +26,33 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	--csv $(BIG_DATASET_URL) \
+	--batchThreads 15 \
+	--batchMemory 1 \
+	--csv $(BIG_DATASET_FILE) \
+	$(OPTS)
+
+
+scan_table: ## full scan on a given table
+	$(JAVA_RUN) $(PACKAGE_ROOT).features.mining.GeneralScan \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
 	$(OPTS)
 
 
 test_graphite: ## test communication between java code and graphite
 	$(JAVA_RUN) $(PACKAGE).core.MetricsManager 
+
+
+create_table: ## test the data rate injection, 80000 objects per second
+	$(JAVA_RUN) $(PACKAGE).main.CreateTable \
+	-i $(INSTANCE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	$(OPTS)
 
 
 download_dataset: ## Download the dataset from github
