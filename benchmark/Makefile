@@ -68,6 +68,16 @@ download_dataset: ## Download the dataset from github
 	wget $(DATASET_URL)
 	wget $(BIG_DATASET_URL)
 	
+read_MR_accumulo: ## scan a table and print results
+	$(JAVA_RUN) $(PACKAGE).main.MapReduce \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	--output ./resultMR \
+	--columns colfam1:colqual1 \
+	$(OPTS)
+
+
 
 sandbox: ## Test some stuff
 	$(JAVA_RUN) $(PACKAGE).scenarios.SandboxScenario \
