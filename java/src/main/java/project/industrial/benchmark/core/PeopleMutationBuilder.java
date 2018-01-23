@@ -38,25 +38,22 @@ public class PeopleMutationBuilder implements MutationBuilder {
         return m;
     }
 
-    public static List<Mutation> buildFromCSV(String filename, Injector injector) {
-        List<Mutation> mutations = new ArrayList<>();
+    public static int buildFromCSV(String filename, Injector injector) {
         PeopleMutationBuilder builder = new PeopleMutationBuilder();
-        logger.info(String.format("Reading '%s' in memory", filename));
+        logger.info(String.format("Reading '%s'", filename));
         BufferedReader reader;
         int countLine = 0;
         String line;
         try {
             reader = new BufferedReader(new FileReader(filename));
             while ((line = reader.readLine()) != null) {
-                line = line.substring(0, line.length() - 1);
-                injector.inject(builder.build(line));
+                injector.inject(builder.build(line.trim()));
                 countLine++;
             }
         } catch (IOException | MutationsRejectedException e) {
             e.printStackTrace();
         }
-        logger.info(countLine + " lines read");
-        return mutations;
+        return countLine;
     }
 
 }

@@ -31,10 +31,10 @@ public class MetricsManager {
 
     public static void initReporters(String scenarioName) {
         if(!reportersInit) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
             String name = sdf.format(new Date());
             if(scenarioName != null)
-                name = scenarioName + "_" + name;
+                name = scenarioName + "." + name;
             reporters.add(initGraphiteReporter(name));
             reporters.add(initCsvReporter(name));
             reportersInit = true;
