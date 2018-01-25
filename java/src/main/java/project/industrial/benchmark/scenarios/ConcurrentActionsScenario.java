@@ -27,7 +27,7 @@ public class ConcurrentActionsScenario extends Scenario {
     private final long PERIOD_KEY = 1;
 
     public ConcurrentActionsScenario() {
-        super("Concurrent actions", 20);
+        super("Concurrent actions");
         this.tasks = new ArrayList();
     }
 
@@ -35,17 +35,17 @@ public class ConcurrentActionsScenario extends Scenario {
     public void action() throws Exception {
         logger.info(String.format("Available processors ", Runtime.getRuntime().availableProcessors()));
         // Objects by Keys list
-        for (int i = 0; i < 2; i++)
-            this.executorService.scheduleAtFixedRate(null, 0, PERIOD_LIST_KEYS, TimeUnit.SECONDS);
+        for (int i = 0; i < 2; i++) {}
+//            this.executorService.scheduleAtFixedRate(null, 0, PERIOD_LIST_KEYS, TimeUnit.SECONDS);
 
         // Objects by Keys list
         for (int i = 0; i < 10; i++) {
-            this.executorService.scheduleAtFixedRate(null, 0, PERIOD_KEY, TimeUnit.SECONDS);
+  //          this.executorService.scheduleAtFixedRate(null, 0, PERIOD_KEY, TimeUnit.SECONDS);
         }
 
         // Full scan
         for (int i = 0; i < 5; i++) {
-            this.executorService.submit((Runnable) null);
+    //        this.executorService.submit((Runnable) null);
         }
 
     }

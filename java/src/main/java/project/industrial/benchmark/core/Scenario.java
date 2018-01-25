@@ -26,22 +26,15 @@ public abstract class Scenario {
 
     /** A name for the scenario, used in graphite */
     protected String name;
-    /** Useful for scheduling some callables */
-    protected ScheduledExecutorService executorService;
     protected static Logger logger = LoggerFactory.getLogger(Scenario.class);
 
-    public Scenario(String name) {
-        this(name, 1);
-    }
 
     /**
      * @param name Name of the new scenario
-     * @param corePoolSize Number of threads for the scheduler (based on threads)
      */
-    public Scenario(String name, int corePoolSize) {
+    public Scenario(String name) {
         this.name = name;
         MetricsManager.initReporters(this.name);
-        this.executorService = new ScheduledThreadPoolExecutor(corePoolSize);
     }
 
     /**
@@ -135,7 +128,6 @@ public abstract class Scenario {
      * Close the scenario (like at the end of a shooting)
      */
     public void finish() {
-        this.executorService.shutdown();
         logger.info(String.format("Scenario '%s' finished",this.name));
 //        MetricsManager.getInstance().report();
     }

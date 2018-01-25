@@ -48,10 +48,10 @@ public class TimeGetByKeysListScenario extends Scenario {
     @Override
     public void action() throws Exception {
         logger.info("Looking for objects where key belongs to the list");
-        ScheduledFuture<ScannerBase> future =
-                this.executorService.schedule(this.getByListTask, 0, TimeUnit.SECONDS);
-        this.checkResults(future.get().iterator());
-        this.saveResultsInCSV(future.get().iterator());
+        // ScheduledFuture<ScannerBase> future =
+        //         this.executorService.schedule(this.getByListTask, 0, TimeUnit.SECONDS);
+        // this.checkResults(future.get().iterator());
+        // this.saveResultsInCSV(future.get().iterator());
     }
 
     private void checkResults(Iterator<Map.Entry<Key, Value>> iterator) throws Exception {
