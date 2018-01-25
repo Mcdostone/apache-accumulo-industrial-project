@@ -3,7 +3,7 @@ package project.industrial.benchmark.main;
 import com.beust.jcommander.Parameter;
 import org.apache.accumulo.core.cli.MapReduceClientOnRequiredTable;
 import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.mapreduce.AccumuloFileOutputFormat;
+import org.apache.accumulo.core.client.mapreduce.AccumuloOutputFormat;
 import org.apache.accumulo.core.client.mapreduce.lib.partition.RangePartitioner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
@@ -20,6 +20,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.accumulo.core.data.Mutation;
 //import project.industrial.benchmark.mapReduce.InjectMapRed;
 
 import java.io.BufferedOutputStream;
@@ -42,50 +43,32 @@ public class WriteHadoop extends Configured implements Tool {
 
 
     /**
-     * The Mapper class that given a row number, will generate the appropriate output line.
+     * The Mapper class. For each input line, write one line in accumulo for each column.
      */
-    public static class MapClass extends Mapper<LongWritable,Text,Text,Text> {
+    public static class MapClass extends Mapper<LongWritable,Text,Text,Mutation> {
         private Text outputKey = new Text();
         private Text outputValue = new Text();
 
         @Override
         public void map(LongWritable key, Text value, Context output) throws IOException, InterruptedException {
-            // split on tab
-            int index = -1;
-            for (int i = 0; i < value.getLength(); i++) {
-                if (value.getBytes()[i] == '\t') {
-                    index = i;
-                    break;
-                }
+
+            String[] stringRow = value.toString().split("\n");
+
+            for (String values: stringRow) {
+                String[] stringCol = values.toString().split(",");
+
+                Mutation mutation = new Mutation(new Text(stringCol[0] + "_" + stringCol[1]));
+                for (int j = 0; j < 6; j ++) {
+                    mutation.put(new Text("meta"), new Text("date"), new Value(stringCol[0]));
+                    mutation.put(new Text("meta"), new Text("nom"), new Value(stringCol[1]));
+                    mutation.put(new Text("meta"), new Text("prenom"), new Value(stringCol[2]));
+                    mutation.put(new Text("meta"), new Text("email"), new Value(stringCol[3]));
+                    mutation.put(new Text("meta"), new Text("url"), new Value(stringCol[4]));
+                    mutation.put(new Text("meta"), new Text("ip"), new Value(stringCol[5]));
+                } 
+                output.write(null, mutation);
             }
 
-            if (index > 0) {
-                outputKey.set(value.getBytes(), 0, index);
-                outputValue.set(value.getBytes(), index + 1, value.getLength() - (index + 1));
-                output.write(outputKey, outputValue);
-            }
-        }
-    }
-
-    public static class ReduceClass extends Reducer<Text,Text,Key,Value> {
-        @Override
-        public void reduce(Text key, Iterable<Text> values, Context output) throws IOException, InterruptedException {
-            // be careful with the timestamp... if you run on a cluster
-            // where the time is whacked you may not see your updates in
-            // accumulo if there is already an existing value with a later
-            // timestamp in accumulo... so make sure ntp is running on the
-            // cluster or consider using logical time... one options is
-            // to let accumulo set the time
-            long timestamp = System.currentTimeMillis();
-
-            int index = 0;
-            for (Text value : values) {
-                Key outputKey = new Key(key, new Text("colf"), new Text(String.format("col_%07d", index)), timestamp);
-                index++;
-
-                Value outputValue = new Value(value.getBytes(), 0, value.getLength());
-                output.write(outputKey, outputValue);
-            }
         }
     }
 
@@ -94,52 +77,31 @@ public class WriteHadoop extends Configured implements Tool {
         opts.parseArgs(WriteHadoop.class.getName(), args);
 
         Configuration conf = getConf();
-        PrintStream out = null;
-            Job job = Job.getInstance(conf);
-            job.setJobName("bulk ingest example");
-            job.setJarByClass(this.getClass());
-            job.setInputFormatClass(TextInputFormat.class);
+        Job job = Job.getInstance(conf);
+        job.setJobName("bulk ingest example");
+        job.setJarByClass(this.getClass());
+        job.setInputFormatClass(TextInputFormat.class);
 
-            job.setMapperClass(MapClass.class);
-            job.setMapOutputKeyClass(Text.class);
-            job.setMapOutputValueClass(Text.class);
+        job.setMapperClass(MapClass.class);
 
-            job.setReducerClass(ReduceClass.class);
-            job.setOutputFormatClass(AccumuloFileOutputFormat.class);
-            opts.setAccumuloConfigs(job);
+        job.setNumReduceTasks(0);
 
-            Connector connector = opts.getConnector();
+        job.setOutputKeyClass(Text.class);
+        job.setOutputFormatClass(AccumuloOutputFormat.class);
+        job.setOutputValueClass(Mutation.class);
+        opts.setAccumuloConfigs(job);
 
-            TextInputFormat.setInputPaths(job, new Path(opts.inputDir));
-            AccumuloFileOutputFormat.setOutputPath(job, new Path(opts.workDir + "/files"));
+        Connector connector = opts.getConnector();
 
-            FileSystem fs = FileSystem.get(conf);
-            out = new PrintStream(new BufferedOutputStream(fs.create(new Path(opts.workDir + "/splits.txt"))));
+        TextInputFormat.setInputPaths(job, new Path(opts.inputDir));
 
-            Collection<Text> splits = connector.tableOperations().listSplits(opts.getTableName(), 100);
-            for (Text split : splits)
-                out.println(Base64.getEncoder().encodeToString(TextUtil.getBytes(split)));
-
-            job.setNumReduceTasks(splits.size() + 1);
-            out.close();
-
-            job.setPartitionerClass(RangePartitioner.class);
-            RangePartitioner.setSplitFile(job, opts.workDir + "/splits.txt");
-
-            job.waitForCompletion(true);
-            Path failures = new Path(opts.workDir, "failures");
-            fs.delete(failures, true);
-            fs.mkdirs(new Path(opts.workDir, "failures"));
-            // With HDFS permissions on, we need to make sure the Accumulo user can read/move the rfiles
-          //  FsShell fsShell = new FsShell(conf);
-         //   fsShell.run(new String[] {"-chmod", "-R", "777", opts.workDir});
-          //  connector.tableOperations().importDirectory(opts.getTableName(), opts.workDir + "/files", opts.workDir + "/failures", false);
-
+        job.waitForCompletion(true);
+            
         return 0;
     }
 
     public static void main(String[] args) throws Exception {
         int res = ToolRunner.run(new Configuration(), new WriteHadoop(), args);
-        System.exit(res);
+        
     }
 }

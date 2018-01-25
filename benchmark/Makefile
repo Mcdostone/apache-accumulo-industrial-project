@@ -6,11 +6,6 @@ DATASET_URL=https://raw.githubusercontent.com/Mcdostone/industrial-project/maste
 BIG_DATASET_URL=https://raw.githubusercontent.com/Mcdostone/industrial-project/master/benchmark/datasets/big_log_access.csv
 DATASET_FILE=$(join $(DIR), $(notdir $(DATASET_URL)))
 BIG_DATASET_FILE=$(join $(DIR), $(notdir $(BIG_DATASET_URL)))
-ifeq ($(DEBUG),1)
-OPTS = --debug
-else
-OPTS = 
-endif
 JAVA_RUN=java -cp /root/sandbox-accumulo-1.0-jar-with-dependencies.jar -Xms15G
 ZOOKEEPERS=145.239.142.185,145.239.142.187,145.239.142.188
 INSTANCE=accumulo
@@ -28,7 +23,6 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
 	--csv $(BIG_DATASET_FILE) \
-	$(OPTS)
 	# --batchLatency 5000
 	# --batchMemory $$(echo $$((500 * 1024 * 1024)))
 	# --batchThreads 5
@@ -41,7 +35,6 @@ scan_table: ## full scan on a given table
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	$(OPTS)
 
 
 test_graphite: ## test communication between java code and graphite
@@ -54,7 +47,6 @@ create_table: ## test the data rate injection, 80000 objects per second
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	$(OPTS)
 
 
 check_metadata_problems: ## 
@@ -63,7 +55,6 @@ check_metadata_problems: ##
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	$(OPTS)
 
 
 download_dataset: ## Download the dataset from github
@@ -74,13 +65,20 @@ download_dataset: ## Download the dataset from github
 read_MR_accumulo: ## scan a table and print results
 	$(JAVA_RUN) $(PACKAGE).main.MapReduce \
 	-i $(INSTANCE) \
+	-z $(ZOOKEEPERS) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	--output ./resultMR \
 	--columns colfam1:colqual1 \
-	$(OPTS)
 
-
+write_MR_accumulo: ## write from csv loal file to accumulo table
+	$(JAVA_RUN) $(PACKAGE).main.WriteHadoop \
+	-i $(INSTANCE) \
+	-z $(ZOOKEEPERS) \
+	-t samia \
+	-p $(ACCUMULO_PASSWORD) \
+	--inputDir datatest \
+	--workDir ~/work
 
 sandbox: ## Test some stuff
 	$(JAVA_RUN) $(PACKAGE).scenarios.SandboxScenario \
@@ -92,7 +90,6 @@ sandbox: ## Test some stuff
 	--batchThreads 15 \
 	--batchMemory $$(echo $$((250 * 1024 * 1024))) \
 	--csv $(BIG_DATASET_FILE) \
-	$(OPTS)
 
 
 help: ## Show this help !
