@@ -9,32 +9,42 @@ import org.apache.accumulo.core.data.Mutation;
 import project.industrial.benchmark.core.MetricsManager;
 import project.industrial.benchmark.core.Scenario;
 
-import java.util.UUID;
+import java.util.Random;
 
-public class DataRateInjectionRandomData extends Scenario {
+public class DataRateInjectionRandomDataScenario extends Scenario {
 
     private final BatchWriter bw;
     private final Meter meter;
-    private int index;
 
-    public DataRateInjectionRandomData(BatchWriter bw) {
-        super(DataRateInjectionRandomData.class.getSimpleName());
+    public DataRateInjectionRandomDataScenario(BatchWriter bw) {
+        super(DataRateInjectionRandomDataScenario.class.getSimpleName());
         this.bw = bw;
-        this.index = 0;
         this.meter = MetricsManager.getMetricRegistry().meter("rate_injection");
     }
 
+
     @Override
     protected void action() throws Exception {
-        while(true) {
-            this.bw.addMutation(this.createRandomMutation());
+        int i = 0;
+        while(i <= 30000000) {
+            this.bw.addMutation(this.createRandomMutation(i));
             this.meter.mark();
-            this.index++;
+            i++;
         }
     }
 
-    private Mutation createRandomMutation() {
-        Mutation m = new Mutation(UUID.randomUUID().toString().substring(0, 6));
+    private String createRandomKey(int index) {
+        Random rnd = new Random();
+        StringBuilder key = new StringBuilder();
+        for(int i = 0 ; i < 4; i++) {
+            key.append((char) (rnd.nextInt(26) + 'a'));
+        }
+        key.append(index);
+        return key.toString();
+    }
+
+    private Mutation createRandomMutation(int index) {
+        Mutation m = new Mutation(this.createRandomKey(index));
         m.put("cf","cq", "my_value_" + index);
         return m;
     }
@@ -46,7 +56,7 @@ public class DataRateInjectionRandomData extends Scenario {
         Connector connector = opts.getConnector();
 
         BatchWriter bw  = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
-        Scenario scenario = new DataRateInjectionRandomData(bw);
+        Scenario scenario = new DataRateInjectionRandomDataScenario(bw);
         scenario.run();
         scenario.finish();
     }

@@ -132,3 +132,5 @@ savedVideos/
 settings.properties
 
 *.csv
+
+*/**/Sandbox.java
