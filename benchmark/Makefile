@@ -86,8 +86,7 @@ write_MR_accumulo: ## write from csv loal file to accumulo table
 	-z $(ZOOKEEPERS) \
 	-t samia \
 	-p $(ACCUMULO_PASSWORD) \
-	--inputDir datatest \
-	--workDir ~/work
+	--inputDir datatest
 
 sandbox: ## Test some stuff
 	$(JAVA_RUN) $(PACKAGE).scenarios.SandboxScenario \

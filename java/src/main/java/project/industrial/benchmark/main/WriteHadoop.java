@@ -34,8 +34,6 @@ public class WriteHadoop extends Configured implements Tool {
     static class Opts extends MapReduceClientOnRequiredTable {
         @Parameter(names = "--inputDir", required = true)
         String inputDir;
-        @Parameter(names = "--workDir", required = true)
-        String workDir;
     }
 
     private Text outputKey = new Text();
@@ -95,8 +93,11 @@ public class WriteHadoop extends Configured implements Tool {
 
         TextInputFormat.setInputPaths(job, new Path(opts.inputDir));
 
+        long startTime = System.currentTimeMillis();
         job.waitForCompletion(true);
-            
+         System.out.println("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
+                + " seconds");    
+        
         return 0;
     }
 
