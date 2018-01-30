@@ -69,7 +69,11 @@ server {
 ```
 ## Start services
 ```bash
+# Start grafana
 /home/grafana/bin/grafana-server start &
+# Start carbon-cache (metrics collector)
+/home/graphite/bin/carbon-cache.py start
+# Start graphite
 PYTHONPATH=/home/graphite/webapp gunicorn wsgi --workers=4 --bind=127.0.0.1:8080 --log-file=/var/log/gunicorn.log --preload --pythonpath=/home/graphite/webapp/graphite &
 ```
 
