@@ -22,7 +22,7 @@ public class PeopleMutationBuilder implements MutationBuilder {
         List<Mutation> mutations = new ArrayList<>();
         // date, name, firstname, email, url, ip
         String[] parts = data[0].split(",");
-        String key = UUID.randomUUID().toString() + "_" + parts[1] + "_" + parts[2];
+        String key = UUID.randomUUID().toString().substring(0, 5) + "_" + parts[1] + "_" + parts[2];
         mutations.add(this.buildMutation(key, "meta", "date", parts[0]));
         mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
         mutations.add(this.buildMutation(key, "identity", "firstname", parts[2]));
