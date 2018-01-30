@@ -30,16 +30,6 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	$(OPTS)
 
 
-Data_rate_injection_random_data: ## infinite loop that inject random mutation, looking for bottleneck
-$(JAVA_RUN) $(PACKAGE).scenarios.DataRateInjectionRandomData \
-	-i $(INSTANCE) \
-	-t $(ACCUMULO_TABLE) \
-	-p $(ACCUMULO_PASSWORD) \
-	-z $(ZOOKEEPERS) \
-	-u $(ACCUMULO_USER) \
-	$(OPTS)
-
-
 scan_table: ## full scan on a given table
 	$(JAVA_RUN) $(PACKAGE_ROOT).features.mining.GeneralScan \
 	-i $(INSTANCE) \
