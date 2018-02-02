@@ -6,7 +6,7 @@ DATASET_URL=https://raw.githubusercontent.com/Mcdostone/industrial-project/maste
 BIG_DATASET_URL=https://raw.githubusercontent.com/Mcdostone/industrial-project/master/benchmark/datasets/big_log_access.csv
 DATASET_FILE=$(join $(DIR), $(notdir $(DATASET_URL)))
 BIG_DATASET_FILE=$(join $(DIR), $(notdir $(BIG_DATASET_URL)))
-JAVA_RUN=java -cp /root/sandbox-accumulo-1.0-jar-with-dependencies.jar -Xms15G
+JAVA_RUN=~/accumulo/bin/accumulo jar /root/sandbox-accumulo-1.0-jar-with-dependencies.jar
 ZOOKEEPERS=145.239.142.185,145.239.142.187,145.239.142.188
 INSTANCE=accumulo
 ACCUMULO_TABLE=test
@@ -86,7 +86,7 @@ write_MR_accumulo: ## write from csv loal file to accumulo table
 	-z $(ZOOKEEPERS) \
 	-t samia \
 	-p $(ACCUMULO_PASSWORD) \
-	--inputDir datatest
+	--inputDir ingest
 
 sandbox: ## Test some stuff
 	$(JAVA_RUN) $(PACKAGE).scenarios.SandboxScenario \
