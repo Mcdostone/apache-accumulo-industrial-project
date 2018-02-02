@@ -97,7 +97,7 @@ public class WriteHadoop extends Configured implements Tool {
         TextInputFormat.setInputPaths(job, new Path(opts.inputDir));
 
         long startTime = System.currentTimeMillis();
-        job.waitForCompletion(true);
+            job.waitForCompletion(true);
          System.out.println("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
                 + " seconds");    
         

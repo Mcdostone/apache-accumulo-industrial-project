@@ -8,7 +8,7 @@ ACCUMULO_USER=root
 PACKAGE_ROOT=project.industrial
 PACKAGE=$PACKAGE_ROOT.benchmark
 BIG_DATASET_FILE=/root/big_log_access.csv
-JAVA_RUN="java -cp /root/sandbox-accumulo-1.0-jar-with-dependencies.jar -Xms15G"
+JAVA_RUN="~/accumulo/bin/accumulo jar /root/sandbox-accumulo-1.0-jar-with-dependencies.jar"
 
 
 reset_table()
