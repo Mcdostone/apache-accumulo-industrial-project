@@ -15,28 +15,22 @@ import java.util.List;
 public class InjectorWithMetrics implements Injector {
 
     private final Injector injector;
-    private final Counter counter;
     private final Meter meter;
 
 
-    public InjectorWithMetrics(BatchWriter bw, Meter meter, Counter counter) {
+    public InjectorWithMetrics(BatchWriter bw, Meter meter) {
         super();
         this.injector = new SimpleInjector(bw);
         this.meter = meter;
-        this.counter = counter;
     }
 
     public InjectorWithMetrics(BatchWriter bw) {
-        this(bw,
-                MetricsManager.getMetricRegistry().meter("rate_injections"),
-                MetricsManager.getMetricRegistry().counter("count_injections")
-        );
+        this(bw, MetricsManager.getMetricRegistry().meter("rate_injections"));
     }
 
     @Override
     public int inject(Mutation m) throws MutationsRejectedException {
         int count = this.injector.inject(m);
-        this.counter.inc();
         this.meter.mark();
         return count;
     }
@@ -44,7 +38,6 @@ public class InjectorWithMetrics implements Injector {
     @Override
     public int inject(List<Mutation> mutations) throws MutationsRejectedException {
         int count = this.injector.inject(mutations);
-        this.counter.inc(count);
         this.meter.mark(count);
         return count;
     }
