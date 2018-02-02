@@ -15,21 +15,17 @@ ACCUMULO_USER=root
 
 
 data_rate_injection_scenario: ## test the data rate injection, 80000 objects per second
-	$(JAVA_RUN) $(PACKAGE).scenarios.DataRateInjectionScenario \
+	$(JAVA_RUN) $(PACKAGE).scenarios.DataRateInjectionScenario --debug \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	--csv $(BIG_DATASET_FILE) \
-
-	# --batchLatency 5000
-	# --batchMemory $$(echo $$((500 * 1024 * 1024)))
-	# --batchThreads 5
+	--csv $(BIG_DATASET_FILE)
 
 
 scan_table: ## full scan on a given table
-	$(JAVA_RUN) $(PACKAGE_ROOT).features.mining.GeneralScan \
+	$(JAVA_RUN) $(PACKAGE_ROOT).features.mining.GeneralScan --debug \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
@@ -42,7 +38,7 @@ test_graphite: ## test communication between java code and graphite
 
 
 create_table: ## ask the name of the table to create
-	$(JAVA_RUN) $(PACKAGE).main.CreateTable \
+	$(JAVA_RUN) $(PACKAGE).main.CreateTable --debug \
 	-i $(INSTANCE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
@@ -50,7 +46,7 @@ create_table: ## ask the name of the table to create
 
 
 delete_table: ## ask the name of the table to delete
-	$(JAVA_RUN) $(PACKAGE).main.DeleteTable \
+	$(JAVA_RUN) $(PACKAGE).main.DeleteTable --debug \
 	-i $(INSTANCE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
@@ -59,7 +55,7 @@ delete_table: ## ask the name of the table to delete
 
 
 check_metadata_problems: ## 
-	$(JAVA_RUN) org.apache.accumulo.server.util.CheckForMetadataProblems \
+	$(JAVA_RUN) org.apache.accumulo.server.util.CheckForMetadataProblems --debug \
 	-i $(INSTANCE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
@@ -72,7 +68,7 @@ download_dataset: ## Download the dataset from github
 	wget $(BIG_DATASET_URL)
 	
 read_MR_accumulo: ## scan a table and print results
-	$(JAVA_RUN) $(PACKAGE).main.MapReduce \
+	$(JAVA_RUN) $(PACKAGE).main.MapReduce --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
 	-t $(ACCUMULO_TABLE) \
@@ -81,7 +77,7 @@ read_MR_accumulo: ## scan a table and print results
 	--columns colfam1:colqual1 \
 
 write_MR_accumulo: ## write from csv loal file to accumulo table
-	$(JAVA_RUN) $(PACKAGE).main.WriteHadoop \
+	$(JAVA_RUN) $(PACKAGE).main.WriteHadoop --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
 	-t samia \
@@ -89,7 +85,7 @@ write_MR_accumulo: ## write from csv loal file to accumulo table
 	--inputDir ingest
 
 sandbox: ## Test some stuff
-	$(JAVA_RUN) $(PACKAGE).scenarios.SandboxScenario \
+	$(JAVA_RUN) $(PACKAGE).scenarios.SandboxScenario --debug \
 	-i $(INSTANCE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-t $(ACCUMULO_TABLE) \
@@ -105,7 +101,7 @@ help: ## Show this help !
 
 
 sequential_batch_writer:
-	$(JAVA_RUN) $(PACKAGE_ROOT).examples.SequentialBatchWriter \
+	$(JAVA_RUN) $(PACKAGE_ROOT).examples.SequentialBatchWriter --debug \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
