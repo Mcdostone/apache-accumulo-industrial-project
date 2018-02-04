@@ -22,8 +22,8 @@ public class DataRateDuringFullScanScenario extends Scenario {
 
     private FullScanTask fullScan;
 
-    public DataRateDuringFullScanScenario(String scenarioName, FullScanTask fullScan) {
-        super(scenarioName);
+    public DataRateDuringFullScanScenario(FullScanTask fullScan) {
+        super(DataRateDuringFullScanScenario.class.getSimpleName());
         this.fullScan = fullScan;
     }
 
@@ -36,9 +36,6 @@ public class DataRateDuringFullScanScenario extends Scenario {
     }
 
     public static void main(String[] args) throws Exception {
-        // Always start by this !
-        String name = "data_rate_during_full_scan";
-        MetricsManager.initReporters(name);
 
         ClientOnRequiredTable opts = new ClientOnRequiredTable();
         BatchWriterOpts bwOpts = new BatchWriterOpts();
@@ -48,7 +45,7 @@ public class DataRateDuringFullScanScenario extends Scenario {
         Scanner sc = connector.createScanner(opts.getTableName(), opts.auths);
 
         FullScanTask getAll = new FullScanTask(sc);
-        Scenario scenario = new DataRateDuringFullScanScenario(name, getAll);
+        Scenario scenario = new DataRateDuringFullScanScenario(getAll);
         scenario.run();
         scenario.finish();
     }

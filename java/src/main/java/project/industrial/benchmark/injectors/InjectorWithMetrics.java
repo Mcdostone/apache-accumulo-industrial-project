@@ -1,6 +1,5 @@
 package project.industrial.benchmark.injectors;
 
-import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.MutationsRejectedException;

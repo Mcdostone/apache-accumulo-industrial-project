@@ -34,7 +34,7 @@ public abstract class Scenario {
      */
     public Scenario(String name) {
         this.name = name;
-        MetricsManager.initReporters(this.name);
+        MetricsManager.initReporters();
     }
 
     /**

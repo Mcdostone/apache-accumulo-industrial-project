@@ -21,7 +21,10 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	--csv $(BIG_DATASET_FILE)
+	--csv $(BIG_DATASET_FILE) \
+	--batchThreads 10 \
+	--batchLatency 1000 \
+	--batchMemory $$(echo $$((500 * 1024 * 1024)))
 
 
 scan_table: ## full scan on a given table

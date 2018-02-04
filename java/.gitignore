@@ -125,6 +125,8 @@ target/classes
 target/generated-sources
 target/maven-archiver
 .idea/
+.project
+.classpath
 
 savedVideos/
 /target/

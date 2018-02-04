@@ -27,16 +27,12 @@ public class MetricsManager {
         return METRIC_REGISTRY;
     }
 
-    public static void initReporters(Class cls) { initReporters(cls.getSimpleName()); }
+    public static void initReporters(Class cls) { initReporters(); }
 
-    public static void initReporters(String scenarioName) {
+    public static void initReporters() {
         if(!reportersInit) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-            String name = sdf.format(new Date());
-            if(scenarioName != null)
-                name = scenarioName + "." + name;
-            reporters.add(initGraphiteReporter(name));
-            reporters.add(initCsvReporter(name));
+            reporters.add(initGraphiteReporter());
+            reporters.add(initCsvReporter());
             reportersInit = true;
         }
         else
@@ -50,14 +46,14 @@ public class MetricsManager {
         });
     }
 
-    private static ScheduledReporter initCsvReporter(String scenarioName) {
+    private static ScheduledReporter initCsvReporter() {
         final CsvReporter consoleReporter = CsvReporter.forRegistry(getMetricRegistry())
                 .build(new File("."));
         consoleReporter.start(20, TimeUnit.SECONDS);
         return consoleReporter;
     }
 
-    private static ScheduledReporter initGraphiteReporter(String scenarioName) {
+    private static ScheduledReporter initGraphiteReporter() {
         Properties prop = new Properties();
         GraphiteReporter graphiteReporter = null;
         try {
@@ -70,7 +66,7 @@ public class MetricsManager {
             final PickledGraphite graphite = new PickledGraphite(address);
 
             graphiteReporter = GraphiteReporter.forRegistry(getMetricRegistry())
-                    .prefixedWith(prop.getProperty("graphite.prefix") + "." + scenarioName)
+                    .prefixedWith(prop.getProperty("graphite.prefix"))
                     .convertRatesTo(TimeUnit.SECONDS)
                     .convertDurationsTo(TimeUnit.MILLISECONDS)
                     .build(graphite);
@@ -85,7 +81,7 @@ public class MetricsManager {
 
 
     public static void main(String[] args) throws InterruptedException {
-        initReporters("loul");
+        initReporters();
         Counter requests = getMetricRegistry().counter("requests");
         requests.inc();
         Thread.sleep(60*1000);
