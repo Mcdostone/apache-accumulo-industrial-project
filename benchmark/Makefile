@@ -27,6 +27,18 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	--batchMemory $$(echo $$((500 * 1024 * 1024)))
 
 
+100_Bytes: ## send 1 mutation of 100 bytes for the value
+	$(JAVA_RUN) $(PACKAGE).scenarios.OneMutationOf100BScenario --debug \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--batchThreads 10 \
+	--batchLatency 1000 \
+	--batchMemory $$(echo $$((500 * 1024 * 1024)))
+
+
 scan_table: ## full scan on a given table
 	$(JAVA_RUN) $(PACKAGE_ROOT).features.mining.GeneralScan --debug \
 	-i $(INSTANCE) \
