@@ -28,7 +28,7 @@ public class TimeGetByKeyScenario extends Scenario {
     private String key;
 
     public TimeGetByKeyScenario(Scanner scanner, String key) {
-        super("Time for accessing to an object by key");
+        super("Time to access an object by key");
         this.scanner = scanner;
         this.maxDuration = 100;
         this.key = key;
@@ -68,5 +68,7 @@ public class TimeGetByKeyScenario extends Scenario {
             opts.rowId = Scenario.askInput("Key of object you want to retrieve:");
 
         Scenario scenario = new TimeGetByKeyScenario(sc, opts.rowId);
+        scenario.run();
+        scenario.finish();
     }
 }

@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ScheduledExecutorService;
 
 
 /**
@@ -27,6 +28,7 @@ public abstract class Scenario {
     /** A name for the scenario, used in graphite */
     protected String name;
     protected static Logger logger = LoggerFactory.getLogger(Scenario.class);
+    protected ScheduledExecutorService exe;
 
 
     /**

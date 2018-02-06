@@ -75,10 +75,11 @@ read_MR_accumulo: ## scan a table and print results
 	$(JAVA_RUN) $(PACKAGE).main.MapReduce \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
-	-t $(ACCUMULO_TABLE) \
+	-t samia\
+	-u root \
 	-p $(ACCUMULO_PASSWORD) \
-	--output ./resultMR \
-	--columns colfam1:colqual1 \
+	--output ./ResultMR \
+	--columns meta:email \
 
 write_MR_accumulo: ## write from csv loal file to accumulo table
 	$(JAVA_RUN) $(PACKAGE).main.WriteHadoop \
@@ -114,5 +115,21 @@ sequential_batch_writer:
 	-u $(ACCUMULO_USER) \
 	--num 1000000000 \
 	--size 60
-	
+get_by_key_scenario:
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeyScenario \
+	-i $(INSTANCE) \
+	-t samia \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--rowId 15/12/2017_Woodyard
 
+get_by_key_range_scenario:
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeysListScenario \
+	-i $(INSTANCE) \
+	-t samia \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--maxRowId 10000000 \
+	--nbKeys 45 
