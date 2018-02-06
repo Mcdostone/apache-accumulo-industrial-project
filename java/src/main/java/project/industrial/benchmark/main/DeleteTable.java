@@ -25,7 +25,6 @@ public class DeleteTable {
 
         if(tableName == null )
             tableName = Scenario.askInput("Name of the table to delete:");
-
         if(connector.tableOperations().exists(tableName))
             connector.tableOperations().delete(tableName);
         else

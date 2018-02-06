@@ -1,5 +1,6 @@
 package project.industrial.benchmark;
 
+import project.industrial.benchmark.main.CreateSplits;
 import project.industrial.benchmark.main.CreateTable;
 import project.industrial.benchmark.main.DeleteTable;
 import project.industrial.benchmark.scenarios.DataRateInjectionScenario;
@@ -20,6 +21,7 @@ public class Help {
         List<Class<?>> classes = new ArrayList<>();
         classes.add(DataRateInjectionScenario.class);
         classes.add(SandboxScenario.class);
+        classes.add(CreateSplits.class);
         classes.add(CreateTable.class);
         classes.add(DeleteTable.class);
         System.out.printf("%d java classes available for the benchmark:\n", classes.size());

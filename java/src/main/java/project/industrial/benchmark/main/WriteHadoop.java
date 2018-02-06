@@ -22,6 +22,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.accumulo.core.data.Mutation;
 //import project.industrial.benchmark.mapReduce.InjectMapRed;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -34,8 +35,6 @@ public class WriteHadoop extends Configured implements Tool {
     static class Opts extends MapReduceClientOnRequiredTable {
         @Parameter(names = "--inputDir", required = true)
         String inputDir;
-        @Parameter(names = "--workDir", required = true)
-        String workDir;
     }
 
     private Text outputKey = new Text();
@@ -57,7 +56,9 @@ public class WriteHadoop extends Configured implements Tool {
             for (String values: stringRow) {
                 String[] stringCol = values.toString().split(",");
 
-                Mutation mutation = new Mutation(new Text(stringCol[0] + "_" + stringCol[1]));
+                String rowID = randomAlphabetic(2).toLowerCase();
+
+                Mutation mutation = new Mutation(new Text(rowID));
                 for (int j = 0; j < 6; j ++) {
                     mutation.put(new Text("meta"), new Text("date"), new Value(stringCol[0]));
                     mutation.put(new Text("meta"), new Text("nom"), new Value(stringCol[1]));
@@ -78,7 +79,7 @@ public class WriteHadoop extends Configured implements Tool {
 
         Configuration conf = getConf();
         Job job = Job.getInstance(conf);
-        job.setJobName("bulk ingest example");
+        job.setJobName("MapRed ingest accumulo");
         job.setJarByClass(this.getClass());
         job.setInputFormatClass(TextInputFormat.class);
 
@@ -95,8 +96,11 @@ public class WriteHadoop extends Configured implements Tool {
 
         TextInputFormat.setInputPaths(job, new Path(opts.inputDir));
 
-        job.waitForCompletion(true);
-            
+        long startTime = System.currentTimeMillis();
+            job.waitForCompletion(true);
+         System.out.println("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
+                + " seconds");    
+        
         return 0;
     }
 

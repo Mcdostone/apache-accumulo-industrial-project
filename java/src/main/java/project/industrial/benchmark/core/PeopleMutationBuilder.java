@@ -11,25 +11,38 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 
 public class PeopleMutationBuilder implements MutationBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(PeopleMutationBuilder.class);
+    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
     @Override
     public List<Mutation> build(String ...data) {
         List<Mutation> mutations = new ArrayList<>();
         // date, name, firstname, email, url, ip
         String[] parts = data[0].split(",");
-        String key = UUID.randomUUID().toString() + "_" + parts[1] + "_" + parts[2];
+        String key = this.generateRandomKey(parts[1]);
         mutations.add(this.buildMutation(key, "meta", "date", parts[0]));
-        mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
+            mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
         mutations.add(this.buildMutation(key, "identity", "firstname", parts[2]));
         mutations.add(this.buildMutation(key, "meta", "email", parts[3]));
         mutations.add(this.buildMutation(key, "access", "url", parts[4]));
         mutations.add(this.buildMutation(key, "access", "ip", parts[5]));
         return mutations;
+    }
+
+    private String generateRandomKey(String suffix) {
+        StringBuilder key = new StringBuilder();
+        for(int i = 0; i < 4; i++){
+            Random randomGenerator = new Random();
+            char ch = ALPHABET.charAt(randomGenerator.nextInt(ALPHABET.length()));
+            key.append(ch);
+        }
+        key.append('_');
+        key.append(suffix);
+        return key.toString();
     }
 
     private Mutation buildMutation(String key, String cf, String cq, String value) {
@@ -38,25 +51,22 @@ public class PeopleMutationBuilder implements MutationBuilder {
         return m;
     }
 
-    public static List<Mutation> buildFromCSV(String filename, Injector injector) {
-        List<Mutation> mutations = new ArrayList<>();
+    public static int buildFromCSV(String filename, Injector injector) {
         PeopleMutationBuilder builder = new PeopleMutationBuilder();
-        logger.info(String.format("Reading '%s' in memory", filename));
+        logger.info(String.format("Reading '%s'", filename));
         BufferedReader reader;
         int countLine = 0;
         String line;
         try {
             reader = new BufferedReader(new FileReader(filename));
             while ((line = reader.readLine()) != null) {
-                line = line.substring(0, line.length() - 1);
-                injector.inject(builder.build(line));
+                injector.inject(builder.build(line.trim()));
                 countLine++;
             }
         } catch (IOException | MutationsRejectedException e) {
             e.printStackTrace();
         }
-        logger.info(countLine + " lines read");
-        return mutations;
+        return countLine;
     }
 
 }
