@@ -13,6 +13,9 @@ import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.injectors.InjectorWithMetrics;
 import project.industrial.benchmark.injectors.SimpleInjector;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This scenario checks the data rate injection in accumulo.
  * We should inject 80000 objects per second
@@ -31,14 +34,20 @@ public class OneMutationOf100BScenario extends Scenario {
 
     private Mutation createMutation(int i) {
         Mutation m = new Mutation("myrowkeys" + i);
-        m.put("mycolumnfa", "mycolumnca","myrowvalue");
+        m.put("", "mycolumnca","myrowvalue");
+        logger.info("### Size of mutation: " + m.size());
+        //System.out.println("#######\n#######\n#######\nSize of mutation: " + m.size() +"\n#######");
         return m;
     }
 
     @Override
     public void action() throws Exception {
         this.injector.inject(this.createMutation(1));
-        this.injector.inject(this.createMutation(2));
+        List<Mutation> m = new ArrayList<>();
+        for(int i = 0; i <= 1000; i++) {
+            m.add(this.createMutation(i));
+        }
+        //this.injector.inject(this.createMutation(2));
         this.injector.close();
     }
 
