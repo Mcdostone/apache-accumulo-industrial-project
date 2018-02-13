@@ -33,6 +33,10 @@ public abstract class Scenario {
         MetricsManager.initReporters();
     }
 
+    public Scenario(Class cls) {
+        this(cls.getSimpleName());
+    }
+
     /**
      * @param message Logs this message if false
      * @param condition Condition to check

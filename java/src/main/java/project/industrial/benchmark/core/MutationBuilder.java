@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface MutationBuilder {
 
-    public List<Mutation> build(String... data);
+    public List<Mutation> build(String data);
+
 
 }

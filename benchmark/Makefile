@@ -14,6 +14,7 @@ ACCUMULO_PASSWORD=root
 ACCUMULO_USER=root
 
 
+#[maxMemory=52428800, maxLatency=120000, maxWriteThreads=3, timeout=9223372036854775807, durability=DEFAULT]'
 data_rate_injection_scenario: ## test the data rate injection, 80000 objects per second
 	$(JAVA_RUN) $(PACKAGE).scenarios.DataRateInjectionScenario --debug \
 	-i $(INSTANCE) \
@@ -23,8 +24,17 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-u $(ACCUMULO_USER) \
 	--csv $(BIG_DATASET_FILE) \
 	--batchThreads 10 \
-	--batchLatency 1000 \
+	--batchLatency 120000 \
 	--batchMemory $$(echo $$((500 * 1024 * 1024)))
+
+
+one_mutation: ## send 1 mutation
+	$(JAVA_RUN) $(PACKAGE).scenarios.OneMutationScenario --debug \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER)
 
 
 scan_table: ## full scan on a given table
@@ -36,9 +46,14 @@ scan_table: ## full scan on a given table
 	-u $(ACCUMULO_USER) \
 
 
-test_graphite: ## test communication between java code and graphite
-	$(JAVA_RUN) $(PACKAGE).core.MetricsManager 
-
+full_scan_concurrent: ## concurrent actions, executing fullscan
+	$(JAVA_RUN) $(PACKAGE).scenarios.FullScanConcurrent --debug \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER)
+	
 
 create_table: ## ask the name of the table to create
 	$(JAVA_RUN) $(PACKAGE).main.CreateTable --debug \

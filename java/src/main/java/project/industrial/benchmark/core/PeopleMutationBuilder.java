@@ -19,13 +19,13 @@ public class PeopleMutationBuilder implements MutationBuilder {
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
     @Override
-    public List<Mutation> build(String ...data) {
+    public List<Mutation> build(String data) {
         List<Mutation> mutations = new ArrayList<>();
         // date, name, firstname, email, url, ip
-        String[] parts = data[0].split(",");
+        String[] parts = data.split(",");
         String key = this.generateRandomKey(parts[1]);
         mutations.add(this.buildMutation(key, "meta", "date", parts[0]));
-            mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
+        mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
         mutations.add(this.buildMutation(key, "identity", "firstname", parts[2]));
         mutations.add(this.buildMutation(key, "meta", "email", parts[3]));
         mutations.add(this.buildMutation(key, "access", "url", parts[4]));
@@ -35,12 +35,11 @@ public class PeopleMutationBuilder implements MutationBuilder {
 
     private String generateRandomKey(String suffix) {
         StringBuilder key = new StringBuilder();
-        for(int i = 0; i < 4; i++){
+        for(int i = 0; i < 4; i++) {
             Random randomGenerator = new Random();
             char ch = ALPHABET.charAt(randomGenerator.nextInt(ALPHABET.length()));
             key.append(ch);
         }
-        key.append('_');
         key.append(suffix);
         return key.toString();
     }
@@ -51,7 +50,7 @@ public class PeopleMutationBuilder implements MutationBuilder {
         return m;
     }
 
-    public static int buildFromCSV(String filename, Injector injector) {
+    public static int injectFromCSV(String filename, Injector injector) {
         PeopleMutationBuilder builder = new PeopleMutationBuilder();
         logger.info(String.format("Reading '%s'", filename));
         BufferedReader reader;
