@@ -86,7 +86,7 @@ download_dataset: ## Download the dataset from github
 	wget $(BIG_DATASET_URL)
 	
 read_MR_accumulo: ## scan a table and print results
-	$(JAVA_RUN) $(PACKAGE).main.MapReduce --debug \
+	$(JAVA_RUN) $(PACKAGE).scenarios.ReadMapReduceScenario	 --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
 	-t samia \
@@ -94,6 +94,7 @@ read_MR_accumulo: ## scan a table and print results
 	-p $(ACCUMULO_PASSWORD) \
 	--output ./ResultMR \
 	--columns meta:email,meta:nom,meta:prenom,meta:date,meta:url,meta:ip
+
 
 write_MR_accumulo: ## write from csv loal file to accumulo table
 	$(JAVA_RUN) $(PACKAGE).main.WriteHadoop --debug \

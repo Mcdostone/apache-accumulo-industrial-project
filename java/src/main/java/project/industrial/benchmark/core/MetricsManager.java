@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MetricsManager {
 
-    private static boolean reportersInit = false;
     private final static MetricRegistry METRIC_REGISTRY = new MetricRegistry();
     private static final List<ScheduledReporter> reporters = new ArrayList<>();
 
@@ -27,16 +26,12 @@ public class MetricsManager {
         return METRIC_REGISTRY;
     }
 
-    public static void initReporters(Class cls) { initReporters(); }
+    public static void initReporters(String prefix) {
+        reporters.add(initGraphiteReporter(prefix));
+    }
 
     public static void initReporters() {
-        if(!reportersInit) {
-            reporters.add(initGraphiteReporter());
-            reporters.add(initCsvReporter());
-            reportersInit = true;
-        }
-        else
-            System.err.println("You can call 'initReporters' only once!");
+        initReporters(null);
     }
 
     public static void close() {
@@ -46,14 +41,7 @@ public class MetricsManager {
         });
     }
 
-    private static ScheduledReporter initCsvReporter() {
-        final CsvReporter consoleReporter = CsvReporter.forRegistry(getMetricRegistry())
-                .build(new File("."));
-        consoleReporter.start(20, TimeUnit.SECONDS);
-        return consoleReporter;
-    }
-
-    private static ScheduledReporter initGraphiteReporter() {
+    private static ScheduledReporter initGraphiteReporter(String prefix) {
         Properties prop = new Properties();
         GraphiteReporter graphiteReporter = null;
         try {
@@ -66,7 +54,7 @@ public class MetricsManager {
             final PickledGraphite graphite = new PickledGraphite(address);
 
             graphiteReporter = GraphiteReporter.forRegistry(getMetricRegistry())
-                    .prefixedWith(prop.getProperty("graphite.prefix"))
+                    .prefixedWith(prefix == null ? prop.getProperty("graphite.prefix"): prefix)
                     .convertRatesTo(TimeUnit.SECONDS)
                     .convertDurationsTo(TimeUnit.MILLISECONDS)
                     .build(graphite);
@@ -76,22 +64,6 @@ public class MetricsManager {
         } catch (IOException e) { e.printStackTrace(); }
 
         return graphiteReporter;
-    }
-
-
-
-    public static void main(String[] args) throws InterruptedException {
-        initReporters();
-        Counter requests = getMetricRegistry().counter("requests");
-        requests.inc();
-        Thread.sleep(60*1000);
-        requests.inc();
-        requests.inc();
-        Thread.sleep(60 * 1000);
-        requests.inc();
-        Thread.sleep(1000);
-        requests.inc();
-        close();
     }
 
 }

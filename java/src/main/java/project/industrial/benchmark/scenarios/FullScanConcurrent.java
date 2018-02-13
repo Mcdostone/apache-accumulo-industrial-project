@@ -1,14 +1,10 @@
 package project.industrial.benchmark.scenarios;
 
-import com.codahale.metrics.graphite.GraphiteReporter;
-import org.apache.hadoop.metrics2.sink.GraphiteSink;
 import project.industrial.benchmark.core.Scenario;
-import project.industrial.benchmark.tasks.JobFetch10000Entries;
 import project.industrial.benchmark.tasks.JobFetch600Entries;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

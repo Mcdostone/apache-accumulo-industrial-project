@@ -7,8 +7,10 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.util.ToolRunner;
+import org.w3c.dom.ranges.Range;
 
 import java.io.IOException;
+import java.util.List;
 
 public class JobFetch10000Entries extends JobReadMapReduce {
 
