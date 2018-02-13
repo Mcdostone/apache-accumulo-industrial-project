@@ -29,6 +29,7 @@ public class DataRateDuringFullScanScenario extends Scenario {
 
     @Override
     public void action() throws Exception {
+
     }
 
     private void processResults(ScannerBase entries) {

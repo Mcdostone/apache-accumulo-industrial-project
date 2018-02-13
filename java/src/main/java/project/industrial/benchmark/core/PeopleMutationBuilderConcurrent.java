@@ -13,19 +13,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class PeopleMutationBuilder implements MutationBuilder {
+public class PeopleMutationBuilderConcurrent implements MutationBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(PeopleMutationBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(PeopleMutationBuilderConcurrent.class);
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+    private final int endKey;
+    private final int startKey;
+    private int current;
+
+    public PeopleMutationBuilderConcurrent(int startKey, int endKey) {
+        this.startKey = startKey;
+        this.endKey = endKey;
+        this.current = startKey;
+    }
 
     @Override
     public List<Mutation> build(String data) {
         List<Mutation> mutations = new ArrayList<>();
         // date, name, firstname, email, url, ip
         String[] parts = data.split(",");
-        String key = this.generateRandomKey(parts[1]);
+        String key = this.generateRandomKey();
         mutations.add(this.buildMutation(key, "meta", "date", parts[0]));
-            mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
+        mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
         mutations.add(this.buildMutation(key, "identity", "firstname", parts[2]));
         mutations.add(this.buildMutation(key, "meta", "email", parts[3]));
         mutations.add(this.buildMutation(key, "access", "url", parts[4]));
@@ -33,15 +42,9 @@ public class PeopleMutationBuilder implements MutationBuilder {
         return mutations;
     }
 
-    private String generateRandomKey(String suffix) {
+    public String generateRandomKey() {
         StringBuilder key = new StringBuilder();
-        for(int i = 0; i < 4; i++){
-            Random randomGenerator = new Random();
-            char ch = ALPHABET.charAt(randomGenerator.nextInt(ALPHABET.length()));
-            key.append(ch);
-        }
-        key.append('_');
-        key.append(suffix);
+        key.append(this.current++);
         return key.toString();
     }
 
@@ -51,8 +54,8 @@ public class PeopleMutationBuilder implements MutationBuilder {
         return m;
     }
 
-    public static int buildFromCSV(String filename, Injector injector) {
-        PeopleMutationBuilder builder = new PeopleMutationBuilder();
+    public static int buildFromCSV(String filename, Injector injector, int start, int end) {
+        PeopleMutationBuilderConcurrent builder = new PeopleMutationBuilderConcurrent(start, end);
         logger.info(String.format("Reading '%s'", filename));
         BufferedReader reader;
         int countLine = 0;
