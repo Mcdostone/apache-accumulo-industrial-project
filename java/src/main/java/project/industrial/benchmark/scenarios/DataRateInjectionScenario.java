@@ -30,7 +30,7 @@ public class DataRateInjectionScenario extends Scenario {
 
     @Override
     public void action() throws Exception {
-        PeopleMutationBuilder.buildFromCSV(this.filename, this.injector);
+        PeopleMutationBuilder.injectFromCSV(this.filename, this.injector);
         this.injector.close();
     }
 

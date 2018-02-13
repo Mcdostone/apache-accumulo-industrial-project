@@ -14,6 +14,7 @@ ACCUMULO_PASSWORD=root
 ACCUMULO_USER=root
 
 
+#[maxMemory=52428800, maxLatency=120000, maxWriteThreads=3, timeout=9223372036854775807, durability=DEFAULT]'
 data_rate_injection_scenario: ## test the data rate injection, 80000 objects per second
 	$(JAVA_RUN) $(PACKAGE).scenarios.DataRateInjectionScenario --debug \
 	-i $(INSTANCE) \
@@ -23,8 +24,17 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	-u $(ACCUMULO_USER) \
 	--csv $(BIG_DATASET_FILE) \
 	--batchThreads 10 \
-	--batchLatency 1000 \
+	--batchLatency 120000 \
 	--batchMemory $$(echo $$((500 * 1024 * 1024)))
+
+
+one_mutation: ## send 1 mutation
+	$(JAVA_RUN) $(PACKAGE).scenarios.OneMutationScenario --debug \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER)
 
 
 scan_table: ## full scan on a given table
@@ -36,9 +46,14 @@ scan_table: ## full scan on a given table
 	-u $(ACCUMULO_USER) \
 
 
-test_graphite: ## test communication between java code and graphite
-	$(JAVA_RUN) $(PACKAGE).core.MetricsManager 
-
+full_scan_concurrent: ## concurrent actions, executing fullscan
+	$(JAVA_RUN) $(PACKAGE).scenarios.FullScanConcurrent --debug \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER)
+	
 
 create_table: ## ask the name of the table to create
 	$(JAVA_RUN) $(PACKAGE).main.CreateTable --debug \
@@ -71,13 +86,15 @@ download_dataset: ## Download the dataset from github
 	wget $(BIG_DATASET_URL)
 	
 read_MR_accumulo: ## scan a table and print results
-	$(JAVA_RUN) $(PACKAGE).main.MapReduce --debug \
+	$(JAVA_RUN) $(PACKAGE).scenarios.ReadMapReduceScenario	 --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
-	-t $(ACCUMULO_TABLE) \
+	-t samia \
+	-u root \
 	-p $(ACCUMULO_PASSWORD) \
-	--output ./resultMR \
-	--columns colfam1:colqual1 \
+	--output ./ResultMR \
+	--columns meta:email,meta:nom,meta:prenom,meta:date,meta:url,meta:ip
+
 
 write_MR_accumulo: ## write from csv loal file to accumulo table
 	$(JAVA_RUN) $(PACKAGE).main.WriteHadoop --debug \
@@ -112,5 +129,42 @@ sequential_batch_writer:
 	-u $(ACCUMULO_USER) \
 	--num 1000000000 \
 	--size 60
-	
+get_by_key_scenario:
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeyScenario \
+	-i $(INSTANCE) \
+	-t test \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	-- rowId 99999
 
+
+get_by_key_range_scenario:
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeysListScenario \
+	-i $(INSTANCE) \
+	-t test \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--maxRowId 10000000 \
+	--nbKeys 45 \
+	--key ejgjnz
+
+
+inf_get_by_key_time_scenario:
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyScenario \
+	-i $(INSTANCE) \
+	-t test \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--csv testGet.csv
+
+infinite_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in a file (one row = one key)
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyListScenario \
+	-i $(INSTANCE) \
+	-t coucou \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--csv listTestGet.csv

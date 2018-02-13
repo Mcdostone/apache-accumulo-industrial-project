@@ -3,9 +3,10 @@
 deploy() {
     FILE=$1
     echo "Deploy '$(basename $1)' on VMs"
-    scp -r $FILE root@37.59.123.111:/root
-#    scp -r $FILE root@37.59.123.118:/root
-#    scp -r $FILE root@37.59.123.138:/root
+    #scp $FILE root@37.59.123.111:/root &
+    # scp $FILE root@37.59.123.118:/root &
+    #scp $FILE root@37.59.123.138:/root &
+    #wait
 }
 
 # Build the jar

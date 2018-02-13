@@ -1,31 +1,32 @@
-package project.industrial.benchmark.main;
+package project.industrial.benchmark.scenarios;
 
-import java.io.IOException;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.HashSet;
-import java.util.Map;
-
+import com.beust.jcommander.Parameter;
 import org.apache.accumulo.core.cli.MapReduceClientOnRequiredTable;
-import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.util.Pair;
 import org.apache.accumulo.core.util.format.DefaultFormatter;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import project.industrial.benchmark.core.MapReduceScenario;
 
-import com.beust.jcommander.Parameter;
+import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.HashSet;
+import java.util.Map;
 
-public class MapReduce extends Configured implements Tool {
+public class ReadMapReduceScenario extends MapReduceScenario {
+
+    public ReadMapReduceScenario() {
+        super(ReadMapReduceScenario.class);
+    }
 
     static class Opts extends MapReduceClientOnRequiredTable {
         @Parameter(names = "--output", description = "output directory", required = true)
@@ -40,13 +41,13 @@ public class MapReduce extends Configured implements Tool {
     public static class TTFMapper extends Mapper<Key, Value, NullWritable, Text> {
         @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
-            Map.Entry<Key, Value> entry = new SimpleImmutableEntry<>(row, data);
+            Map.Entry<Key, Value> entry = new AbstractMap.SimpleImmutableEntry<>(row, data);
             context.write(NullWritable.get(), new Text(DefaultFormatter.formatEntry(entry, false)));
             context.setStatus("Outputed Value");
         }
     }
 
-    public int run(String[] args) throws IOException, InterruptedException, ClassNotFoundException, AccumuloSecurityException {
+    public int run(String[] args) throws Exception {
         Job job = Job.getInstance(getConf());
         job.setJobName(this.getClass().getSimpleName() + "_" + System.currentTimeMillis());
         job.setJarByClass(this.getClass());
@@ -56,24 +57,16 @@ public class MapReduce extends Configured implements Tool {
         job.setInputFormatClass(AccumuloInputFormat.class);
         opts.setAccumuloConfigs(job);
 
-        /**  cQ cF  **/
         HashSet<Pair<Text,Text>> columnsToFetch = new HashSet<>();
         for (String col : opts.columns.split(",")) {
-            System.out.println("col: " + col);
             int idx = col.indexOf(":");
             Text cf = new Text(idx < 0 ? col : col.substring(0, idx));
-            System.out.println("cf: " + cf);
             Text cq = idx < 0 ? null : new Text(col.substring(idx + 1));
-            System.out.println("cq: " + cq);
             if (cf.getLength() > 0)
                 columnsToFetch.add(new Pair<>(cf, cq));
         }
-        if (!columnsToFetch.isEmpty()){
+        if (!columnsToFetch.isEmpty())
             AccumuloInputFormat.fetchColumns(job, columnsToFetch);
-            System.out.println("Not Empty");}
-            else{System.out.println("EMPTY");}
-
-
 
         job.setMapperClass(TTFMapper.class);
         job.setMapOutputKeyClass(NullWritable.class);
@@ -88,15 +81,13 @@ public class MapReduce extends Configured implements Tool {
         job.waitForCompletion(true);
         System.out.println("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
                 + " seconds");
+
+        this.sendMetrics(job);
         return job.isSuccessful() ? 0 : 1;
     }
 
-    /**
-     *
-     * @param args
-     *          instanceName zookeepers username password table columns outputpath
-     */
     public static void main(String[] args) throws Exception {
-        ToolRunner.run(new Configuration(), new MapReduce(), args);
+        ToolRunner.run(new Configuration(), new ReadMapReduceScenario(), args);
     }
+
 }

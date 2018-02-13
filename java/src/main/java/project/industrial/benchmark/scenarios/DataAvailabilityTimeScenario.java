@@ -84,7 +84,6 @@ public class DataAvailabilityTimeScenario extends Scenario {
 
     public static void main(String[] args) throws Exception {
         String name = "Data availability time";
-        MetricsManager.initReporters(DataAvailabilityTimeScenario.class);
 
         Opts opts = new Opts();
         BatchWriterOpts bwOpts = new BatchWriterOpts();

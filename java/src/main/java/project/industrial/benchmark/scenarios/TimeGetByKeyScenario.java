@@ -3,14 +3,22 @@ package project.industrial.benchmark.scenarios;
 import com.beust.jcommander.Parameter;
 import org.apache.accumulo.core.cli.BatchWriterOpts;
 import org.apache.accumulo.core.cli.ClientOnRequiredTable;
+import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.client.ScannerBase;
+import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Mutation;
+import org.apache.accumulo.core.data.Range;
+import org.apache.accumulo.core.data.Value;
+import org.apache.hadoop.io.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.tasks.GetByKeyTask;
 import project.industrial.benchmark.tasks.ReaderTask;
+
+import java.util.Map;
 
 
 /**
@@ -28,7 +36,7 @@ public class TimeGetByKeyScenario extends Scenario {
     private String key;
 
     public TimeGetByKeyScenario(Scanner scanner, String key) {
-        super("Time for accessing to an object by key");
+        super("Time to access an object by key");
         this.scanner = scanner;
         this.maxDuration = 100;
         this.key = key;
@@ -39,17 +47,6 @@ public class TimeGetByKeyScenario extends Scenario {
         key = key.trim();
         ReaderTask t =  new GetByKeyTask(this.scanner, key);
         ScannerBase s = t.call();
-
-        long begin = System.currentTimeMillis();
-        int nbResults = this.countResults(s.iterator());
-        long end = System.currentTimeMillis();
-
-        this.showResults(s.iterator());
-
-        boolean durationRespected = (end - begin) <= this.maxDuration;
-        logger.info(String.format("Operation done in %d ms", end - begin));
-        this.assertTrue(String.format("The access by key must finish under %d ms", maxDuration), durationRespected);
-        this.assertTrue("Should return a object",1 >= nbResults);
     }
 
     static class Opts extends ClientOnRequiredTable {
@@ -64,9 +61,28 @@ public class TimeGetByKeyScenario extends Scenario {
         Connector connector = opts.getConnector();
         Scanner sc = connector.createScanner(opts.getTableName(), opts.auths);
 
+        sc.setRange(Range.exact("985"));
+        for (Map.Entry<Key, Value> entry : sc) {
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        }
+
+        System.out.println("###### START HERE");
+
         if(opts.rowId == null)
             opts.rowId = Scenario.askInput("Key of object you want to retrieve:");
 
-        Scenario scenario = new TimeGetByKeyScenario(sc, opts.rowId);
+        String[] oneRow;
+        oneRow=opts.rowId.toString().split(",");
+        long begin = System.currentTimeMillis();
+        for (int i=0; i<oneRow.length;i++) {
+            Scenario scenario = new TimeGetByKeyScenario(sc, oneRow[i]);
+            scenario.run();
+            scenario.finish();
+        }
+        long end = System.currentTimeMillis();
+        long tpsTot = end - begin;
+        float tpsMoy = (float) tpsTot/(oneRow.length);
+        System.out.println("Nombre de requetes Get Unitaire effectuees = " + oneRow.length);
+        System.out.println("Temps Moyen par requete = " + tpsMoy + "ms");
     }
 }
