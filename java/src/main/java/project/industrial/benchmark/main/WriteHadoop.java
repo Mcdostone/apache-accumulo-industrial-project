@@ -20,6 +20,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.accumulo.core.data.Mutation;
 //import project.industrial.benchmark.mapReduce.InjectMapRed;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -48,7 +50,6 @@ public class WriteHadoop extends Configured implements Tool {
         private Text outputKey = new Text();
         private Text outputValue = new Text();
 
-        @Override
         public void map(LongWritable key, Text value, Context output) throws IOException, InterruptedException {
 
             String[] stringRow = value.toString().split("\n");
@@ -56,17 +57,15 @@ public class WriteHadoop extends Configured implements Tool {
             for (String values: stringRow) {
                 String[] stringCol = values.toString().split(",");
 
-                String rowID = randomAlphabetic(2).toLowerCase();
+                String rowID = randomAlphabetic(10).toLowerCase();
 
                 Mutation mutation = new Mutation(new Text(rowID));
-                for (int j = 0; j < 6; j ++) {
-                    mutation.put(new Text("meta"), new Text("date"), new Value(stringCol[0]));
-                    mutation.put(new Text("meta"), new Text("nom"), new Value(stringCol[1]));
-                    mutation.put(new Text("meta"), new Text("prenom"), new Value(stringCol[2]));
-                    mutation.put(new Text("meta"), new Text("email"), new Value(stringCol[3]));
-                    mutation.put(new Text("meta"), new Text("url"), new Value(stringCol[4]));
-                    mutation.put(new Text("meta"), new Text("ip"), new Value(stringCol[5]));
-                } 
+                mutation.put(new Text("meta"), new Text("date"), new Value(stringCol[0]));
+                mutation.put(new Text("meta"), new Text("nom"), new Value(stringCol[1]));
+                mutation.put(new Text("meta"), new Text("prenom"), new Value(stringCol[2]));
+                mutation.put(new Text("meta"), new Text("email"), new Value(stringCol[3]));
+                mutation.put(new Text("meta"), new Text("url"), new Value(stringCol[4]));
+                mutation.put(new Text("meta"), new Text("ip"), new Value(stringCol[5]));
                 output.write(null, mutation);
             }
 
@@ -78,6 +77,7 @@ public class WriteHadoop extends Configured implements Tool {
         opts.parseArgs(WriteHadoop.class.getName(), args);
 
         Configuration conf = getConf();
+
         Job job = Job.getInstance(conf);
         job.setJobName("MapRed ingest accumulo");
         job.setJarByClass(this.getClass());
