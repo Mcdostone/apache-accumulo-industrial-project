@@ -24,10 +24,6 @@ import java.util.Map;
 
 public class ReadMapReduceScenario extends MapReduceScenario {
 
-    public ReadMapReduceScenario() {
-        super(ReadMapReduceScenario.class);
-    }
-
     static class Opts extends MapReduceClientOnRequiredTable {
         @Parameter(names = "--output", description = "output directory", required = true)
         String output;
@@ -57,7 +53,7 @@ public class ReadMapReduceScenario extends MapReduceScenario {
         job.setInputFormatClass(AccumuloInputFormat.class);
         opts.setAccumuloConfigs(job);
 
-        HashSet<Pair<Text,Text>> columnsToFetch = new HashSet<>();
+/*        HashSet<Pair<Text,Text>> columnsToFetch = new HashSet<>();
         for (String col : opts.columns.split(",")) {
             int idx = col.indexOf(":");
             Text cf = new Text(idx < 0 ? col : col.substring(0, idx));
@@ -67,13 +63,11 @@ public class ReadMapReduceScenario extends MapReduceScenario {
         }
         if (!columnsToFetch.isEmpty())
             AccumuloInputFormat.fetchColumns(job, columnsToFetch);
-
+*/
         job.setMapperClass(TTFMapper.class);
         job.setMapOutputKeyClass(NullWritable.class);
         job.setMapOutputValueClass(Text.class);
-
-        job.setNumReduceTasks(0); // Pas de Reduce
-
+        job.setNumReduceTasks(0);
         job.setOutputFormatClass(TextOutputFormat.class);
         TextOutputFormat.setOutputPath(job, new Path(opts.output));
 

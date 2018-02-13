@@ -4,6 +4,7 @@ import com.codahale.metrics.*;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
 import com.codahale.metrics.graphite.PickledGraphite;
+import org.apache.accumulo.server.metrics.Metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,10 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class MetricsManager {
@@ -32,6 +30,12 @@ public class MetricsManager {
 
     public static void initReporters() {
         initReporters(null);
+    }
+
+    public static void forceFlush() {
+        reporters.forEach(r -> {
+            r.report();
+        });
     }
 
     public static void close() {
@@ -64,6 +68,18 @@ public class MetricsManager {
         } catch (IOException e) { e.printStackTrace(); }
 
         return graphiteReporter;
+    }
+
+    public static void main(String[] args) {
+        MetricsManager.initReporters("local");
+        Counter c = MetricsManager.getMetricRegistry().counter("test");
+        Scanner sc = new Scanner(System.in);
+        int v = 0;
+        while(true) {
+            v = sc.nextInt();
+            c.inc(v);
+            forceFlush();
+        }
     }
 
 }
