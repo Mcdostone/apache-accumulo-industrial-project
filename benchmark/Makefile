@@ -92,7 +92,7 @@ read_MR_accumulo: ## scan a table and print results
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	--output ./resultMR \
-	--columns colfam1:colqual1 \
+	--columns identity:name \
 
 write_MR_accumulo: ## write from csv loal file to accumulo table
 	$(JAVA_RUN) $(PACKAGE).main.WriteHadoop --debug \
