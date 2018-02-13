@@ -89,10 +89,12 @@ read_MR_accumulo: ## scan a table and print results
 	$(JAVA_RUN) $(PACKAGE).scenarios.ReadMapReduceScenario	 --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
-	-t $(ACCUMULO_TABLE) \
+	-t samia \
+	-u root \
 	-p $(ACCUMULO_PASSWORD) \
-	--output ./resultMR \
-	--columns identity:name \
+	--output ./ResultMR \
+	--columns meta:email,meta:nom,meta:prenom,meta:date,meta:url,meta:ip
+
 
 write_MR_accumulo: ## write from csv loal file to accumulo table
 	$(JAVA_RUN) $(PACKAGE).main.WriteHadoop --debug \
@@ -116,3 +118,53 @@ sandbox: ## Test some stuff
 
 help: ## Show this help !
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+
+sequential_batch_writer:
+	$(JAVA_RUN) $(PACKAGE_ROOT).examples.SequentialBatchWriter --debug \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--num 1000000000 \
+	--size 60
+get_by_key_scenario:
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeyScenario \
+	-i $(INSTANCE) \
+	-t test \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	-- rowId 99999
+
+
+get_by_key_range_scenario:
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeysListScenario \
+	-i $(INSTANCE) \
+	-t test \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--maxRowId 10000000 \
+	--nbKeys 45 \
+	--key ejgjnz
+
+
+inf_get_by_key_time_scenario:
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyScenario \
+	-i $(INSTANCE) \
+	-t test \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--csv testGet.csv
+
+infinite_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in a file (one row = one key)
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyListScenario \
+	-i $(INSTANCE) \
+	-t coucou \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--csv listTestGet.csv

@@ -16,7 +16,6 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.ToolRunner;
 import project.industrial.benchmark.core.MapReduceScenario;
-import project.industrial.benchmark.main.MapReduce;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -69,7 +68,7 @@ public class ReadMapReduceScenario extends MapReduceScenario {
         if (!columnsToFetch.isEmpty())
             AccumuloInputFormat.fetchColumns(job, columnsToFetch);
 
-        job.setMapperClass(MapReduce.TTFMapper.class);
+        job.setMapperClass(TTFMapper.class);
         job.setMapOutputKeyClass(NullWritable.class);
         job.setMapOutputValueClass(Text.class);
 

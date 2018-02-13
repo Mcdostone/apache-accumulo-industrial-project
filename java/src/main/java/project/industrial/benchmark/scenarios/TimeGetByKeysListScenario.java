@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.tasks.GetByKeysListTask;
-
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -33,6 +33,7 @@ public class TimeGetByKeysListScenario extends Scenario {
     private final List<Range> keys;
     private long maxDuration;
 
+
     /**
      *
      * @param getByList Task corresponding to this scenario
@@ -48,10 +49,13 @@ public class TimeGetByKeysListScenario extends Scenario {
     @Override
     public void action() throws Exception {
         logger.info("Looking for objects where key belongs to the list");
-        // ScheduledFuture<ScannerBase> future =
-        //         this.executorService.schedule(this.getByListTask, 0, TimeUnit.SECONDS);
-        // this.checkResults(future.get().iterator());
-        // this.saveResultsInCSV(future.get().iterator());
+        this.exe = Executors.newScheduledThreadPool(1);
+         ScheduledFuture<ScannerBase> future =
+                 this.exe.schedule(this.getByListTask, 0, TimeUnit.SECONDS);
+
+                 //this.executorService.schedule(this.getByListTask, 0, TimeUnit.SECONDS);
+         this.checkResults(future.get().iterator());
+         this.saveResultsInCSV(future.get().iterator());
     }
 
     private void checkResults(Iterator<Map.Entry<Key, Value>> iterator) throws Exception {
@@ -69,6 +73,7 @@ public class TimeGetByKeysListScenario extends Scenario {
         this.assertEquals(String.format("Should retrieve %d objects", this.keys.size()), this.keys.size(), count);
     }
 
+    // Problème: key = Integer VS peut être n'importe quoi
     private static List<String> generateListOfKeys(int max, int nbGenerations) {
         Random rand = new Random();
         HashMap<Integer, Boolean> used = new HashMap<>();
@@ -106,8 +111,12 @@ public class TimeGetByKeysListScenario extends Scenario {
         }
 
         List<Range> keysRange = opts.keys.stream().map(Range::exact).collect(Collectors.toList());
+        System.out.println(keysRange);
         BatchScanner scanner = connector.createBatchScanner(opts.getTableName(), opts.auths, bsOpts.scanThreads);
         GetByKeysListTask getByList = new GetByKeysListTask(scanner, keysRange);
         Scenario scenario = new TimeGetByKeysListScenario(getByList, keysRange);
+        scenario.run();
+        scenario.finish();
+
     }
 }
