@@ -26,7 +26,6 @@ import org.apache.hadoop.util.ToolRunner;
 import com.beust.jcommander.Parameter;
 
 public class MapReduce extends Configured implements Tool {
-    public static int i=0;
 
     static class Opts extends MapReduceClientOnRequiredTable {
         @Parameter(names = "--output", description = "output directory", required = true)
@@ -39,13 +38,11 @@ public class MapReduce extends Configured implements Tool {
      * The Mapper class that given a row number, will generate the appropriate output line.
      */
     public static class TTFMapper extends Mapper<Key, Value, NullWritable, Text> {
-        //public static class TTFMapper extends Mapper<Key, Value, NullWritable, NullWritable> {
         @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
+            System.out.println(row);
             Map.Entry<Key, Value> entry = new SimpleImmutableEntry<>(row, data);
-            i++;
             context.write(NullWritable.get(), new Text(DefaultFormatter.formatEntry(entry, false)));
-            // context.write(NullWritable.get(),NullWritable.get());
             context.setStatus("Outputed Value");
         }
     }
@@ -66,22 +63,18 @@ public class MapReduce extends Configured implements Tool {
             System.out.println("col: " + col);
             int idx = col.indexOf(":");
             Text cf = new Text(idx < 0 ? col : col.substring(0, idx));
-            System.out.println("cf: " + cf);
             Text cq = idx < 0 ? null : new Text(col.substring(idx + 1));
-           // Text cq = new Text("");
-            System.out.println("cq: " + cq);
             if (cf.getLength() > 0)
                 columnsToFetch.add(new Pair<>(cf, cq));
         }
         if (!columnsToFetch.isEmpty()){
-            AccumuloInputFormat.fetchColumns(job, columnsToFetch);
-            System.out.println("Not Empty");}
-            else{System.out.println("EMPTY");}
+          //  AccumuloInputFormat.setBatchScan(job,true);
+            AccumuloInputFormat.fetchColumns(job, columnsToFetch);}
+
 
         job.setMapperClass(TTFMapper.class);
         job.setMapOutputKeyClass(NullWritable.class);
         job.setMapOutputValueClass(Text.class);
-        //job.setMapOutputValueClass(NullWritable.class);
 
         job.setNumReduceTasks(0); // Pas de Reduce
 

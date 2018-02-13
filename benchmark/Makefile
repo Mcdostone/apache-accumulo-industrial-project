@@ -74,11 +74,11 @@ read_MR_accumulo: ## scan a table and print results
 	$(JAVA_RUN) $(PACKAGE).main.MapReduce --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
-	-t samia\
+	-t samia \
 	-u root \
 	-p $(ACCUMULO_PASSWORD) \
 	--output ./ResultMR \
-	--columns meta:email \
+	--columns meta:email,meta:nom,meta:prenom,meta:date,meta:url,meta:ip
 
 write_MR_accumulo: ## write from csv loal file to accumulo table
 	$(JAVA_RUN) $(PACKAGE).main.WriteHadoop --debug \
@@ -116,18 +116,39 @@ sequential_batch_writer:
 get_by_key_scenario:
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeyScenario \
 	-i $(INSTANCE) \
-	-t samia \
+	-t test \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	--rowId 15/12/2017_Woodyard
+	-- rowId 99999
+
 
 get_by_key_range_scenario:
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeysListScenario \
 	-i $(INSTANCE) \
-	-t samia \
+	-t test \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
 	--maxRowId 10000000 \
-	--nbKeys 45 
+	--nbKeys 45 \
+	--key ejgjnz
+
+
+inf_get_by_key_time_scenario:
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyScenario \
+	-i $(INSTANCE) \
+	-t test \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--csv testGet.csv
+
+infinite_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in a file (one row = one key)
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyListScenario \
+	-i $(INSTANCE) \
+	-t coucou \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--csv listTestGet.csv

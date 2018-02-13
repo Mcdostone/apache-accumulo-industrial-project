@@ -13,11 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.tasks.GetByKeysListTask;
-
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -75,6 +73,7 @@ public class TimeGetByKeysListScenario extends Scenario {
         this.assertEquals(String.format("Should retrieve %d objects", this.keys.size()), this.keys.size(), count);
     }
 
+    // Problème: key = Integer VS peut être n'importe quoi
     private static List<String> generateListOfKeys(int max, int nbGenerations) {
         Random rand = new Random();
         HashMap<Integer, Boolean> used = new HashMap<>();
@@ -118,5 +117,6 @@ public class TimeGetByKeysListScenario extends Scenario {
         Scenario scenario = new TimeGetByKeysListScenario(getByList, keysRange);
         scenario.run();
         scenario.finish();
+
     }
 }

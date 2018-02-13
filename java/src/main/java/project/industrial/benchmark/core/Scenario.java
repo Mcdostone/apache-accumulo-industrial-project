@@ -5,17 +5,12 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import project.industrial.benchmark.scenarios.DataRateInjectionScenario;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ScheduledExecutorService;
-
 
 /**
  * A scenario defines a set of instructions (read, write...) that
@@ -29,7 +24,6 @@ public abstract class Scenario {
     protected String name;
     protected static Logger logger = LoggerFactory.getLogger(Scenario.class);
     protected ScheduledExecutorService exe;
-
 
     /**
      * @param name Name of the new scenario
@@ -122,6 +116,17 @@ public abstract class Scenario {
         return sc.nextLine().trim();
     }
 
+    public static ArrayList readRowKeysFromFile(String filename) throws FileNotFoundException {
+        ArrayList rk = new ArrayList();
+        java.util.Scanner scan = new java.util.Scanner(new File(filename));
+        while(scan.hasNext()) {
+            String line = scan.nextLine();
+            line = line.trim();
+            rk.add(line);
+        }
+        return rk;
+    }
+
     public void run() throws Exception {
         this.action();
     }
@@ -131,6 +136,7 @@ public abstract class Scenario {
      */
     public void finish() {
         logger.info(String.format("Scenario '%s' finished",this.name));
+        MetricsManager.close();
 //        MetricsManager.getInstance().report();
     }
 
@@ -143,3 +149,5 @@ public abstract class Scenario {
     protected abstract void action() throws Exception;
 
 }
+
+//nb lignes lues + débit
