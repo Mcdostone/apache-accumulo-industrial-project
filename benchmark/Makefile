@@ -89,11 +89,11 @@ read_MR_accumulo: ## scan a table and print results
 	$(JAVA_RUN) $(PACKAGE).scenarios.ReadMapReduceScenario	 --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
-	-t samia \
-	-u root \
+	-t $(ACCUMULO_TABLE) \
+	-u $(ACCUMULO_USER) \
 	-p $(ACCUMULO_PASSWORD) \
 	--output ./ResultMR \
-	--columns meta:email,meta:nom,meta:prenom,meta:date,meta:url,meta:ip
+	--columns meta:email,meta:date,identity:firstname,identity:lastname,access:url,access:ip
 
 
 write_MR_accumulo: ## write from csv loal file to accumulo table
