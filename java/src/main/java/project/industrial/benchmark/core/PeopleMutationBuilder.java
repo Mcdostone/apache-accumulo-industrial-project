@@ -23,7 +23,7 @@ public class PeopleMutationBuilder implements MutationBuilder {
         List<Mutation> mutations = new ArrayList<>();
         // date, name, firstname, email, url, ip
         String[] parts = data.split(",");
-        String key = this.generateRandomKey(parts[1]);
+        String key = PeopleMutationBuilder.generateRandomKey();
         mutations.add(this.buildMutation(key, "meta", "date", parts[0]));
         mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
         mutations.add(this.buildMutation(key, "identity", "firstname", parts[2]));
@@ -33,14 +33,13 @@ public class PeopleMutationBuilder implements MutationBuilder {
         return mutations;
     }
 
-    private String generateRandomKey(String suffix) {
+    public static String generateRandomKey() {
         StringBuilder key = new StringBuilder();
         for(int i = 0; i < 4; i++) {
             Random randomGenerator = new Random();
             char ch = ALPHABET.charAt(randomGenerator.nextInt(ALPHABET.length()));
             key.append(ch);
         }
-        key.append(suffix);
         return key.toString();
     }
 

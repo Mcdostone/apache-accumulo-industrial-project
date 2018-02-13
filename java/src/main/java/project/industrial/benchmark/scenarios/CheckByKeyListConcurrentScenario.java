@@ -34,7 +34,6 @@ public class CheckByKeyListConcurrentScenario extends Scenario {
         return ranges;
     }
 
-
     @Override
     protected void action() throws Exception {
         while(true) {
