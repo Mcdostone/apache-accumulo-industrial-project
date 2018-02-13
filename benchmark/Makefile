@@ -153,11 +153,11 @@ get_by_key_range_scenario:
 inf_get_by_key_time_scenario:
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyScenario \
 	-i $(INSTANCE) \
-	-t test \
+	-t coucou \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	--csv testGet.csv
+	--csv listTestGet.csv
 
 infinite_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in a file (one row = one key)
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyListScenario \
@@ -167,3 +167,14 @@ infinite_get_by_key_list_scenario: ## infinite get by list of keys, keys are giv
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
 	--csv listTestGet.csv
+
+
+infinite_get_by_key_range_scenario: ## infinite get by range of keys, keys are given in a file (one row = one key)
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyRangeScenario \
+        -i $(INSTANCE) \
+        -t coucou \
+        -p $(ACCUMULO_PASSWORD) \
+        -z $(ZOOKEEPERS) \
+        -u $(ACCUMULO_USER) \
+        --csv rangeTestGet.csv
+

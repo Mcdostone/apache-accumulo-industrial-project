@@ -36,7 +36,7 @@ public class InfiniteTimeGetByKeyScenario extends Scenario {
             tasks.add(new InfiniteGetByKeyTask(
                     this.scanners[i],
                     rowKeys,
-                    MetricsManager.getMetricRegistry().meter(String.format("get_by_list.thread_%d",i))));
+                    MetricsManager.getMetricRegistry().meter(String.format("get_by_key.thread_%d",i))));
         }
             this.executorService.invokeAll(tasks);
     }
