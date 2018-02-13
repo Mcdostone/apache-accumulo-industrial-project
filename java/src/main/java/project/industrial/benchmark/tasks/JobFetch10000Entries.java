@@ -15,7 +15,8 @@ public class JobFetch10000Entries extends JobReadMapReduce {
     public static class Mapper10000Entries extends Mapper<Key, Value, NullWritable, Text> {
         @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
-            context.write(NullWritable.get(), row.getRow());
+            if(row.getRow().toString().length() == 3)
+                context.write(NullWritable.get(), row.getRow());
         }
     }
 

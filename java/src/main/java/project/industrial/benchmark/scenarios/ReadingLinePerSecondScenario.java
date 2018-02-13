@@ -16,7 +16,7 @@ public class ReadingLinePerSecondScenario extends Scenario {
     @Override
     protected void action() throws Exception {
         long begin = System.currentTimeMillis();
-        PeopleMutationBuilder.buildFromCSV(filename, new FakeInjector());
+        PeopleMutationBuilder.injectFromCSV(filename, new FakeInjector());
         long end = System.currentTimeMillis();
         System.out.println(end - begin);
     }

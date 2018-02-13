@@ -5,8 +5,11 @@ import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Counter;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
+import org.apache.hadoop.metrics2.sink.GraphiteSink;
 import org.apache.hadoop.util.Tool;
 
 public abstract class JobReadMapReduce extends Configured implements Tool {
@@ -33,10 +36,15 @@ public abstract class JobReadMapReduce extends Configured implements Tool {
         job.setMapOutputKeyClass(NullWritable.class);
         job.setMapOutputValueClass(Text.class);
 
+
         job.setNumReduceTasks(0);
         job.setOutputFormatClass(NullOutputFormat.class);
 
         job.waitForCompletion(true);
+        Counters c = job.getCounters();
+        for(String group: c.getGroupNames()) {
+            System.out.println(group);
+        }
         return job.isSuccessful() ? 0 : 1;
     }
 

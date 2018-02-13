@@ -1,5 +1,7 @@
 package project.industrial.benchmark.scenarios;
 
+import com.codahale.metrics.graphite.GraphiteReporter;
+import org.apache.hadoop.metrics2.sink.GraphiteSink;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.tasks.JobFetch10000Entries;
 import project.industrial.benchmark.tasks.JobFetch600Entries;
@@ -25,8 +27,8 @@ public class FullScanConcurrent extends Scenario {
     protected void action() throws Exception {
         Collection<Callable<Integer>> tasks = new ArrayList<>();
         tasks.add(() -> { JobFetch600Entries.main(args); return 0; });
-        tasks.add(() -> { JobFetch600Entries.main(args); return 0; });
-        tasks.add(() -> { JobFetch600Entries.main(args); return 0; });
+        //tasks.add(() -> { JobFetch600Entries.main(args); return 0; });
+        //tasks.add(() -> { JobFetch600Entries.main(args); return 0; });
         //tasks.add(() -> { JobFetch10000Entries.main(args); return 0; });
         //tasks.add(() -> { JobFetch10000Entries.main(args); return 0; });
         this.executorService.invokeAll(tasks);
@@ -35,6 +37,7 @@ public class FullScanConcurrent extends Scenario {
     public void finish() {
         super.finish();
         this.executorService.shutdown();
+
     }
 
     public static void main(String[] args) throws Exception {

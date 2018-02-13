@@ -47,12 +47,12 @@ scan_table: ## full scan on a given table
 
 
 full_scan_concurrent: ## concurrent actions, executing fullscan
-	$(JAVA_RUN) $(PACKAGE).tasks.JobFetch600Entries --debug \
+	$(JAVA_RUN) $(PACKAGE).scenarios.FullScanConcurrent --debug \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
-	-u $(ACCUMULO_USER)) \
+	-u $(ACCUMULO_USER)
 	
 
 create_table: ## ask the name of the table to create
