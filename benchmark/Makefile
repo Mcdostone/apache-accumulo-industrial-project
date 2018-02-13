@@ -15,8 +15,6 @@ ACCUMULO_USER=root
 
 
 #[maxMemory=52428800, maxLatency=120000, maxWriteThreads=3, timeout=9223372036854775807, durability=DEFAULT]'
-
-
 data_rate_injection_scenario: ## test the data rate injection, 80000 objects per second
 	$(JAVA_RUN) $(PACKAGE).scenarios.DataRateInjectionScenario --debug \
 	-i $(INSTANCE) \
@@ -29,16 +27,14 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	--batchLatency 120000 \
 	--batchMemory $$(echo $$((500 * 1024 * 1024)))
 
-100_Bytes: ## send 1 mutation of 100 bytes for the value
-	$(JAVA_RUN) $(PACKAGE).scenarios.OneMutationOf100BScenario --debug \
+
+one_mutation: ## send 1 mutation
+	$(JAVA_RUN) $(PACKAGE).scenarios.OneMutationScenario --debug \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
-	-u $(ACCUMULO_USER) \
-	--batchThreads 10 \
-	--batchLatency 1000 \
-	--batchMemory $$(echo $$((500 * 1024 * 1024)))
+	-u $(ACCUMULO_USER)
 
 
 scan_table: ## full scan on a given table
@@ -50,9 +46,14 @@ scan_table: ## full scan on a given table
 	-u $(ACCUMULO_USER) \
 
 
-test_graphite: ## test communication between java code and graphite
-	$(JAVA_RUN) $(PACKAGE).core.MetricsManager 
-
+full_scan_concurrent: ## concurrent actions, executing fullscan
+	$(JAVA_RUN) $(PACKAGE).tasks.JobFetch600Entries --debug \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER)) \
+	
 
 create_table: ## ask the name of the table to create
 	$(JAVA_RUN) $(PACKAGE).main.CreateTable --debug \
@@ -115,16 +116,3 @@ sandbox: ## Test some stuff
 
 help: ## Show this help !
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
-
-
-sequential_batch_writer:
-	$(JAVA_RUN) $(PACKAGE_ROOT).examples.SequentialBatchWriter --debug \
-	-i $(INSTANCE) \
-	-t $(ACCUMULO_TABLE) \
-	-p $(ACCUMULO_PASSWORD) \
-	-z $(ZOOKEEPERS) \
-	-u $(ACCUMULO_USER) \
-	--num 1000000000 \
-	--size 60
-	
-
