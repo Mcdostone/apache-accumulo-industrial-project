@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JobFetch600Entries extends JobReadMapReduce {
-
+private static int i=0;
 
     public static class Mapper600Entries extends Mapper<Key, Value, NullWritable, Text> {
         private static final String COUNTER = "COUNTER";
@@ -26,10 +26,10 @@ public class JobFetch600Entries extends JobReadMapReduce {
 
         @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
-            if(row.getRow().toString().length() == 2) {
-                context.getConfiguration().setInt(COUNTER, context.getConfiguration().getInt(COUNTER, 0) + 1);
+            if ( i % 600 == 0 ) {
+                context.write(NullWritable.get(), row.getRow());
             }
-            context.write(NullWritable.get(), row.getRow());
+            i++;
         }
     }
 

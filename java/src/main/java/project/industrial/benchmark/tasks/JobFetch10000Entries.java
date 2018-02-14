@@ -13,12 +13,15 @@ import java.io.IOException;
 import java.util.List;
 
 public class JobFetch10000Entries extends JobReadMapReduce {
+    private static int i=0;
 
     public static class Mapper10000Entries extends Mapper<Key, Value, NullWritable, Text> {
         @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
-            if(row.getRow().toString().length() == 3)
+            if ( i % 10000 == 0 ) {
                 context.write(NullWritable.get(), row.getRow());
+            }
+            i++;
         }
     }
 
@@ -28,7 +31,7 @@ public class JobFetch10000Entries extends JobReadMapReduce {
     }
 
     public static void main(String[] args) throws Exception {
-        ToolRunner.run(new Configuration(), new JobFetch600Entries(), args);
+        ToolRunner.run(new Configuration(), new JobFetch10000Entries(), args);
     }
 
 }

@@ -6,11 +6,13 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
@@ -22,7 +24,7 @@ public abstract class JobReadMapReduce extends Configured implements Tool {
     public static class MapperRead extends Mapper<Key, Value, NullWritable, Text> {
         @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
-            context.write(NullWritable.get(), row.getRow());
+            context.write(NullWritable.get(), new Text(row.getRow() ));
         }
     }
 
@@ -43,7 +45,8 @@ public abstract class JobReadMapReduce extends Configured implements Tool {
 
 
         job.setNumReduceTasks(0);
-        job.setOutputFormatClass(NullOutputFormat.class);
+        //job.setOutputFormatClass(NullOutputFormat.class);
+        FileOutputFormat.setOutputPath(job, new Path("./MR6"));
 
         job.waitForCompletion(true);
         Counters c = job.getCounters();
