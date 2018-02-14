@@ -19,11 +19,11 @@ import java.util.concurrent.Executors;
 
 public class InfiniteTimeGetByKeyScenario extends Scenario {
 
-    private Scanner[] scanners;
+    private BatchScanner[] scanners;
     private ExecutorService executorService;
     public static ArrayList rowKeys = new ArrayList();
 
-    public InfiniteTimeGetByKeyScenario(Scanner[] scanners) {
+    public InfiniteTimeGetByKeyScenario(BatchScanner[] scanners) {
         super(InfiniteTimeGetByKeyScenario.class.getSimpleName());
         this.scanners = scanners;
         this.executorService = Executors.newFixedThreadPool(scanners.length);
@@ -35,7 +35,6 @@ public class InfiniteTimeGetByKeyScenario extends Scenario {
         for (int i =0; i<this.scanners.length;i++){
             tasks.add(new InfiniteGetByKeyTask(
                     this.scanners[i],
-                    rowKeys,
                     MetricsManager.getMetricRegistry().meter(String.format("get_by_list.thread_%d",i))));
         }
             this.executorService.invokeAll(tasks);
@@ -58,9 +57,9 @@ public class InfiniteTimeGetByKeyScenario extends Scenario {
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
 
-        Scanner[] scanners = new Scanner[10];
+        BatchScanner[] scanners = new BatchScanner[10];
         for(int i = 0; i < 10; i++)
-            scanners[i] = connector.createScanner(opts.getTableName(), opts.auths);
+            scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
 
         Scenario scenario = new InfiniteTimeGetByKeyScenario(scanners);
         if(opts.csv == null)

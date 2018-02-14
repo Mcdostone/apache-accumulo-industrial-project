@@ -76,6 +76,8 @@ public class ReadMapReduceScenario extends MapReduceScenario {
         System.out.println("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
                 + " seconds");
 
+        if( 1 == 1)
+            throw new Exception(job.getJobName());
         this.sendMetrics(job);
         return job.isSuccessful() ? 0 : 1;
     }

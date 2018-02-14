@@ -11,7 +11,6 @@ import org.apache.accumulo.core.data.Value;
 import project.industrial.benchmark.core.MetricsManager;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.tasks.InfiniteGetByKeyListTask;
-import project.industrial.benchmark.tasks.InfiniteGetByKeyTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,6 @@ public class InfiniteTimeGetByKeyListScenario extends Scenario {
         for (int i = 0; i < this.bscanners.length; i++) {
             tasks.add(new InfiniteGetByKeyListTask(
                     this.bscanners[i],
-                    rowKeys,
                     MetricsManager.getMetricRegistry().meter(String.format("get_by_list.thread_%d", i))));
         }
         this.executorService.invokeAll(tasks);

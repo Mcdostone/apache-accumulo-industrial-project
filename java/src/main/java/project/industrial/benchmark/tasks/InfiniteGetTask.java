@@ -7,33 +7,31 @@ import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.Text;
 import project.industrial.benchmark.core.KeyGeneratorStrategy;
-import project.industrial.benchmark.core.MetricsManager;
 import project.industrial.benchmark.core.RandomKeyGeneratorStrategy;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-/**
- * Callable task which returns the scanner when this process is finished
- *
- * @author Samia Benjida
- */
-public class InfiniteGetByKeyListTask extends InfiniteGetTask {
+public abstract class InfiniteGetTask implements Callable {
 
+    protected final BatchScanner bscanner;
+    protected final Meter meter;
+    protected KeyGeneratorStrategy keyGeneratorStrategy;
 
-    public InfiniteGetByKeyListTask(BatchScanner bscanner, Meter m) {
+    public InfiniteGetTask(BatchScanner bscanner, Meter m) {
         this(bscanner, m, new RandomKeyGeneratorStrategy());
     }
 
-    public InfiniteGetByKeyListTask(BatchScanner bscanner, Meter m, KeyGeneratorStrategy keyGen) {
-        super(bscanner, m, keyGen);
+    public InfiniteGetTask(BatchScanner bscanner, Meter m, KeyGeneratorStrategy keyGen) {
+        this.bscanner = bscanner;
+        this.meter = m;
+        this.keyGeneratorStrategy = keyGen;
     }
 
-    @Override
+/*    @Override
     public Object call() {
         while(true) {
             List<String> values = this.keyGeneratorStrategy.generateKeys(2000);
@@ -47,4 +45,14 @@ public class InfiniteGetByKeyListTask extends InfiniteGetTask {
             }
         }
     }
+*/
+    /*private List<String> generateKey() {
+        List<String> list = new ArrayList();
+        int max = this.rowKeys.size() < 2000 ? 5 : 20000;
+        for (int j = 0; j < max; j++) {
+            int i = (int) (Math.random() * (this.rowKeys.size()));
+            list.add(this.rowKeys.get(i).toString());
+        }
+        return list;
+    }*/
 }

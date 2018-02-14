@@ -20,11 +20,6 @@ public class JobFetch600Entries extends JobReadMapReduce {
         private static final String COUNTER = "COUNTER";
 
         @Override
-        protected void setup(Context context) throws IOException, InterruptedException {
-            context.getConfiguration().setInt(COUNTER, 0);
-        }
-
-        @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
             if(row.getRow().toString().length() == 2) {
                 context.getConfiguration().setInt(COUNTER, context.getConfiguration().getInt(COUNTER, 0) + 1);
