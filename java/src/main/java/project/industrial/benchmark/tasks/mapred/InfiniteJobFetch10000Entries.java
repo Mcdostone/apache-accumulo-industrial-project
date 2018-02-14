@@ -1,4 +1,4 @@
-package project.industrial.benchmark.tasks;
+package project.industrial.benchmark.tasks.mapred;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
@@ -7,12 +7,10 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.util.ToolRunner;
-import org.w3c.dom.ranges.Range;
 
 import java.io.IOException;
-import java.util.List;
 
-public class JobFetch10000Entries extends JobReadMapReduce {
+public class InfiniteJobFetch10000Entries extends JobMapReduce {
 
     public static class Mapper10000Entries extends Mapper<Key, Value, NullWritable, Text> {
         @Override
@@ -28,7 +26,8 @@ public class JobFetch10000Entries extends JobReadMapReduce {
     }
 
     public static void main(String[] args) throws Exception {
-        ToolRunner.run(new Configuration(), new JobFetch600Entries(), args);
+        while(true)
+            ToolRunner.run(new Configuration(), new InfiniteJobFetch10000Entries(), args);
     }
 
 }

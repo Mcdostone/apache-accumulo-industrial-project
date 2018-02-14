@@ -26,7 +26,7 @@ public class InfiniteTimeGetByKeyRangeScenario extends Scenario {
         super(InfiniteTimeGetByKeyRangeScenario.class.getSimpleName());
         this.bscanners = bscanners;
         this.keyGen = keyGen;
-        this.executorService = Executors.newFixedThreadPool(bscanners.length);
+        this.executorService = Executors.newFixedThreadPool(this.bscanners.length * 2);
     }
 
     @Override
@@ -54,7 +54,6 @@ public class InfiniteTimeGetByKeyRangeScenario extends Scenario {
         for (Map.Entry<Key, Value> entry : sc) {
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
-
         BatchScanner[] scanners = new BatchScanner[2];
         for(int i = 0; i < scanners.length; i++)
             scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);

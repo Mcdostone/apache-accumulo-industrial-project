@@ -36,8 +36,7 @@ public class InfiniteGetByKeyRangeTask extends InfiniteGetTask {
             while(iterator.hasNext()) {
                 Map.Entry e = iterator.next();
                 this.meter.mark();
-                //System.out.println(Thread.currentThread().getId() + " - " + meter.getCount());
-                if(this.meter.getCount() % 10000 == 0)
+                if(this.meter.getCount() % 100000 == 0)
                     System.out.println(e);
             }
         }

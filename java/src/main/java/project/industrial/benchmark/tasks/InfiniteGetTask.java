@@ -21,10 +21,6 @@ public abstract class InfiniteGetTask implements Callable {
     protected final Meter meter;
     protected KeyGeneratorStrategy keyGeneratorStrategy;
 
-    public InfiniteGetTask(BatchScanner bscanner, Meter m) {
-        this(bscanner, m, new RandomKeyGeneratorStrategy());
-    }
-
     public InfiniteGetTask(BatchScanner bscanner, Meter m, KeyGeneratorStrategy keyGen) {
         this.bscanner = bscanner;
         this.meter = m;
