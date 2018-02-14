@@ -2,17 +2,15 @@ package project.industrial.benchmark.tasks;
 
 import com.codahale.metrics.Meter;
 import org.apache.accumulo.core.client.BatchScanner;
-import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import project.industrial.benchmark.core.RandomKeyGeneratorStrategy;
+import project.industrial.benchmark.core.KeyGeneratorStrategy;
+import project.industrial.benchmark.core.MetricsManager;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 /**
  * Callable task which returns the scanner when this process is finished
@@ -21,8 +19,9 @@ import java.util.concurrent.Callable;
  */
 public class InfiniteGetByKeyTask extends InfiniteGetTask {
 
-    public InfiniteGetByKeyTask(BatchScanner scanner, Meter m) {
-        super(scanner, m, new RandomKeyGeneratorStrategy());
+    public InfiniteGetByKeyTask(BatchScanner scanner, Meter m, KeyGeneratorStrategy keyGen) {
+        super(scanner, m, keyGen);
+        MetricsManager.initReporters();
     }
 
     @Override
@@ -39,9 +38,4 @@ public class InfiniteGetByKeyTask extends InfiniteGetTask {
             }
         }
     }
-
-    /*private String generateKey() {
-            int i = (int) (Math.random() * (this.rowKeys.size()));
-            return this.rowKeys.get(i).toString();
-    }*/
 }

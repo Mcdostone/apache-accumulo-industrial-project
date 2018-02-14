@@ -11,7 +11,7 @@ public class RandomKeyGeneratorStrategy implements KeyGeneratorStrategy {
     @Override
     public List<String> generateKeys(int nb) {
         Random r = new Random();
-        return this.generateKeys(nb, r.nextInt(8));
+        return this.generateKeys(nb, r.nextInt(9));
     }
 
     @Override
@@ -25,7 +25,7 @@ public class RandomKeyGeneratorStrategy implements KeyGeneratorStrategy {
 
     @Override
     public String generateOne() {
-        return this.generateKeys(1).get(0);
+        return this.generateKeys(1, 10).get(0);
     }
 
     public static String generateRandomKey(int length) {

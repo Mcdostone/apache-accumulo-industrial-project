@@ -24,11 +24,6 @@ import java.util.stream.Collectors;
  */
 public class InfiniteGetByKeyListTask extends InfiniteGetTask {
 
-
-    public InfiniteGetByKeyListTask(BatchScanner bscanner, Meter m) {
-        this(bscanner, m, new RandomKeyGeneratorStrategy());
-    }
-
     public InfiniteGetByKeyListTask(BatchScanner bscanner, Meter m, KeyGeneratorStrategy keyGen) {
         super(bscanner, m, keyGen);
     }

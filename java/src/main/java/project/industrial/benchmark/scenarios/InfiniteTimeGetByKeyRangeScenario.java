@@ -8,9 +8,11 @@ import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import org.slf4j.LoggerFactory;
-import project.industrial.benchmark.core.*;
+import project.industrial.benchmark.core.MetricsManager;
+import project.industrial.benchmark.core.RandomKeyGeneratorStrategy;
+import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.tasks.InfiniteGetByKeyListTask;
+import project.industrial.benchmark.tasks.InfiniteGetByKeyRangeTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +21,16 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class InfiniteTimeGetByKeyListScenario extends Scenario {
+public class InfiniteTimeGetByKeyRangeScenario extends Scenario {
 
-    private final KeyGeneratorStrategy keyGen;
     private BatchScanner[] bscanners;
     private ExecutorService executorService;
+    private List<String> rowKeys;
 
-    public InfiniteTimeGetByKeyListScenario(BatchScanner[] bscanners, KeyGeneratorStrategy keyGen) {
-        super(InfiniteTimeGetByKeyListScenario.class.getSimpleName());
+    public InfiniteTimeGetByKeyRangeScenario(BatchScanner[] bscanners, List<String> rowKeys) {
+        super(InfiniteTimeGetByKeyRangeScenario.class.getSimpleName());
         this.bscanners = bscanners;
-        this.keyGen = keyGen;
+        this.rowKeys = rowKeys;
         this.executorService = Executors.newFixedThreadPool(bscanners.length);
     }
 
@@ -36,10 +38,10 @@ public class InfiniteTimeGetByKeyListScenario extends Scenario {
     public void action() throws Exception {
         List<Callable<Object>> tasks = new ArrayList<>();
         for (int i = 0; i < this.bscanners.length; i++) {
-            tasks.add(new InfiniteGetByKeyListTask(
+            tasks.add(new InfiniteGetByKeyRangeTask(
                     this.bscanners[i],
-                    MetricsManager.getMetricRegistry().meter(String.format("get_by_list.thread_%d", i)),
-                    this.keyGen
+                    MetricsManager.getMetricRegistry().meter(String.format("get_by_range.thread_%d", i)),
+                    new RandomKeyGeneratorStrategy()
             ));
         }
         this.executorService.invokeAll(tasks);
@@ -52,7 +54,7 @@ public class InfiniteTimeGetByKeyListScenario extends Scenario {
 
     public static void main(String[] args) throws Exception {
         Opts opts = new Opts();
-        opts.parseArgs(InfiniteTimeGetByKeyListScenario.class.getName(), args);
+        opts.parseArgs(InfiniteTimeGetByKeyRangeScenario.class.getName(), args);
         Connector connector = opts.getConnector();
 
         // init first connection
@@ -61,15 +63,14 @@ public class InfiniteTimeGetByKeyListScenario extends Scenario {
         for (Map.Entry<Key, Value> entry : sc) {
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
-        BatchScanner[] scanners = new BatchScanner[2];
-        for(int i = 0; i < scanners.length; i++)
-            scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
 
-        Scenario scenario;
-        if(opts.csv == null)
-            scenario = new InfiniteTimeGetByKeyListScenario(scanners, new RandomKeyGeneratorStrategy());
-        else
-            scenario = new InfiniteTimeGetByKeyListScenario(scanners, new KeyGeneratorFromFileStrategy(opts.csv));
+        BatchScanner[] bscanners = new BatchScanner[2];
+        for(int i = 0; i < bscanners.length; i++)
+            bscanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
+
+        List<String> rowKeys = Scenario.readRowKeysFromFile(opts.csv);
+        Scenario scenario = new InfiniteTimeGetByKeyRangeScenario(bscanners, rowKeys);
+
         scenario.run();
         scenario.finish();
     }

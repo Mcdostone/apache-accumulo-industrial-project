@@ -27,6 +27,8 @@ public abstract class MapReduceScenario extends Configured implements Tool {
         countInput.inc(job.getCounters().findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue());
         countCpuTime.inc(job.getCounters().findCounter(TaskCounter.CPU_MILLISECONDS).getValue());
         countRate.inc(countInput.getCount() / countCpuTime.getCount());
+        System.out.println("#################### " + countCpuTime.getCount());
+        System.out.println("#################### " + countInput.getCount());
         MetricsManager.forceFlush();
     }
 
