@@ -28,6 +28,19 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 	--batchMemory $$(echo $$((500 * 1024 * 1024)))
 
 
+loop_data_rate_injection_scenario: ## 20 Milliards de lignes
+	$(JAVA_RUN) $(PACKAGE).scenarios.DataRateInjectionScenario --debug \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--csv $(BIG_DATASET_FILE) \
+	--batchThreads 10 \
+	--batchLatency 120000 \
+	--batchMemory $$(echo $$((500 * 1024 * 1024)))
+
+
 one_mutation: ## send 1 mutation
 	$(JAVA_RUN) $(PACKAGE).scenarios.OneMutationScenario --debug \
 	-i $(INSTANCE) \
@@ -46,8 +59,8 @@ scan_table: ## full scan on a given table
 	-u $(ACCUMULO_USER) \
 
 
-full_scan_concurrent: ## concurrent actions, executing fullscan
-	$(JAVA_RUN) $(PACKAGE).scenarios.FullScanConcurrent --debug \
+full_scan_concurrent_scenario: ## concurrent actions, executing fullscan
+	$(JAVA_RUN) $(PACKAGE).scenarios.FullScanConcurrentScenario --debug \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
@@ -150,6 +163,7 @@ inf_get_by_key_scenario: ## Infinite get by key
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
 	--keyFile keys
+
 
 inf_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in a file (one row = one key)
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyListScenario \

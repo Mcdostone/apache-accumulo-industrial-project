@@ -13,10 +13,20 @@ import java.io.IOException;
 public class InfiniteJobFetch10000Entries extends JobMapReduce {
 
     public static class Mapper10000Entries extends Mapper<Key, Value, NullWritable, Text> {
+
+        private int i;
+
+        @Override
+        protected void setup(Context context) {
+            this.i = 0;
+        }
+
         @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
-            if(row.getRow().toString().length() == 3)
+            if(this.i % 10000 == 0) {
                 context.write(NullWritable.get(), row.getRow());
+            }
+            i++;
         }
     }
 

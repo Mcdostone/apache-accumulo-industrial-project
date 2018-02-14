@@ -49,11 +49,19 @@ public class PeopleMutationBuilder implements MutationBuilder {
         return m;
     }
 
-    public static int injectFromCSV(String filename, Injector injector) {
-        PeopleMutationBuilder builder = new PeopleMutationBuilder();
-        logger.info(String.format("Reading '%s'", filename));
-        BufferedReader reader;
+
+    public static long loopInjectFromCSV(String filename, Injector injector) {
         int countLine = 0;
+        while(countLine < 20000000000.0) {
+            countLine += injectFromCSV(filename, injector);
+        }
+        return countLine;
+    }
+
+    public static long injectFromCSV(String filename, Injector injector) {
+        PeopleMutationBuilder builder = new PeopleMutationBuilder();
+        BufferedReader reader;
+        long countLine = 0;
         String line;
         try {
             reader = new BufferedReader(new FileReader(filename));

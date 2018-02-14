@@ -3,22 +3,15 @@ package project.industrial.benchmark.tasks.mapred;
 import com.codahale.metrics.Counter;
 import org.apache.accumulo.core.cli.MapReduceClientOnRequiredTable;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
-import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Value;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.TaskCounter;
+import org.apache.hadoop.mapreduce.TaskCounter  ;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
 import project.industrial.benchmark.core.MetricsManager;
 
-import javax.naming.Context;
 import java.io.IOException;
 
 public abstract class JobMapReduce extends Configured implements Tool {
@@ -58,6 +51,7 @@ public abstract class JobMapReduce extends Configured implements Tool {
 
         job.setNumReduceTasks(0);
         job.setOutputFormatClass(NullOutputFormat.class);
+        //FileOutputFormat.setOutputPath(job, new Path("./MR6"));
 
         job.waitForCompletion(true);
         sendMetrics(job);

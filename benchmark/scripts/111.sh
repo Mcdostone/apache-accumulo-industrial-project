@@ -1,1 +1,0 @@
-make data_rate_injection > injection.log &

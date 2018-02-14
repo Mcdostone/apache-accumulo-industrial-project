@@ -9,18 +9,25 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InfiniteJobFetch600Entries extends JobMapReduce {
 
     public static class Mapper600Entries extends Mapper<Key, Value, NullWritable, Text> {
-        private static final String COUNTER = "COUNTER";
+
+        private int i = 0;
+
+        @Override
+        protected void setup(Context context) {
+            this.i = 0;
+        }
 
         @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
-            if(row.getRow().toString().length() == 2) {
-                context.getConfiguration().setInt(COUNTER, context.getConfiguration().getInt(COUNTER, 0) + 1);
-            }
-            context.write(NullWritable.get(), row.getRow());
+            if(i % 600 == 0)
+                context.write(NullWritable.get(), row.getRow());
+            i++;
         }
     }
 
