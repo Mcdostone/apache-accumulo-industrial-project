@@ -6,7 +6,7 @@ public interface KeyGeneratorStrategy {
 
     public List<String> generateKeys(int nb);
 
-    public List<String> generateKeys(int nb, int length);
-
     public String generateOne();
+
+    public String[] getRange();
 }

@@ -53,7 +53,7 @@ public class ReadMapReduceScenario extends MapReduceScenario {
         job.setInputFormatClass(AccumuloInputFormat.class);
         opts.setAccumuloConfigs(job);
 
-/*        HashSet<Pair<Text,Text>> columnsToFetch = new HashSet<>();
+        HashSet<Pair<Text,Text>> columnsToFetch = new HashSet<>();
         for (String col : opts.columns.split(",")) {
             int idx = col.indexOf(":");
             Text cf = new Text(idx < 0 ? col : col.substring(0, idx));
@@ -63,7 +63,7 @@ public class ReadMapReduceScenario extends MapReduceScenario {
         }
         if (!columnsToFetch.isEmpty())
             AccumuloInputFormat.fetchColumns(job, columnsToFetch);
-*/
+
         job.setMapperClass(TTFMapper.class);
         job.setMapOutputKeyClass(NullWritable.class);
         job.setMapOutputValueClass(Text.class);
@@ -76,8 +76,6 @@ public class ReadMapReduceScenario extends MapReduceScenario {
         System.out.println("Job Finished in " + (System.currentTimeMillis() - startTime) / 1000.0
                 + " seconds");
 
-        if( 1 == 1)
-            throw new Exception(job.getJobName());
         this.sendMetrics(job);
         return job.isSuccessful() ? 0 : 1;
     }

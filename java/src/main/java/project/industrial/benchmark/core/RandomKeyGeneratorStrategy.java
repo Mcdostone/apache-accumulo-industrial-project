@@ -11,11 +11,10 @@ public class RandomKeyGeneratorStrategy implements KeyGeneratorStrategy {
     @Override
     public List<String> generateKeys(int nb) {
         Random r = new Random();
-        return this.generateKeys(nb, r.nextInt(9));
+        return this.generateKeys(nb, r.nextInt(10));
     }
 
-    @Override
-    public List<String> generateKeys(int nb, int length) {
+    private List<String> generateKeys(int nb, int length) {
         List<String> keys = new ArrayList<>();
         for(int i = 0; i < nb; i++) {
             keys.add(generateRandomKey(length));
@@ -26,6 +25,12 @@ public class RandomKeyGeneratorStrategy implements KeyGeneratorStrategy {
     @Override
     public String generateOne() {
         return this.generateKeys(1, 10).get(0);
+    }
+
+    @Override
+    public String[] getRange() {
+        System.err.println("Don't call RandomKeyGeneratorStrategy.getRange()");
+        return new String[]{"aaaaaaaaaa", "aaaaabbbbb"};
     }
 
     public static String generateRandomKey(int length) {

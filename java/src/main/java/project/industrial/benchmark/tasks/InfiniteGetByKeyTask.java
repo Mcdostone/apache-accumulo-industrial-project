@@ -21,20 +21,21 @@ public class InfiniteGetByKeyTask extends InfiniteGetTask {
 
     public InfiniteGetByKeyTask(BatchScanner scanner, Meter m, KeyGeneratorStrategy keyGen) {
         super(scanner, m, keyGen);
-        MetricsManager.initReporters();
     }
 
     @Override
     public Object call() {
-        while (true) {
+        while(true) {
             String val = this.keyGeneratorStrategy.generateOne();
             this.bscanner.setRanges(Arrays.asList(Range.exact(val)));
             Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
             while (iterator.hasNext()) {
                 Map.Entry e = iterator.next();
                 this.meter.mark();
-                if(this.meter.getCount() % 10000 == 0)
+                if(this.meter.getCount() % 10000 == 0) {
                     System.out.println(e);
+                }
+
             }
         }
     }

@@ -91,7 +91,7 @@ read_MR_accumulo: ## scan a table and print results
 	$(JAVA_RUN) $(PACKAGE).scenarios.ReadMapReduceScenario --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
-	-t $(ACCUMULO_TABLE) \
+	-t test \
 	-u $(ACCUMULO_USER) \
 	-p $(ACCUMULO_PASSWORD) \
 	--output ./ResultMR \
@@ -157,13 +157,15 @@ inf_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
-	-u $(ACCUMULO_USER)
+	-u $(ACCUMULO_USER) \
+	--keyFile keys
 
 
-inf_get_by_key_range_scenario: ## infinite get by range of keys, keys are given in a file (one row = one key)
+inf_get_by_key_range_scenario: ## infinite get by range of keys
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyRangeScenario \
     -i $(INSTANCE) \
     -t $(ACCUMULO_TABLE) \
     -p $(ACCUMULO_PASSWORD) \
     -z $(ZOOKEEPERS) \
-    -u $(ACCUMULO_USER)      
+    -u $(ACCUMULO_USER) \
+	--keyFile keys

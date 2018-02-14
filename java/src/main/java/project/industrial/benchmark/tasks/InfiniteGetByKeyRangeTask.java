@@ -30,34 +30,21 @@ public class InfiniteGetByKeyRangeTask extends InfiniteGetTask {
     @Override
     public Object call() {
         while(true) {
-            java.util.Collection<Range> rang = java.util.Arrays.asList(this.generateRange());
+            List<Range> rang = java.util.Arrays.asList(this.generateRange());
             this.bscanner.setRanges(rang);
             Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
             while(iterator.hasNext()) {
                 Map.Entry e = iterator.next();
-                System.out.println("coucou " + e );
                 this.meter.mark();
-                if(this.meter.getCount() % 200 == 0)
+                //System.out.println(Thread.currentThread().getId() + " - " + meter.getCount());
+                if(this.meter.getCount() % 10000 == 0)
                     System.out.println(e);
             }
         }
     }
 
     private Range generateRange() {
-        return new Range("aaaaaaaaaa","aoaaagjexx");
-        /*int index = (int) (Math.random() * (this.rowKeys.size()));
-        // test sur table petite 5 donnees
-        while(index + 4 > this.rowKeys.size()) {
-            index = (int) (Math.random() * (this.rowKeys.size()));
-        }
-        String startKey = this.rowKeys.get(index);
-        System.out.println("SATRTKEY === " + startKey);
-        return new Range(startKey, this.rowKeys.get(index + 4));
-
-        while(index + 2000 > this.rowKeys.size())
-            index = (int) (Math.random() * (this.rowKeys.size()));
-        String startKey = this.rowKeys.get(index);
-        return new Range(startKey, this.rowKeys.get(index + 2000));
-        */
+        String[] r = this.keyGeneratorStrategy.getRange();
+        return new Range(r[0], r[1]);
     }
 }

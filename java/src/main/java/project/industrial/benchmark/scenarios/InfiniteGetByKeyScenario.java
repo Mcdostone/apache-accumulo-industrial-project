@@ -38,7 +38,7 @@ public class InfiniteGetByKeyScenario extends Scenario {
         for (int i =0; i<this.scanners.length;i++){
             tasks.add(new InfiniteGetByKeyTask(
                     this.scanners[i],
-                    MetricsManager.getMetricRegistry().meter(String.format("get_by_list.thread_%d",i)),
+                    MetricsManager.getMetricRegistry().meter(String.format("get_by_key.thread_%d",i)),
                     this.keyGeneratorStrategy
             ));
         }
@@ -46,13 +46,9 @@ public class InfiniteGetByKeyScenario extends Scenario {
         this.executorService.invokeAll(tasks);
     }
 
-    static class Opts extends ClientOnRequiredTable {
-        @Parameter(names = "--keyFile", description = "file containing a set of keys")
-        String keyFile = null;
-    }
 
     public static void main(String[] args) throws Exception {
-        Opts opts = new Opts();
+        KeyFileOpts opts = new KeyFileOpts();
         opts.parseArgs(InfiniteGetByKeyScenario.class.getName(), args);
         Connector connector = opts.getConnector();
         Scanner sc = connector.createScanner(opts.getTableName(), opts.auths);

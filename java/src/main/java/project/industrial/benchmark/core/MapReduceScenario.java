@@ -11,14 +11,13 @@ import java.io.IOException;
 public abstract class MapReduceScenario extends Configured implements Tool {
 
     public MapReduceScenario() {
-        MetricsManager.initReporters("MR");
+        MetricsManager.initReporters();
     }
 
     private Counter createCounter(Job job, String name) {
         String[] parts = job.getJobName().split("_");
-        return MetricsManager.getMetricRegistry().counter(String.format("%s.%s.%s", parts[0], parts[1], name));
+        return MetricsManager.getMetricRegistry().counter(String.format("MR.%s.%s.%s", parts[0], parts[1], name));
     }
-
 
     public void sendMetrics(Job job) throws IOException {
         Counter countInput = this.createCounter(job, "map_input_records");
@@ -26,9 +25,10 @@ public abstract class MapReduceScenario extends Configured implements Tool {
         Counter countRate = this.createCounter(job, "rate_input_records");
         countInput.inc(job.getCounters().findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue());
         countCpuTime.inc(job.getCounters().findCounter(TaskCounter.CPU_MILLISECONDS).getValue());
-        countRate.inc(countInput.getCount() / countCpuTime.getCount());
+        countRate.inc(countInput.getCount() / (countCpuTime.getCount()/1000));
         System.out.println("#################### " + countCpuTime.getCount());
         System.out.println("#################### " + countInput.getCount());
+        System.out.println(countRate.getCount());
         MetricsManager.forceFlush();
     }
 

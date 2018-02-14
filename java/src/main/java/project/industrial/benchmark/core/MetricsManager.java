@@ -4,7 +4,6 @@ import com.codahale.metrics.*;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
 import com.codahale.metrics.graphite.PickledGraphite;
-import org.apache.accumulo.server.metrics.Metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,11 +11,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 public class MetricsManager {
 
+    private static boolean reportersInit = false;
     private final static MetricRegistry METRIC_REGISTRY = new MetricRegistry();
     private static final List<ScheduledReporter> reporters = new ArrayList<>();
 
@@ -24,18 +27,13 @@ public class MetricsManager {
         return METRIC_REGISTRY;
     }
 
-    public static void initReporters(String prefix) {
-        reporters.add(initGraphiteReporter(prefix));
-    }
-
     public static void initReporters() {
-        initReporters(null);
-    }
-
-    public static void forceFlush() {
-        reporters.forEach(r -> {
-            r.report();
-        });
+        if(!reportersInit) {
+            reporters.add(initGraphiteReporter());
+            reportersInit = true;
+        }
+        else
+            System.err.println("You can call 'initReporters' only once!");
     }
 
     public static void close() {
@@ -45,7 +43,11 @@ public class MetricsManager {
         });
     }
 
-    private static ScheduledReporter initGraphiteReporter(String prefix) {
+    public static void forceFlush() {
+        reporters.forEach(r -> r.report());
+    }
+
+    private static ScheduledReporter initGraphiteReporter() {
         Properties prop = new Properties();
         GraphiteReporter graphiteReporter = null;
         try {
@@ -58,28 +60,16 @@ public class MetricsManager {
             final PickledGraphite graphite = new PickledGraphite(address);
 
             graphiteReporter = GraphiteReporter.forRegistry(getMetricRegistry())
-                    .prefixedWith(prefix == null ? prop.getProperty("graphite.prefix"): prefix)
+                    .prefixedWith(prop.getProperty("graphite.prefix"))
                     .convertRatesTo(TimeUnit.SECONDS)
                     .convertDurationsTo(TimeUnit.MILLISECONDS)
                     .build(graphite);
-                graphiteReporter.start(
-                        Long.parseLong(prop.getProperty("graphite.polling.period")),
-                        TimeUnit.valueOf(prop.getProperty("graphite.polling.timeUnit")));
+            graphiteReporter.start(
+                    Long.parseLong(prop.getProperty("graphite.polling.period")),
+                    TimeUnit.valueOf(prop.getProperty("graphite.polling.timeUnit")));
         } catch (IOException e) { e.printStackTrace(); }
 
         return graphiteReporter;
-    }
-
-    public static void main(String[] args) {
-        MetricsManager.initReporters("local");
-        Counter c = MetricsManager.getMetricRegistry().counter("test");
-        Scanner sc = new Scanner(System.in);
-        int v = 0;
-        while(true) {
-            v = sc.nextInt();
-            c.inc(v);
-            forceFlush();
-        }
     }
 
 }

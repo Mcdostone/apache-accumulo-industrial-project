@@ -1,14 +1,11 @@
 package project.industrial.benchmark.scenarios;
 
-import com.beust.jcommander.Parameter;
-import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.*;
 import project.industrial.benchmark.tasks.InfiniteGetByKeyListTask;
 
@@ -45,13 +42,9 @@ public class InfiniteTimeGetByKeyListScenario extends Scenario {
         this.executorService.invokeAll(tasks);
     }
 
-    static class Opts extends ClientOnRequiredTable {
-        @Parameter(names = "--csv", required = true, description = "CSV with RowId you want to retrieve")
-        String csv = null;
-    }
 
     public static void main(String[] args) throws Exception {
-        Opts opts = new Opts();
+        KeyFileOpts opts = new KeyFileOpts();
         opts.parseArgs(InfiniteTimeGetByKeyListScenario.class.getName(), args);
         Connector connector = opts.getConnector();
 
@@ -66,10 +59,10 @@ public class InfiniteTimeGetByKeyListScenario extends Scenario {
             scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
 
         Scenario scenario;
-        if(opts.csv == null)
+        if(opts.keyFile == null)
             scenario = new InfiniteTimeGetByKeyListScenario(scanners, new RandomKeyGeneratorStrategy());
         else
-            scenario = new InfiniteTimeGetByKeyListScenario(scanners, new KeyGeneratorFromFileStrategy(opts.csv));
+            scenario = new InfiniteTimeGetByKeyListScenario(scanners, new KeyGeneratorFromFileStrategy(opts.keyFile));
         scenario.run();
         scenario.finish();
     }
