@@ -2,19 +2,17 @@ package project.industrial.benchmark.tasks;
 
 import com.codahale.metrics.Meter;
 import org.apache.accumulo.core.client.BatchScanner;
+import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import org.apache.hadoop.io.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.KeyGeneratorStrategy;
 
-import javax.sound.midi.Soundbank;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 /**
  * Callable task which returns the scanner when this process is finished
@@ -23,15 +21,17 @@ import java.util.stream.Collectors;
  */
 public class InfiniteGetByKeyRangeTask extends InfiniteGetTask {
 
-    public InfiniteGetByKeyRangeTask(BatchScanner bscanner, Meter m, KeyGeneratorStrategy keyGen) {
-        super(bscanner, m, keyGen);
+    private static final Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyRangeTask.class);
+
+    public InfiniteGetByKeyRangeTask(BatchScanner scanner, Meter m, KeyGeneratorStrategy keyGen) {
+        super(scanner, m, keyGen);
     }
 
     @Override
     public Object call() {
+        System.out.println("je suis vénér");
         while(true) {
-            List<Range> rang = java.util.Arrays.asList(this.generateRange());
-            this.bscanner.setRanges(rang);
+            this.bscanner.setRanges(Arrays.asList(this.generateRange()));
             Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
             while(iterator.hasNext()) {
                 Map.Entry e = iterator.next();

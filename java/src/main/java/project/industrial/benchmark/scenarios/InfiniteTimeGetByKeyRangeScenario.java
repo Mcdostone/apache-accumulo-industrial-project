@@ -19,27 +19,35 @@ import java.util.concurrent.Executors;
 public class InfiniteTimeGetByKeyRangeScenario extends Scenario {
 
     private final KeyGeneratorStrategy keyGen;
-    private BatchScanner[] bscanners;
+    private BatchScanner[] scanners;
     private ExecutorService executorService;
 
-    public InfiniteTimeGetByKeyRangeScenario(BatchScanner[] bscanners, KeyGeneratorStrategy keyGen) {
+    public InfiniteTimeGetByKeyRangeScenario(BatchScanner[] scanners, KeyGeneratorStrategy keyGen) {
         super(InfiniteTimeGetByKeyRangeScenario.class.getSimpleName());
-        this.bscanners = bscanners;
+        this.scanners = scanners;
         this.keyGen = keyGen;
-        this.executorService = Executors.newFixedThreadPool(this.bscanners.length * 2);
+        this.executorService = Executors.newFixedThreadPool(this.scanners.length);
     }
 
     @Override
     public void action() throws Exception {
         List<Callable<Object>> tasks = new ArrayList<>();
-        for (int i = 0; i < this.bscanners.length; i++) {
+        for (int i = 0; i < this.scanners.length; i++) {
             tasks.add(new InfiniteGetByKeyRangeTask(
-                    this.bscanners[i],
+                    this.scanners[i],
                     MetricsManager.getMetricRegistry().meter(String.format("get_by_range.thread_%d", i)),
                     this.keyGen
             ));
         }
+        System.out.println("before invokeAll");
         this.executorService.invokeAll(tasks);
+        System.out.println("after invokeAll");
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        this.executorService.shutdown();
     }
 
 
@@ -48,16 +56,13 @@ public class InfiniteTimeGetByKeyRangeScenario extends Scenario {
         opts.parseArgs(InfiniteTimeGetByKeyRangeScenario.class.getName(), args);
         Connector connector = opts.getConnector();
 
-        // init first connection
         Scanner sc = connector.createScanner(opts.getTableName(), opts.auths);
         sc.setRange(Range.exact("aa"));
-        for (Map.Entry<Key, Value> entry : sc) {
-            System.out.println(entry.getKey() + " " + entry.getValue());
-        }
+        for (Map.Entry<Key, Value> entry : sc) { }
+
         BatchScanner[] scanners = new BatchScanner[2];
         for(int i = 0; i < scanners.length; i++)
             scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
-
         Scenario scenario;
         if(opts.keyFile == null)
             scenario = new InfiniteTimeGetByKeyRangeScenario(scanners, new RandomKeyGeneratorStrategy());
@@ -65,7 +70,5 @@ public class InfiniteTimeGetByKeyRangeScenario extends Scenario {
             scenario = new InfiniteTimeGetByKeyRangeScenario(scanners, new KeyGeneratorFromFileStrategy(opts.keyFile));
         scenario.run();
         scenario.finish();
-
-
     }
 }

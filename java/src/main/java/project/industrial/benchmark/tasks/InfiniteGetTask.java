@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public abstract class InfiniteGetTask implements Callable {
 
     protected final BatchScanner bscanner;
-    protected final Meter meter;
+    protected volatile Meter meter;
     protected KeyGeneratorStrategy keyGeneratorStrategy;
 
     public InfiniteGetTask(BatchScanner bscanner, Meter m, KeyGeneratorStrategy keyGen) {
@@ -26,29 +26,4 @@ public abstract class InfiniteGetTask implements Callable {
         this.meter = m;
         this.keyGeneratorStrategy = keyGen;
     }
-
-/*    @Override
-    public Object call() {
-        while(true) {
-            List<String> values = this.keyGeneratorStrategy.generateKeys(2000);
-            this.bscanner.setRanges(values.stream().map(id -> Range.exact(new Text(id))).collect(Collectors.toList()));
-            Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
-            while(iterator.hasNext()) {
-                Map.Entry e = iterator.next();
-                this.meter.mark();
-                if(this.meter.getCount() % 10000 == 0)
-                    System.out.println(e);
-            }
-        }
-    }
-*/
-    /*private List<String> generateKey() {
-        List<String> list = new ArrayList();
-        int max = this.rowKeys.size() < 2000 ? 5 : 20000;
-        for (int j = 0; j < max; j++) {
-            int i = (int) (Math.random() * (this.rowKeys.size()));
-            list.add(this.rowKeys.get(i).toString());
-        }
-        return list;
-    }*/
 }

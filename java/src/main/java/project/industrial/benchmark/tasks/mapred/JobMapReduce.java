@@ -48,7 +48,6 @@ public abstract class JobMapReduce extends Configured implements Tool {
         job.setMapOutputKeyClass(NullWritable.class);
         job.setMapOutputValueClass(Text.class);
 
-
         job.setNumReduceTasks(0);
         job.setOutputFormatClass(NullOutputFormat.class);
         //FileOutputFormat.setOutputPath(job, new Path("./MR6"));

@@ -15,17 +15,18 @@ public class InfiniteJobFetch10000Entries extends JobMapReduce {
     public static class Mapper10000Entries extends Mapper<Key, Value, NullWritable, Text> {
 
         private int i;
+        private int count;
 
         @Override
         protected void setup(Context context) {
             this.i = 0;
+            this.count = (int) 13000000000.0 / 10000;
         }
 
         @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
-            if(this.i % 10000 == 0) {
+            if(i % count == 0)
                 context.write(NullWritable.get(), row.getRow());
-            }
             i++;
         }
     }
