@@ -7,8 +7,9 @@ import org.apache.accumulo.core.client.*;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import project.industrial.benchmark.core.MetricsManager;
-import project.industrial.benchmark.core.Scenario;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import project.industrial.benchmark.core.*;
 import project.industrial.benchmark.tasks.InfiniteGetByKeyTask;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +18,18 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class InfiniteTimeGetByKeyScenario extends Scenario {
+public class InfiniteGetByKeyScenario extends Scenario {
 
-    private Scanner[] scanners;
+    private static final Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyScenario.class);
+    private BatchScanner[] scanners;
     private ExecutorService executorService;
-    public static ArrayList rowKeys = new ArrayList();
+    private KeyGeneratorStrategy keyGeneratorStrategy;
 
-    public InfiniteTimeGetByKeyScenario(Scanner[] scanners) {
-        super(InfiniteTimeGetByKeyScenario.class.getSimpleName());
+    public InfiniteGetByKeyScenario(BatchScanner[] scanners, KeyGeneratorStrategy keyGeneratorStrategy) {
+        super(InfiniteGetByKeyScenario.class);
         this.scanners = scanners;
         this.executorService = Executors.newFixedThreadPool(scanners.length);
+        this.keyGeneratorStrategy = keyGeneratorStrategy;
     }
 
     @Override
@@ -35,20 +38,18 @@ public class InfiniteTimeGetByKeyScenario extends Scenario {
         for (int i =0; i<this.scanners.length;i++){
             tasks.add(new InfiniteGetByKeyTask(
                     this.scanners[i],
-                    rowKeys,
-                    MetricsManager.getMetricRegistry().meter(String.format("get_by_key.thread_%d",i))));
+                    MetricsManager.getMetricRegistry().meter(String.format("get_by_key.thread_%d",i)),
+                    this.keyGeneratorStrategy
+            ));
         }
-            this.executorService.invokeAll(tasks);
+        logger.info("Invoke all tasks");
+        this.executorService.invokeAll(tasks);
     }
 
-    static class Opts extends ClientOnRequiredTable {
-        @Parameter(names = "--csv", description = "CSV with RowId you want to retrieve")
-        String csv = null;
-    }
 
     public static void main(String[] args) throws Exception {
-        Opts opts = new Opts();
-        opts.parseArgs(InfiniteTimeGetByKeyScenario.class.getName(), args);
+        KeyFileOpts opts = new KeyFileOpts();
+        opts.parseArgs(InfiniteGetByKeyScenario.class.getName(), args);
         Connector connector = opts.getConnector();
         Scanner sc = connector.createScanner(opts.getTableName(), opts.auths);
 
@@ -58,14 +59,15 @@ public class InfiniteTimeGetByKeyScenario extends Scenario {
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
 
-        Scanner[] scanners = new Scanner[10];
+        BatchScanner[] scanners = new BatchScanner[10];
         for(int i = 0; i < 10; i++)
-            scanners[i] = connector.createScanner(opts.getTableName(), opts.auths);
+            scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
 
-        Scenario scenario = new InfiniteTimeGetByKeyScenario(scanners);
-        if(opts.csv == null)
-            opts.csv = Scenario.askInput("Key of object you want to retrieve:");
-        rowKeys = Scenario.readRowKeysFromFile(opts.csv);
+        Scenario scenario;
+        if(opts.keyFile == null)
+            scenario = new InfiniteGetByKeyScenario(scanners, new RandomKeyGeneratorStrategy());
+        else
+            scenario = new InfiniteGetByKeyScenario(scanners, new KeyGeneratorFromFileStrategy(opts.keyFile));
         scenario.run();
         scenario.finish();
     }

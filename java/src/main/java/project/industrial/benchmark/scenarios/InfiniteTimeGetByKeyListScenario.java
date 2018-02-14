@@ -1,17 +1,13 @@
 package project.industrial.benchmark.scenarios;
 
-import com.beust.jcommander.Parameter;
-import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import project.industrial.benchmark.core.MetricsManager;
-import project.industrial.benchmark.core.Scenario;
+import project.industrial.benchmark.core.*;
 import project.industrial.benchmark.tasks.InfiniteGetByKeyListTask;
-import project.industrial.benchmark.tasks.InfiniteGetByKeyTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +18,14 @@ import java.util.concurrent.Executors;
 
 public class InfiniteTimeGetByKeyListScenario extends Scenario {
 
+    private final KeyGeneratorStrategy keyGen;
     private BatchScanner[] bscanners;
     private ExecutorService executorService;
-    private List<String> rowKeys;
 
-    public InfiniteTimeGetByKeyListScenario(BatchScanner[] bscanners, List<String> rowKeys) {
+    public InfiniteTimeGetByKeyListScenario(BatchScanner[] bscanners, KeyGeneratorStrategy keyGen) {
         super(InfiniteTimeGetByKeyListScenario.class.getSimpleName());
         this.bscanners = bscanners;
-        this.rowKeys = rowKeys;
+        this.keyGen = keyGen;
         this.executorService = Executors.newFixedThreadPool(bscanners.length);
     }
 
@@ -39,19 +35,16 @@ public class InfiniteTimeGetByKeyListScenario extends Scenario {
         for (int i = 0; i < this.bscanners.length; i++) {
             tasks.add(new InfiniteGetByKeyListTask(
                     this.bscanners[i],
-                    rowKeys,
-                    MetricsManager.getMetricRegistry().meter(String.format("get_by_list.thread_%d", i))));
+                    MetricsManager.getMetricRegistry().meter(String.format("get_by_list.thread_%d", i)),
+                    this.keyGen
+            ));
         }
         this.executorService.invokeAll(tasks);
     }
 
-    static class Opts extends ClientOnRequiredTable {
-        @Parameter(names = "--csv", required = true, description = "CSV with RowId you want to retrieve")
-        String csv = null;
-    }
 
     public static void main(String[] args) throws Exception {
-        Opts opts = new Opts();
+        KeyFileOpts opts = new KeyFileOpts();
         opts.parseArgs(InfiniteTimeGetByKeyListScenario.class.getName(), args);
         Connector connector = opts.getConnector();
 
@@ -61,14 +54,15 @@ public class InfiniteTimeGetByKeyListScenario extends Scenario {
         for (Map.Entry<Key, Value> entry : sc) {
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
+        BatchScanner[] scanners = new BatchScanner[2];
+        for(int i = 0; i < scanners.length; i++)
+            scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
 
-        BatchScanner[] bscanners = new BatchScanner[2];
-        for(int i = 0; i < bscanners.length; i++)
-            bscanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
-
-        List<String> rowKeys = Scenario.readRowKeysFromFile(opts.csv);
-        Scenario scenario = new InfiniteTimeGetByKeyListScenario(bscanners, rowKeys);
-
+        Scenario scenario;
+        if(opts.keyFile == null)
+            scenario = new InfiniteTimeGetByKeyListScenario(scanners, new RandomKeyGeneratorStrategy());
+        else
+            scenario = new InfiniteTimeGetByKeyListScenario(scanners, new KeyGeneratorFromFileStrategy(opts.keyFile));
         scenario.run();
         scenario.finish();
     }

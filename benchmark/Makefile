@@ -9,7 +9,7 @@ BIG_DATASET_FILE=$(join $(DIR), $(notdir $(BIG_DATASET_URL)))
 JAVA_RUN=accumulo
 ZOOKEEPERS=145.239.142.185,145.239.142.187,145.239.142.188
 INSTANCE=accumulo
-ACCUMULO_TABLE=test
+ACCUMULO_TABLE=samia
 ACCUMULO_PASSWORD=root
 ACCUMULO_USER=root
 
@@ -72,24 +72,26 @@ delete_table: ## ask the name of the table to delete
 	$(OPTS)
 
 
-check_metadata_problems: ## 
-	$(JAVA_RUN) org.apache.accumulo.server.util.CheckForMetadataProblems --debug \
-	-i $(INSTANCE) \
-	-p $(ACCUMULO_PASSWORD) \
-	-z $(ZOOKEEPERS) \
-	-u $(ACCUMULO_USER) \
-
-
 download_dataset: ## Download the dataset from github
 	rm -f *.csv
 	wget $(DATASET_URL)
 	wget $(BIG_DATASET_URL)
-	
-read_MR_accumulo: ## scan a table and print results
-	$(JAVA_RUN) $(PACKAGE).scenarios.ReadMapReduceScenario	 --debug \
+
+
+sandbox: ## sandbox
+	$(JAVA_RUN) $(PACKAGE).scenarios.SandboxScenario --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
 	-t $(ACCUMULO_TABLE) \
+	-u $(ACCUMULO_USER) \
+	-p $(ACCUMULO_PASSWORD)
+
+
+read_MR_accumulo: ## scan a table and print results
+	$(JAVA_RUN) $(PACKAGE).scenarios.ReadMapReduceScenario --debug \
+	-i $(INSTANCE) \
+	-z $(ZOOKEEPERS) \
+	-t test \
 	-u $(ACCUMULO_USER) \
 	-p $(ACCUMULO_PASSWORD) \
 	--output ./ResultMR \
@@ -100,20 +102,9 @@ write_MR_accumulo: ## write from csv loal file to accumulo table
 	$(JAVA_RUN) $(PACKAGE).main.WriteHadoop --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
-	-t samia \
+	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	--inputDir ingest
-
-sandbox: ## Test some stuff
-	$(JAVA_RUN) $(PACKAGE).scenarios.SandboxScenario --debug \
-	-i $(INSTANCE) \
-	-p $(ACCUMULO_PASSWORD) \
-	-t $(ACCUMULO_TABLE) \
-	-z $(ZOOKEEPERS) \
-	-u $(ACCUMULO_USER) \
-	--batchThreads 15 \
-	--batchMemory $$(echo $$((250 * 1024 * 1024))) \
-	--csv $(BIG_DATASET_FILE) \
 
 
 help: ## Show this help !
@@ -129,20 +120,20 @@ sequential_batch_writer:
 	-u $(ACCUMULO_USER) \
 	--num 1000000000 \
 	--size 60
+
+
 get_by_key_scenario:
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeyScenario \
 	-i $(INSTANCE) \
 	-t test \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
-	-u $(ACCUMULO_USER) \
-	-- rowId 99999
-
+	-u $(ACCUMULO_USER)
 
 get_by_key_range_scenario:
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeysListScenario \
 	-i $(INSTANCE) \
-	-t test \
+	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
@@ -151,31 +142,30 @@ get_by_key_range_scenario:
 	--key ejgjnz
 
 
-inf_get_by_key_time_scenario:
-	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyScenario \
+inf_get_by_key_scenario: ## Infinite get by key
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteGetByKeyScenario \
 	-i $(INSTANCE) \
-	-t coucou \
+	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	--csv listTestGet.csv
+	--keyFile keys
 
-infinite_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in a file (one row = one key)
+inf_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in a file (one row = one key)
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyListScenario \
 	-i $(INSTANCE) \
-	-t coucou \
+	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER) \
-	--csv listTestGet.csv
+	--keyFile keys
 
 
-infinite_get_by_key_range_scenario: ## infinite get by range of keys, keys are given in a file (one row = one key)
+inf_get_by_key_range_scenario: ## infinite get by range of keys
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyRangeScenario \
-        -i $(INSTANCE) \
-        -t coucou \
-        -p $(ACCUMULO_PASSWORD) \
-        -z $(ZOOKEEPERS) \
-        -u $(ACCUMULO_USER) \
-        --csv rangeTestGet.csv
-
+    -i $(INSTANCE) \
+    -t $(ACCUMULO_TABLE) \
+    -p $(ACCUMULO_PASSWORD) \
+    -z $(ZOOKEEPERS) \
+    -u $(ACCUMULO_USER) \
+	--keyFile keys

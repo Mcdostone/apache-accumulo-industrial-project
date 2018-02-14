@@ -120,17 +120,6 @@ public abstract class Scenario {
         return sc.nextLine().trim();
     }
 
-    public static ArrayList readRowKeysFromFile(String filename) throws FileNotFoundException {
-        ArrayList rk = new ArrayList();
-        java.util.Scanner scan = new java.util.Scanner(new File(filename));
-        while(scan.hasNext()) {
-            String line = scan.nextLine();
-            line = line.trim();
-            rk.add(line);
-        }
-        return rk;
-    }
-
     public void run() throws Exception {
         this.action();
     }
