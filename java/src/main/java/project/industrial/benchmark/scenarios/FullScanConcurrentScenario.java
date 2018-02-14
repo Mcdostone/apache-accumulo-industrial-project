@@ -18,7 +18,7 @@ public class FullScanConcurrentScenario extends Scenario {
     public FullScanConcurrentScenario(String[] args) {
         super(FullScanConcurrentScenario.class);
         this.args = args;
-        this.executorService = Executors.newFixedThreadPool(5);
+        this.executorService = Executors.newFixedThreadPool(25);
     }
 
     protected void action() throws Exception {

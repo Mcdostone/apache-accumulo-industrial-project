@@ -35,7 +35,7 @@ public class PeopleMutationBuilder implements MutationBuilder {
 
     public static String generateRandomKey() {
         StringBuilder key = new StringBuilder();
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < 10; i++) {
             Random randomGenerator = new Random();
             char ch = ALPHABET.charAt(randomGenerator.nextInt(ALPHABET.length()));
             key.append(ch);

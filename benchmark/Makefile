@@ -104,7 +104,7 @@ read_MR_accumulo: ## scan a table and print results
 	$(JAVA_RUN) $(PACKAGE).scenarios.ReadMapReduceScenario --debug \
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
-	-t test \
+	-t $(ACCUMULO_TABLE) \
 	-u $(ACCUMULO_USER) \
 	-p $(ACCUMULO_PASSWORD) \
 	--output ./ResultMR \
@@ -138,7 +138,7 @@ sequential_batch_writer:
 get_by_key_scenario:
 	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeyScenario \
 	-i $(INSTANCE) \
-	-t test \
+	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
 	-z $(ZOOKEEPERS) \
 	-u $(ACCUMULO_USER)

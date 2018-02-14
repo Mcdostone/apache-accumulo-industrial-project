@@ -16,7 +16,7 @@ echo
 # Deploy jar on VMs
 deploy ../java/target/*.jar
 deploy ./Makefile
-deploy ./scripts
+#deploy ./scripts
 
 
 scp -r ./111.sh root@37.59.123.111:/root &
