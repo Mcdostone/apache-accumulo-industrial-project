@@ -29,7 +29,7 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 
 
 loop_data_rate_injection_scenario: ## 20 Milliards de lignes
-	$(JAVA_RUN) $(PACKAGE).scenarios.DataRateInjectionScenario --debug \
+	$(JAVA_RUN) $(PACKAGE).scenarios.LoopDataRateInjectionScenario --debug \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \

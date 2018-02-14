@@ -52,7 +52,9 @@ public class PeopleMutationBuilder implements MutationBuilder {
 
     public static long loopInjectFromCSV(String filename, Injector injector) {
         int countLine = 0;
+        logger.info("Start Injection");
         while(countLine < 20000000000.0) {
+            logger.info("New Loop for injection, inserted lines: " + countLine);
             countLine += injectFromCSV(filename, injector);
         }
         return countLine;
