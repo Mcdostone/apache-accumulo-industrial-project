@@ -6,6 +6,8 @@ import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.data.Mutation;
 import project.industrial.benchmark.core.MetricsManager;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 /**
@@ -14,17 +16,17 @@ import java.util.List;
 public class InjectorWithMetrics implements Injector {
 
     private final Injector injector;
-    private final Meter meter;
+    private Meter meter;
 
-
-    public InjectorWithMetrics(BatchWriter bw, Meter meter) {
-        super();
-        this.injector = new SimpleInjector(bw);
-        this.meter = meter;
-    }
 
     public InjectorWithMetrics(BatchWriter bw) {
-        this(bw, MetricsManager.getMetricRegistry().meter("rate_injections"));
+        super();
+        this.injector = new SimpleInjector(bw);
+        try {
+            this.meter = MetricsManager.getMetricRegistry().meter( "rate_injections." + InetAddress.getLocalHost().getHostName());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

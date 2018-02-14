@@ -5,6 +5,8 @@ import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.KeyGeneratorStrategy;
 import project.industrial.benchmark.core.MetricsManager;
 
@@ -19,6 +21,8 @@ import java.util.Map;
  */
 public class InfiniteGetByKeyTask extends InfiniteGetTask {
 
+    private static final Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyTask.class);
+
     public InfiniteGetByKeyTask(BatchScanner scanner, Meter m, KeyGeneratorStrategy keyGen) {
         super(scanner, m, keyGen);
     }
@@ -27,8 +31,10 @@ public class InfiniteGetByKeyTask extends InfiniteGetTask {
     public Object call() {
         while(true) {
             String val = this.keyGeneratorStrategy.generateOne();
+            logger.info("Looking for " + val);
             this.bscanner.setRanges(Arrays.asList(Range.exact(val)));
             Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
+            logger.info("Iterate on results");
             while (iterator.hasNext()) {
                 Map.Entry e = iterator.next();
                 this.meter.mark();
