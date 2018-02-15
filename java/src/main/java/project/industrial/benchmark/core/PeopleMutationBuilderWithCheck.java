@@ -3,12 +3,15 @@ package project.industrial.benchmark.core;
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Mutation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.tasks.CheckAvailability;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,6 +22,7 @@ public class PeopleMutationBuilderWithCheck implements MutationBuilder {
     private final CheckAvailability check;
     private final ScheduledExecutorService executorService;
     private MutationBuilder peopleMutationBuilder;
+    private static final Logger logger = LoggerFactory.getLogger(PeopleMutationBuilderWithCheck.class);
 
 
     public PeopleMutationBuilderWithCheck(Scanner sc, PeopleMutationBuilder b) {
@@ -30,8 +34,9 @@ public class PeopleMutationBuilderWithCheck implements MutationBuilder {
     @Override
     public List<Mutation> build(String data) {
         List<Mutation> mutations = this.peopleMutationBuilder.build(data);
-        String key = mutations.get(0).getRow().toString();
-        if(key.hashCode() % 5000 == 0) {
+        String key = new String(mutations.get(0).getRow());
+        if(key.hashCode() % 550555 == 0) {
+            logger.info("Check data availability of " + key + ", fetch by key in 10s");
             this.check.setKey(key);
             this.executorService.schedule(this.check, 10, TimeUnit.SECONDS);
         }

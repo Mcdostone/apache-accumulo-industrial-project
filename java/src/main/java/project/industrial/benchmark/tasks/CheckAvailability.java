@@ -30,12 +30,12 @@ public class CheckAvailability implements Runnable {
 
     @Override
     public void run() {
-        logger.info("Check availability of " + key);
+        logger.info("10s passed, checking availability of " + key);
         GetByKeyTask task = new GetByKeyTask(this.sc, key);
         Map.Entry<Key, Value> entry =  task.call();
         if(entry.getKey().getRow().toString().equals(key))
-            this.counterAvailable.inc();
+            this.counterAvailable.inc(1);
         else
-            this.counterNotAvailable.inc();
+            this.counterNotAvailable.inc(1);
     }
 }

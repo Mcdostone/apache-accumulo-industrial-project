@@ -35,8 +35,6 @@ public class LoopDataRateInjectionAndCheckAvailabilityScenario extends Scenario 
     public void action() {
         PeopleMutationBuilderWithCheck builder = new PeopleMutationBuilderWithCheck(this.scanner, new PeopleMutationBuilder());
         builder.loopInjectFromCSV(this.filename, this.injector);
-        this.executorService.scheduleAtFixedRate(new CheckAvailability(this.scanner),10, 10, TimeUnit.SECONDS);
-        PeopleMutationBuilder.loopInjectFromCSV(this.filename, this.injector);
     }
 
     @Override

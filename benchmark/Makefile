@@ -42,7 +42,7 @@ loop_data_rate_injection_scenario: ## 20 Milliards de lignes
 
 
 loop_data_rate_injection_and_check_scenario: ## 20 Milliards de lignes
-	$(JAVA_RUN) $(PACKAGE).scenarios.LoopDataRateInjectionAndCheckAvailabilityScenario --debug \
+	$(JAVA_RUN) $(PACKAGE).scenarios.LoopDataRateInjectionAndCheckAvailabilityScenario \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
@@ -189,30 +189,17 @@ inf_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in
 
 
 inf_get_by_key_range_scenario: ## infinite get by range of keys
-	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteGetByKeyRangeScenario --debug \
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteGetByKeyRangeScenario \
     -i $(INSTANCE) \
     -t $(ACCUMULO_TABLE) \
     -p $(ACCUMULO_PASSWORD) \
     -z $(ZOOKEEPERS) \
     -u $(ACCUMULO_USER) \
-	--id 1 \
-	--keyFile keys
-
-
-inf_get_by_key_range_scenario_0: ## infinite get by range of keys
-	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteGetByKeyRangeScenario --debug \
-    -i $(INSTANCE) \
-    -t $(ACCUMULO_TABLE) \
-    -p $(ACCUMULO_PASSWORD) \
-    -z $(ZOOKEEPERS) \
-    -u $(ACCUMULO_USER) \
-	--id 0 \
 	--keyFile keys
 
 
 create_keys_file: ## Create keys file
-	echo "# Execute the following command"
-	@echo "make scan_table > tmp1"	
-	@echo  "\ntail +40 tmp1 > tmp2"
-	@echo "cut -d ' ' -f1 tmp2 | uniq > keys"
-	@echo "rm tmp1 tmp2"
+	make scan_table > tmp1
+	tail +40 tmp1 > tmp2
+	cut -d ' ' -f1 tmp2 | uniq | sort > keys
+	rm tmp1 tmp2

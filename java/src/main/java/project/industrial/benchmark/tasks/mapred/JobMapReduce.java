@@ -53,7 +53,7 @@ public abstract class JobMapReduce extends Configured implements Tool {
         //FileOutputFormat.setOutputPath(job, new Path("./MR6"));
 
         job.waitForCompletion(true);
-        sendMetrics(job);
+//        sendMetrics(job);
         return job.isSuccessful() ? 0 : 1;
     }
 

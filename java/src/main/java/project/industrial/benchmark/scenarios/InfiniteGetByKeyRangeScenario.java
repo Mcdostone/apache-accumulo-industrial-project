@@ -1,12 +1,13 @@
 package project.industrial.benchmark.scenarios;
 
-import com.beust.jcommander.Parameter;
 import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.*;
 import project.industrial.benchmark.tasks.InfiniteGetByKeyRangeTask;
 
@@ -19,27 +20,29 @@ import java.util.concurrent.Executors;
 
 public class InfiniteGetByKeyRangeScenario extends Scenario {
 
+    protected static Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyRangeScenario.class);
     private final KeyGeneratorStrategy keyGen;
-    private BatchScanner scanner;
+    private BatchScanner[] scanners;
     private ExecutorService executorService;
-    private int nb;
 
-    public InfiniteGetByKeyRangeScenario(BatchScanner scanner, KeyGeneratorStrategy keyGen, int nb) {
+    public InfiniteGetByKeyRangeScenario(BatchScanner[] scanner, KeyGeneratorStrategy keyGen) {
         super(InfiniteGetByKeyRangeScenario.class.getSimpleName());
-        this.scanner = scanner;
+        this.scanners = scanner;
         this.keyGen = keyGen;
-        this.nb = nb;
-        this.executorService = Executors.newFixedThreadPool(2);
+        this.executorService = Executors.newFixedThreadPool(10);
     }
 
     @Override
     public void action() throws Exception {
         List<Callable<Object>> tasks = new ArrayList<>();
-        tasks.add(new InfiniteGetByKeyRangeTask(
-                this.scanner,
-                MetricsManager.getMetricRegistry().timer(String.format("get_by_range.thread_%d", this.nb)),
-                this.keyGen
-        ));
+        for(int i = 0; i < this.scanners.length; i++) {
+            tasks.add(new InfiniteGetByKeyRangeTask(
+                    this.scanners[i],
+                    MetricsManager.getMetricRegistry().timer(String.format("get_by_range.thread_%d", i)),
+                    this.keyGen
+            ));
+        }
+        logger.info("Invoke all tasks - " + tasks.size() + " threads");
         this.executorService.invokeAll(tasks);
     }
 
@@ -49,13 +52,8 @@ public class InfiniteGetByKeyRangeScenario extends Scenario {
         this.executorService.shutdown();
     }
 
-    static class Opts extends KeyFileOpts {
-        @Parameter(names = "--id", description = "number for the metric", required = true)
-        int id = 0;
-    }
-
     public static void main(String[] args) throws Exception {
-        Opts opts = new Opts();
+        KeyFileOpts opts = new KeyFileOpts();
         opts.parseArgs(InfiniteGetByKeyRangeScenario.class.getName(), args);
         Connector connector = opts.getConnector();
 
@@ -63,12 +61,15 @@ public class InfiniteGetByKeyRangeScenario extends Scenario {
         sc.setRange(Range.exact("aa"));
         for (Map.Entry<Key, Value> entry : sc) { }
 
-        BatchScanner scanner = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
+        BatchScanner[] batchScanners = new BatchScanner[2];
+        for(int i = 0; i < batchScanners.length; i++)
+            batchScanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
+
         Scenario scenario;
         if(opts.keyFile == null)
-            scenario = new InfiniteGetByKeyRangeScenario(scanner, new RandomKeyGeneratorStrategy(), opts.id);
+            scenario = new InfiniteGetByKeyRangeScenario(batchScanners, new RandomKeyGeneratorStrategy());
         else
-            scenario = new InfiniteGetByKeyRangeScenario(scanner, new KeyGeneratorFromFileStrategy(opts.keyFile), opts.id);
+            scenario = new InfiniteGetByKeyRangeScenario(batchScanners, new KeyGeneratorFromFileStrategy(opts.keyFile));
         scenario.run();
         scenario.finish();
     }
