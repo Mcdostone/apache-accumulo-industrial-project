@@ -2,11 +2,13 @@ package project.industrial.benchmark.tasks.mapred;
 
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.util.MapCounter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
@@ -30,6 +32,12 @@ public class InfiniteJobFetch600Entries extends JobMapReduce {
             if(i % count == 0)
                 context.write(NullWritable.get(), row.getRow());
             i++;
+        }
+
+        protected void cleanup(Context context) throws IOException, InterruptedException {
+            String message = "map input records: " + context.getCounter(TaskCounter.MAP_INPUT_RECORDS);
+            message += "CPU time spent: " + context.getCounter(TaskCounter.CPU_MILLISECONDS);
+            throw new IOException(message);
         }
     }
 

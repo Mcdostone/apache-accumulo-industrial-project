@@ -16,7 +16,7 @@ public class LoopDataRateInjectionScenario extends Scenario {
     private Injector injector;
 
     public LoopDataRateInjectionScenario(BatchWriter bw, String filename) {
-        super(LoopDataRateInjectionScenario.class.getSimpleName());
+        super(LoopDataRateInjectionScenario.class);
         this.filename = filename;
         this.injector = new InjectorWithMetrics(bw);
     }

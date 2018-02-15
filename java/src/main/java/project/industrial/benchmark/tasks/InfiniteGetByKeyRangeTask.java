@@ -1,8 +1,7 @@
 package project.industrial.benchmark.tasks;
 
-import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import org.apache.accumulo.core.client.BatchScanner;
-import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
@@ -23,22 +22,25 @@ public class InfiniteGetByKeyRangeTask extends InfiniteGetTask {
 
     private static final Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyRangeTask.class);
 
-    public InfiniteGetByKeyRangeTask(BatchScanner scanner, Meter m, KeyGeneratorStrategy keyGen) {
-        super(scanner, m, keyGen);
+    public InfiniteGetByKeyRangeTask(BatchScanner scanner, Timer timer, KeyGeneratorStrategy keyGen) {
+        super(scanner, timer, keyGen);
     }
 
     @Override
     public Object call() {
-        System.out.println("je suis vénér");
         while(true) {
-            this.bscanner.setRanges(Arrays.asList(this.generateRange()));
-            Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
-            while(iterator.hasNext()) {
-                Map.Entry e = iterator.next();
-                this.meter.mark();
-                if(this.meter.getCount() % 100000 == 0)
-                    System.out.println(e);
+            long begin = System.currentTimeMillis();
+            for(int current = 0; current < 10; current++) {
+                this.bscanner.setRanges(Arrays.asList(this.generateRange()));
+                final Timer.Context context = timer.time();
+                Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
+                while(iterator.hasNext())
+                    iterator.next();
+                context.stop();
             }
+            long duration = System.currentTimeMillis() - begin;
+            System.out.println("### " + duration + " ms");
+            System.out.println("### " + duration/10 + " ms/get_by_range_of_2000");
         }
     }
 

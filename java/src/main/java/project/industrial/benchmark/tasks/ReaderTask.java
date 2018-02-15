@@ -3,12 +3,14 @@ package project.industrial.benchmark.tasks;
 import org.apache.accumulo.core.client.ScannerBase;
 import project.industrial.benchmark.core.Task;
 
+import java.util.concurrent.Callable;
+
 /**
  * Basic class for task which reads data in accumulo cluster
  *
  * @author Yann Prono
  */
-public abstract class ReaderTask implements Task<ScannerBase> {
+public abstract class ReaderTask implements Callable<ScannerBase> {
 
     protected final ScannerBase scanner;
 

@@ -29,9 +29,5 @@ public class SandboxScenario extends Scenario {
         opts.parseArgs(DataRateInjectionScenario.class.getName(), args, bwOpts);
         Connector connector = opts.getConnector();
         Scanner sc = connector.createScanner(opts.getTableName(), opts.auths);
-
-        String rowKey = Scenario.askInput("Enter a rowKey: ");
-        Task t = new GetByKeyTask(sc, rowKey);
-        t.call();
     }
 }

@@ -10,30 +10,32 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * Callable task which returns the scanner when this process is finished
  *
  * @author Yann Prono
  */
-public class GetByKeyTask extends ReaderTask {
+public class GetByKeyTask implements Callable<Map.Entry<Key, Value>> {
 
     private final String keyToSearch;
+    private Scanner scanner;
     private static final Logger logger = LoggerFactory.getLogger(GetByKeyTask.class);
 
     public GetByKeyTask(Scanner scanner, String key) {
-        super(scanner);
+        this.scanner = scanner;
         this.keyToSearch = key;
         scanner.setRange(Range.exact(this.keyToSearch));
     }
 
     @Override
-    public ScannerBase call() {
+    public Map.Entry<Key, Value> call() {
         logger.info(String.format("Looking for data with key '%s'", this.keyToSearch));
         Iterator<Map.Entry<Key, Value>> iterator = this.scanner.iterator();
         while(iterator.hasNext()) {
-            iterator.next();
+            return iterator.next();
         }
-        return this.scanner;
+        return null;
     }
 }

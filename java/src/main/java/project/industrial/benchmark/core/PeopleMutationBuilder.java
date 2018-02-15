@@ -5,6 +5,7 @@ import org.apache.accumulo.core.data.Mutation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.injectors.Injector;
+import project.industrial.benchmark.tasks.CheckAvailability;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,11 +13,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class PeopleMutationBuilder implements MutationBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(PeopleMutationBuilder.class);
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+    private static String LAST_KEY_ADDED;
 
     @Override
     public List<Mutation> build(String data) {
@@ -24,6 +27,7 @@ public class PeopleMutationBuilder implements MutationBuilder {
         // date, name, firstname, email, url, ip
         String[] parts = data.split(",");
         String key = PeopleMutationBuilder.generateRandomKey();
+        LAST_KEY_ADDED = key;
         mutations.add(this.buildMutation(key, "meta", "date", parts[0]));
         mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
         mutations.add(this.buildMutation(key, "identity", "firstname", parts[2]));
@@ -31,6 +35,10 @@ public class PeopleMutationBuilder implements MutationBuilder {
         mutations.add(this.buildMutation(key, "access", "url", parts[4]));
         mutations.add(this.buildMutation(key, "access", "ip", parts[5]));
         return mutations;
+    }
+
+    public static String getLastKeyAdded() {
+        return LAST_KEY_ADDED;
     }
 
     public static String generateRandomKey() {

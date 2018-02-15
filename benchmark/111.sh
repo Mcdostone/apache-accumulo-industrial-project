@@ -1,2 +1,3 @@
-make loop_data_rate_injection_scenario > injection.log &
+make loop_data_rate_injection_and_check_scenario > injection_and_check.log &
 make full_scan_concurrent_scenario > mr.log &
+make inf_get_by_key_range_scenario_0 > get_range.log &

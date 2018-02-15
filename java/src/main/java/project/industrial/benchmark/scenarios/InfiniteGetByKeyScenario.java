@@ -38,7 +38,7 @@ public class InfiniteGetByKeyScenario extends Scenario {
         for (int i =0; i<this.scanners.length;i++){
             tasks.add(new InfiniteGetByKeyTask(
                     this.scanners[i],
-                    MetricsManager.getMetricRegistry().meter(String.format("get_by_key.thread_%d",i)),
+                    MetricsManager.getMetricRegistry().timer(String.format("get_by_key.thread_%d",i)),
                     this.keyGeneratorStrategy
             ));
         }

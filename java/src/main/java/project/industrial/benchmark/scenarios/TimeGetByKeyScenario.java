@@ -19,6 +19,7 @@ import project.industrial.benchmark.tasks.GetByKeyTask;
 import project.industrial.benchmark.tasks.ReaderTask;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 
 /**
@@ -44,9 +45,9 @@ public class TimeGetByKeyScenario extends Scenario {
 
     @Override
     public void action() throws Exception {
-        key = key.trim();
-        ReaderTask t =  new GetByKeyTask(this.scanner, key);
-        ScannerBase s = t.call();
+/*        key = key.trim();
+        Callable t =  new GetByKeyTask(this.scanner, key);
+        ScannerBase s = t.call();*/
     }
 
     static class Opts extends ClientOnRequiredTable {
@@ -72,7 +73,7 @@ public class TimeGetByKeyScenario extends Scenario {
             opts.rowId = Scenario.askInput("Key of object you want to retrieve:");
 
         String[] oneRow;
-        oneRow=opts.rowId.toString().split(",");
+        oneRow= opts.rowId.split(",");
         long begin = System.currentTimeMillis();
         for (int i=0; i<oneRow.length;i++) {
             Scenario scenario = new TimeGetByKeyScenario(sc, oneRow[i]);

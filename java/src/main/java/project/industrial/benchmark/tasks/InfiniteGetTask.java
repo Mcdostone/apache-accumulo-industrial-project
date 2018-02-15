@@ -1,6 +1,7 @@
 package project.industrial.benchmark.tasks;
 
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
@@ -18,12 +19,12 @@ import java.util.stream.Collectors;
 public abstract class InfiniteGetTask implements Callable {
 
     protected final BatchScanner bscanner;
-    protected volatile Meter meter;
+    protected Timer timer;
     protected KeyGeneratorStrategy keyGeneratorStrategy;
 
-    public InfiniteGetTask(BatchScanner bscanner, Meter m, KeyGeneratorStrategy keyGen) {
+    public InfiniteGetTask(BatchScanner bscanner, Timer t, KeyGeneratorStrategy keyGen) {
         this.bscanner = bscanner;
-        this.meter = m;
+        this.timer = t;
         this.keyGeneratorStrategy = keyGen;
     }
 }

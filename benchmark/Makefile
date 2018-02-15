@@ -9,7 +9,7 @@ BIG_DATASET_FILE=$(join $(DIR), $(notdir $(BIG_DATASET_URL)))
 JAVA_RUN=accumulo
 ZOOKEEPERS=145.239.142.185,145.239.142.187,145.239.142.188
 INSTANCE=accumulo
-ACCUMULO_TABLE=samia
+ACCUMULO_TABLE=ingest
 ACCUMULO_PASSWORD=root
 ACCUMULO_USER=root
 
@@ -30,6 +30,19 @@ data_rate_injection_scenario: ## test the data rate injection, 80000 objects per
 
 loop_data_rate_injection_scenario: ## 20 Milliards de lignes
 	$(JAVA_RUN) $(PACKAGE).scenarios.LoopDataRateInjectionScenario --debug \
+	-i $(INSTANCE) \
+	-t $(ACCUMULO_TABLE) \
+	-p $(ACCUMULO_PASSWORD) \
+	-z $(ZOOKEEPERS) \
+	-u $(ACCUMULO_USER) \
+	--csv $(BIG_DATASET_FILE) \
+	--batchThreads 10 \
+	--batchLatency 120000 \
+	--batchMemory $$(echo $$((500 * 1024 * 1024)))
+
+
+loop_data_rate_injection_and_check_scenario: ## 20 Milliards de lignes
+	$(JAVA_RUN) $(PACKAGE).scenarios.LoopDataRateInjectionAndCheckAvailabilityScenario --debug \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
@@ -116,7 +129,7 @@ write_MR_accumulo: ## write from csv loal file to accumulo table
 	-i $(INSTANCE) \
 	-z $(ZOOKEEPERS) \
 	-t $(ACCUMULO_TABLE) \
-	-p $(ACCUMULO_PASSWORD) \
+		-p $(ACCUMULO_PASSWORD) \
 	--inputDir ingest
 
 
@@ -166,7 +179,7 @@ inf_get_by_key_scenario: ## Infinite get by key
 
 
 inf_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in a file (one row = one key)
-	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyListScenario \
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteGetByKeyListScenario \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
@@ -176,10 +189,30 @@ inf_get_by_key_list_scenario: ## infinite get by list of keys, keys are given in
 
 
 inf_get_by_key_range_scenario: ## infinite get by range of keys
-	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteTimeGetByKeyRangeScenario \
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteGetByKeyRangeScenario --debug \
     -i $(INSTANCE) \
     -t $(ACCUMULO_TABLE) \
     -p $(ACCUMULO_PASSWORD) \
     -z $(ZOOKEEPERS) \
     -u $(ACCUMULO_USER) \
+	--id 1 \
 	--keyFile keys
+
+
+inf_get_by_key_range_scenario_0: ## infinite get by range of keys
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.InfiniteGetByKeyRangeScenario --debug \
+    -i $(INSTANCE) \
+    -t $(ACCUMULO_TABLE) \
+    -p $(ACCUMULO_PASSWORD) \
+    -z $(ZOOKEEPERS) \
+    -u $(ACCUMULO_USER) \
+	--id 0 \
+	--keyFile keys
+
+
+create_keys_file: ## Create keys file
+	echo "# Execute the following command"
+	@echo "make scan_table > tmp1"	
+	@echo  "\ntail +40 tmp1 > tmp2"
+	@echo "cut -d ' ' -f1 tmp2 | uniq > keys"
+	@echo "rm tmp1 tmp2"

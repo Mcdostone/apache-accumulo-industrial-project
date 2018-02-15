@@ -1,18 +1,16 @@
 package project.industrial.benchmark.tasks;
 
-import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.KeyGeneratorStrategy;
-import project.industrial.benchmark.core.MetricsManager;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
+
 
 /**
  * Callable task which returns the scanner when this process is finished
@@ -21,28 +19,28 @@ import java.util.Map;
  */
 public class InfiniteGetByKeyTask extends InfiniteGetTask {
 
-    private static final Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyTask.class);
+    private static final double COUNT_GET = 100.0;
 
-    public InfiniteGetByKeyTask(BatchScanner scanner, Meter m, KeyGeneratorStrategy keyGen) {
-        super(scanner, m, keyGen);
+    public InfiniteGetByKeyTask(BatchScanner scanner, Timer timer, KeyGeneratorStrategy keyGen) {
+        super(scanner, timer, keyGen);
     }
 
     @Override
     public Object call() {
         while(true) {
-            String val = this.keyGeneratorStrategy.generateOne();
-            logger.info("Looking for " + val);
-            this.bscanner.setRanges(Arrays.asList(Range.exact(val)));
-            Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
-            logger.info("Iterate on results");
-            while (iterator.hasNext()) {
-                Map.Entry e = iterator.next();
-                this.meter.mark();
-                if(this.meter.getCount() % 10000 == 0) {
-                    System.out.println(e);
-                }
-
+            for(int current = 0; current < COUNT_GET; current++) {
+                String val = this.keyGeneratorStrategy.generateOne();
+                this.bscanner.setRanges(Arrays.asList(Range.exact(val)));
+                final Timer.Context context = timer.time();
+                Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
+                while (iterator.hasNext())
+                    iterator.next();
+                context.stop();
             }
+            /*long duration = System.currentTimeMillis() - begin;
+            System.out.println("### " + duration + " ms");
+            System.out.println("### " + duration/COUNT_GET + " ms/key");
+            */
         }
     }
 }
