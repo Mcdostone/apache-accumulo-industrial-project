@@ -23,19 +23,23 @@ public class PeopleMutationBuilder implements MutationBuilder {
 
     @Override
     public List<Mutation> build(String data) {
-        List<Mutation> mutations = new ArrayList<>();
-        // date, name, firstname, email, url, ip
         String[] parts = data.split(",");
         String key = PeopleMutationBuilder.generateRandomKey();
         LAST_KEY_ADDED = key;
-        mutations.add(this.buildMutation(key, "meta", "date", parts[0]));
-        mutations.add(this.buildMutation(key, "identity", "name", parts[1]));
-        mutations.add(this.buildMutation(key, "identity", "firstname", parts[2]));
-        mutations.add(this.buildMutation(key, "meta", "email", parts[3]));
-        mutations.add(this.buildMutation(key, "access", "url", parts[4]));
-        mutations.add(this.buildMutation(key, "access", "ip", parts[5]));
+        return this.buildFromArray(key, parts);
+    }
+
+    public List<Mutation> buildFromArray(String key, String[] data) {
+        List<Mutation> mutations = new ArrayList<>();
+        mutations.add(this.buildMutation(key, "meta", "date", data[0]));
+        mutations.add(this.buildMutation(key, "identity", "name", data[1]));
+        mutations.add(this.buildMutation(key, "identity", "firstname", data[2]));
+        mutations.add(this.buildMutation(key, "meta", "email", data[3]));
+        mutations.add(this.buildMutation(key, "access", "url", data[4]));
+        mutations.add(this.buildMutation(key, "access", "ip", data[5]));
         return mutations;
     }
+
 
     public static String getLastKeyAdded() {
         return LAST_KEY_ADDED;
@@ -51,7 +55,7 @@ public class PeopleMutationBuilder implements MutationBuilder {
         return key.toString();
     }
 
-    private Mutation buildMutation(String key, String cf, String cq, String value) {
+    public Mutation buildMutation(String key, String cf, String cq, String value) {
         Mutation m = new Mutation(key.trim());
         m.put(cf.trim(), cq.trim(), value.trim());
         return m;

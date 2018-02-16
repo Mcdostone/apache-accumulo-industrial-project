@@ -11,6 +11,7 @@ import project.industrial.benchmark.tasks.CheckAvailability;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -21,9 +22,9 @@ public class PeopleMutationBuilderWithCheck implements MutationBuilder {
 
     private final CheckAvailability check;
     private final ScheduledExecutorService executorService;
-    private MutationBuilder peopleMutationBuilder;
+    private PeopleMutationBuilder peopleMutationBuilder;
     private static final Logger logger = LoggerFactory.getLogger(PeopleMutationBuilderWithCheck.class);
-
+    private int counter;
 
     public PeopleMutationBuilderWithCheck(Scanner sc, PeopleMutationBuilder b) {
         this.peopleMutationBuilder = b;
@@ -37,8 +38,19 @@ public class PeopleMutationBuilderWithCheck implements MutationBuilder {
         String key = new String(mutations.get(0).getRow());
         if(key.hashCode() % 550555 == 0) {
             logger.info("Check data availability of " + key + ", fetch by key in 10s");
-            this.check.setKey(key);
+            this.check.setKey(String.valueOf(counter));
+            String parts[] = new String[]{
+                    this.counter + "/08/2016",
+                    this.counter + "Ardinger",
+                    this.counter + "Heather",
+                    this.counter + "Ardinger.Heather@rdi.eat",
+                    this.counter + "QH40.org/SN",
+                    this.counter + ".24.183.151"
+            };
+            mutations.addAll(this.peopleMutationBuilder.buildFromArray(String.valueOf(this.counter), parts));
             this.executorService.schedule(this.check, 10, TimeUnit.SECONDS);
+            this.counter++;
+
         }
         return mutations;
     }

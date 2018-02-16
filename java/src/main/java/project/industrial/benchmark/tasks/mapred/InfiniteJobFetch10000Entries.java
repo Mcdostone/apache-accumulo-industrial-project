@@ -6,28 +6,28 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
 
 public class InfiniteJobFetch10000Entries extends JobMapReduce {
 
-    public static class Mapper10000Entries extends Mapper<Key, Value, NullWritable, Text> {
+    public static class Mapper10000Entries extends BenchmarkMapper {
 
-        private int i;
         private int count;
 
         @Override
         protected void setup(Context context) {
-            this.i = 0;
-            this.count = (int) 13000000000.0 / 10000;
+            this.count = 0;
         }
 
         @Override
         public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
-            if(i % count == 0)
+            if(row.hashCode() % 240 == 0 && this.count < 10000) {
                 context.write(NullWritable.get(), row.getRow());
-            i++;
+                count++;
+            }
         }
     }
 
