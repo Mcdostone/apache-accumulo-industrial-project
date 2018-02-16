@@ -8,12 +8,10 @@ import java.util.concurrent.Callable;
 
 public abstract class InfiniteGetTask implements Callable {
 
-    protected final BatchScanner bscanner;
     protected Timer timer;
     protected KeyGeneratorStrategy keyGeneratorStrategy;
 
-    public InfiniteGetTask(BatchScanner bscanner, Timer t, KeyGeneratorStrategy keyGen) {
-        this.bscanner = bscanner;
+    public InfiniteGetTask(Timer t, KeyGeneratorStrategy keyGen) {
         this.timer = t;
         this.keyGeneratorStrategy = keyGen;
     }

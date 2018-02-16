@@ -1,6 +1,5 @@
 package project.industrial.benchmark.scenarios;
 
-import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
@@ -22,10 +21,10 @@ public class InfiniteGetByKeyRangeScenario extends Scenario {
 
     protected static Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyRangeScenario.class);
     private final KeyGeneratorStrategy keyGen;
-    private BatchScanner[] scanners;
+    private Scanner[] scanners;
     private ExecutorService executorService;
 
-    public InfiniteGetByKeyRangeScenario(BatchScanner[] scanner, KeyGeneratorStrategy keyGen) {
+    public InfiniteGetByKeyRangeScenario(Scanner[] scanner, KeyGeneratorStrategy keyGen) {
         super(InfiniteGetByKeyRangeScenario.class.getSimpleName());
         this.scanners = scanner;
         this.keyGen = keyGen;
@@ -61,15 +60,15 @@ public class InfiniteGetByKeyRangeScenario extends Scenario {
         sc.setRange(Range.exact("aa"));
         for (Map.Entry<Key, Value> entry : sc) { }
 
-        BatchScanner[] batchScanners = new BatchScanner[2];
-        for(int i = 0; i < batchScanners.length; i++)
-            batchScanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
+        Scanner[] scanners = new Scanner[2];
+        for(int i = 0; i < scanners.length; i++)
+            scanners[i] = connector.createScanner(opts.getTableName(), opts.auths);
 
         Scenario scenario;
         if(opts.keyFile == null)
-            scenario = new InfiniteGetByKeyRangeScenario(batchScanners, new RandomKeyGeneratorStrategy());
+            scenario = new InfiniteGetByKeyRangeScenario(scanners, new RandomKeyGeneratorStrategy());
         else
-            scenario = new InfiniteGetByKeyRangeScenario(batchScanners, new KeyGeneratorFromFileStrategy(opts.keyFile));
+            scenario = new InfiniteGetByKeyRangeScenario(scanners, new KeyGeneratorFromFileStrategy(opts.keyFile));
         scenario.run();
         scenario.finish();
     }

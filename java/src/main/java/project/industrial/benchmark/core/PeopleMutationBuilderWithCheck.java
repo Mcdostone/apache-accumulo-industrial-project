@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.tasks.CheckAvailability;
+import project.industrial.benchmark.tasks.GetByKeyTask;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -20,15 +21,15 @@ import java.util.concurrent.TimeUnit;
 
 public class PeopleMutationBuilderWithCheck implements MutationBuilder {
 
-    private final CheckAvailability check;
     private final ScheduledExecutorService executorService;
     private PeopleMutationBuilder peopleMutationBuilder;
     private static final Logger logger = LoggerFactory.getLogger(PeopleMutationBuilderWithCheck.class);
+    private Scanner scanner;
     private int counter;
 
     public PeopleMutationBuilderWithCheck(Scanner sc, PeopleMutationBuilder b) {
         this.peopleMutationBuilder = b;
-        this.check = new CheckAvailability(sc);
+        this.scanner = sc;
         this.executorService = Executors.newScheduledThreadPool(100);
     }
 
@@ -37,8 +38,7 @@ public class PeopleMutationBuilderWithCheck implements MutationBuilder {
         List<Mutation> mutations = this.peopleMutationBuilder.build(data);
         String key = new String(mutations.get(0).getRow());
         if(key.hashCode() % 550555 == 0) {
-            logger.info("Check data availability of " + key + ", fetch by key in 10s");
-            this.check.setKey(String.valueOf(counter));
+            logger.info("Check data availability of " + counter + ", fetch by key in 10s");
             String parts[] = new String[]{
                     this.counter + "/08/2016",
                     this.counter + "Ardinger",
@@ -48,9 +48,8 @@ public class PeopleMutationBuilderWithCheck implements MutationBuilder {
                     this.counter + ".24.183.151"
             };
             mutations.addAll(this.peopleMutationBuilder.buildFromArray(String.valueOf(this.counter), parts));
-            this.executorService.schedule(this.check, 10, TimeUnit.SECONDS);
+            this.executorService.schedule(new CheckAvailability(this.scanner, Integer.toString(counter)), 10, TimeUnit.SECONDS);
             this.counter++;
-
         }
         return mutations;
     }

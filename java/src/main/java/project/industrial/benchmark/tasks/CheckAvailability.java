@@ -18,13 +18,10 @@ public class CheckAvailability implements Runnable {
     private String key;
     private static final Logger logger = LoggerFactory.getLogger(CheckAvailability.class);
 
-    public CheckAvailability(Scanner scanner) {
+    public CheckAvailability(Scanner scanner, String key) {
         this.sc = scanner;
         this.counterAvailable = MetricsManager.getMetricRegistry().counter("availability.10s.yes");
         this.counterNotAvailable = MetricsManager.getMetricRegistry().counter("availability.10s.no");
-    }
-
-    public void setKey(String key) {
         this.key = key;
     }
 

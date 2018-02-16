@@ -45,9 +45,9 @@ public class TimeGetByKeyScenario extends Scenario {
 
     @Override
     public void action() throws Exception {
-/*        key = key.trim();
+        key = key.trim();
         Callable t =  new GetByKeyTask(this.scanner, key);
-        ScannerBase s = t.call();*/
+        t.call();
     }
 
     static class Opts extends ClientOnRequiredTable {

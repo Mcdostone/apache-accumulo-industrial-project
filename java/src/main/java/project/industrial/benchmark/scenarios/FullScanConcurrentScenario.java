@@ -23,11 +23,11 @@ public class FullScanConcurrentScenario extends Scenario {
 
     protected void action() throws Exception {
         Collection<Callable<Integer>> tasks = new ArrayList<>();
-        //tasks.add(() -> { InfiniteJobFetch600Entries.main(args); return 0; });
-        //tasks.add(() -> { InfiniteJobFetch600Entries.main(args); return 0; });
-        //tasks.add(() -> { InfiniteJobFetch600Entries.main(args); return 0; });
+        tasks.add(() -> { InfiniteJobFetch600Entries.main(args); return 0; });
+        tasks.add(() -> { InfiniteJobFetch600Entries.main(args); return 0; });
+        tasks.add(() -> { InfiniteJobFetch600Entries.main(args); return 0; });
         tasks.add(() -> { InfiniteJobFetch10000Entries.main(args); return 0; });
-        //tasks.add(() -> { InfiniteJobFetch10000Entries.main(args); return 0; });
+        tasks.add(() -> { InfiniteJobFetch10000Entries.main(args); return 0; });
         this.executorService.invokeAll(tasks);
     }
 

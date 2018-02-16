@@ -4,30 +4,28 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class InfiniteJobFetch10000Entries extends JobMapReduce {
 
     public static class Mapper10000Entries extends BenchmarkMapper {
 
-        private int count;
-
         @Override
-        protected void setup(Context context) {
-            this.count = 0;
+        public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
+            // we have 676 mappers, each mapper must write 15 objects
+            if(row.hashCode() % 2000000 == 0 && !isFinished()) {
+                context.write(NullWritable.get(), row.getRow());
+            }
         }
 
         @Override
-        public void map(Key row, Value data, Context context) throws IOException, InterruptedException {
-            if(row.hashCode() % 240 == 0 && this.count < 10000) {
-                context.write(NullWritable.get(), row.getRow());
-                count++;
-            }
+        protected boolean isFinished() {
+            AtomicInteger check = new AtomicInteger(0);
+            this.countAttributes.forEach((k, v) -> check.addAndGet(v));
+            return this.countAttributes.keySet().size() == 15 && check.equals(6 * 15);
         }
     }
 

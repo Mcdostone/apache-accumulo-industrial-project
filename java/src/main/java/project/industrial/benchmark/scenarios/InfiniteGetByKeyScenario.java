@@ -21,11 +21,11 @@ import java.util.concurrent.Executors;
 public class InfiniteGetByKeyScenario extends Scenario {
 
     private static final Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyScenario.class);
-    private BatchScanner[] scanners;
+    private Scanner[] scanners;
     private ExecutorService executorService;
     private KeyGeneratorStrategy keyGeneratorStrategy;
 
-    public InfiniteGetByKeyScenario(BatchScanner[] scanners, KeyGeneratorStrategy keyGeneratorStrategy) {
+    public InfiniteGetByKeyScenario(Scanner[] scanners, KeyGeneratorStrategy keyGeneratorStrategy) {
         super(InfiniteGetByKeyScenario.class);
         this.scanners = scanners;
         this.executorService = Executors.newFixedThreadPool(scanners.length);
@@ -59,10 +59,12 @@ public class InfiniteGetByKeyScenario extends Scenario {
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
 
-        BatchScanner[] scanners = new BatchScanner[10];
-        for(int i = 0; i < 10; i++)
-            scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 1);
-
+        Scanner[] scanners = new Scanner[10];
+        for(int i = 0; i < 10; i++) {
+            scanners[i] = connector.createScanner(opts.getTableName(), opts.auths);
+            scanners[i].setBatchSize(6);
+            //scanners[i].setReadaheadThreshold(1);
+        }
         Scenario scenario;
         if(opts.keyFile == null)
             scenario = new InfiniteGetByKeyScenario(scanners, new RandomKeyGeneratorStrategy());

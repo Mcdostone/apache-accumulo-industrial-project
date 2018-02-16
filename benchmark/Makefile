@@ -64,7 +64,7 @@ one_mutation: ## send 1 mutation
 
 
 scan_table: ## full scan on a given table
-	$(JAVA_RUN) $(PACKAGE_ROOT).features.mining.GeneralScan --debug \
+	$(JAVA_RUN) $(PACKAGE_ROOT).features.mining.GeneralScan \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \
@@ -149,7 +149,7 @@ sequential_batch_writer:
 
 
 get_by_key_scenario:
-	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.TimeGetByKeyScenario \
+	$(JAVA_RUN) $(PACKAGE_ROOT).benchmark.scenarios.GetByKeyScenario \
 	-i $(INSTANCE) \
 	-t $(ACCUMULO_TABLE) \
 	-p $(ACCUMULO_PASSWORD) \

@@ -8,8 +8,18 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.TaskCounter;
 
 import java.io.IOException;
+import java.util.HashMap;
 
-public class BenchmarkMapper extends Mapper<Key, Value, NullWritable, Text> {
+public abstract class BenchmarkMapper extends Mapper<Key, Value, NullWritable, Text> {
+
+    protected HashMap<Key, Integer> countAttributes;
+
+    protected abstract boolean isFinished();
+
+    @Override
+    protected void setup(Context context) {
+        this.countAttributes = new HashMap<>();
+    }
 
     private void sendMetrics(String metricName, String value) throws IOException {
         long now = System.currentTimeMillis() / 1000;
@@ -23,13 +33,12 @@ public class BenchmarkMapper extends Mapper<Key, Value, NullWritable, Text> {
 
     @Override
     protected void cleanup(Context context) throws IOException, InterruptedException {
-        String metricName = "vm.MR." + InfiniteJobFetch600Entries.class.getSimpleName() + "." + context.getTaskAttemptID();
-        String msg = "" + context.getCounter(TaskCounter.CPU_MILLISECONDS).getValue();
-        msg += " - " + context.getCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
-        msg += " - " + context.getCounter(TaskCounter.MAP_OUTPUT_RECORDS).getValue();
-        double rate = context.getCounter(TaskCounter.MAP_INPUT_RECORDS).getValue() / (context.getCounter(TaskCounter.CPU_MILLISECONDS).getValue() / 100.0);
-        this.sendMetrics(metricName, String.valueOf(rate));
-        throw new IOException(msg);
+        String baseMetric = "vm.MR." + InfiniteJobFetch600Entries.class.getSimpleName() + "." + context.getTaskAttemptID();
+        double rate = context.getCounter(TaskCounter.MAP_INPUT_RECORDS).getValue() / (context.getCounter(TaskCounter.CPU_MILLISECONDS).getValue() / 1000.0);
+        this.sendMetrics(baseMetric + ".rate", String.valueOf(rate));
+        this.sendMetrics(baseMetric + ".cpu_time_spent", String.valueOf(TaskCounter.CPU_MILLISECONDS));
+        this.sendMetrics(baseMetric + ".map_input_records", String.valueOf(TaskCounter.MAP_INPUT_RECORDS));
+        this.sendMetrics(baseMetric + ".map_output_records", String.valueOf(TaskCounter.MAP_OUTPUT_RECORDS));
     }
 
 }

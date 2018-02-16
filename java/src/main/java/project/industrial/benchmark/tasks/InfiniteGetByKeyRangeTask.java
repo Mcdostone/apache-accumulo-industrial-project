@@ -2,15 +2,13 @@ package project.industrial.benchmark.tasks;
 
 import com.codahale.metrics.Timer;
 import org.apache.accumulo.core.client.BatchScanner;
+import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import project.industrial.benchmark.core.KeyGeneratorStrategy;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -20,27 +18,28 @@ import java.util.Map;
  */
 public class InfiniteGetByKeyRangeTask extends InfiniteGetTask {
 
-    private static final Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyRangeTask.class);
+    private int nbIterations = 10;
+    private Scanner scanner;
 
-    public InfiniteGetByKeyRangeTask(BatchScanner scanner, Timer timer, KeyGeneratorStrategy keyGen) {
-        super(scanner, timer, keyGen);
+    public InfiniteGetByKeyRangeTask(Scanner scanner, Timer timer, KeyGeneratorStrategy keyGen) {
+        super(timer, keyGen);
+        this.scanner = scanner;
     }
+
 
     @Override
     public Object call() {
         while(true) {
             long begin = System.currentTimeMillis();
-            for(int current = 0; current < 10; current++) {
-                this.bscanner.setRanges(Arrays.asList(this.generateRange()));
+            for(int current = 0; current < nbIterations; current++) {
+                this.scanner.setRange(this.generateRange());
                 final Timer.Context context = timer.time();
-                Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
-                while(iterator.hasNext())
-                    iterator.next();
+                for (Map.Entry<Key, Value> ignored : this.scanner) { }
                 context.stop();
             }
             long duration = System.currentTimeMillis() - begin;
-            System.out.println("### " + duration + " ms");
-            System.out.println("### " + duration/10 + " ms/get_by_range_of_2000");
+            System.out.printf("[%d] %d ms for %d iterations\n", Thread.currentThread().getId(), duration, nbIterations);
+            System.out.printf("[%d] %d ms/get_by_range_of_2000_keys\n", Thread.currentThread().getId(), duration/nbIterations);
         }
     }
 

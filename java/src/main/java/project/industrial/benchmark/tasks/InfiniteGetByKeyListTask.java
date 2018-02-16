@@ -20,26 +20,28 @@ import java.util.stream.Collectors;
  */
 public class InfiniteGetByKeyListTask extends InfiniteGetTask {
 
-    public InfiniteGetByKeyListTask(BatchScanner bscanner, Timer timer, KeyGeneratorStrategy keyGen) {
-        super(bscanner, timer, keyGen);
+    private int nbIterations = 10;
+    private BatchScanner scanner;
+
+    public InfiniteGetByKeyListTask(BatchScanner scanner, Timer timer, KeyGeneratorStrategy keyGen) {
+        super(timer, keyGen);
+        this.scanner = scanner;
     }
 
     @Override
     public Object call() {
         while(true) {
             long begin = System.currentTimeMillis();
-            for(int current = 0; current < 10; current++) {
+            for(int current = 0; current < nbIterations; current++) {
                 List<String> values = this.keyGeneratorStrategy.generateKeys(2000);
-                this.bscanner.setRanges(values.stream().map(id -> Range.exact(new Text(id))).collect(Collectors.toList()));
+                this.scanner.setRanges(values.stream().map(id -> Range.exact(new Text(id))).collect(Collectors.toList()));
                 final Timer.Context context = timer.time();
-                Iterator<Map.Entry<Key, Value>> iterator = this.bscanner.iterator();
-                while (iterator.hasNext())
-                    iterator.next();
+                for (Map.Entry<Key, Value> ignored : this.scanner) { }
                 context.stop();
             }
             long duration = System.currentTimeMillis() - begin;
-            System.out.println("### " + duration + " ms");
-            System.out.println("### " + duration/10 + " ms/get_by_list_of_2000");
+            System.out.printf("[%d] %d ms for %d iterations\n", Thread.currentThread().getId(), duration, nbIterations);
+            System.out.printf("[%d] %d ms/get_by_list_of_2000_keys\n", Thread.currentThread().getId(), duration/nbIterations);
         }
     }
 }
