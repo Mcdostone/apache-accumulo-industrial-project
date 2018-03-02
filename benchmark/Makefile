@@ -9,7 +9,7 @@ BIG_DATASET_FILE=$(join $(DIR), $(notdir $(BIG_DATASET_URL)))
 JAVA_RUN=accumulo
 ZOOKEEPERS=145.239.142.185,145.239.142.187,145.239.142.188
 INSTANCE=accumulo
-ACCUMULO_TABLE=ingest
+ACCUMULO_TABLE=other
 ACCUMULO_PASSWORD=root
 ACCUMULO_USER=root
 
@@ -199,7 +199,7 @@ inf_get_by_key_range_scenario: ## infinite get by range of keys
 
 
 create_keys_file: ## Create keys file
-	make scan_table > tmp1
-	tail +40 tmp1 > tmp2
-	cut -d ' ' -f1 tmp2 | uniq | sort > keys
-	rm tmp1 tmp2
+	# make scan_table > tmp1
+	# tail +40 tmp1 > tmp2
+	# cut -d ' ' -f1 tmp2 | uniq | sort > keys
+	# rm tmp1 tmp2

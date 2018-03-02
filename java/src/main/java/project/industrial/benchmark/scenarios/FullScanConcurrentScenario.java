@@ -1,8 +1,8 @@
 package project.industrial.benchmark.scenarios;
 
 import project.industrial.benchmark.core.Scenario;
-import project.industrial.benchmark.tasks.mapred.InfiniteJobFetch10000Entries;
-import project.industrial.benchmark.tasks.mapred.InfiniteJobFetch600Entries;
+import project.industrial.benchmark.tasks.mapred.JobFetch10000Entries;
+import project.industrial.benchmark.tasks.mapred.JobFetch600Entries;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,11 +23,11 @@ public class FullScanConcurrentScenario extends Scenario {
 
     protected void action() throws Exception {
         Collection<Callable<Integer>> tasks = new ArrayList<>();
-        tasks.add(() -> { InfiniteJobFetch600Entries.main(args); return 0; });
-        tasks.add(() -> { InfiniteJobFetch600Entries.main(args); return 0; });
-        tasks.add(() -> { InfiniteJobFetch600Entries.main(args); return 0; });
-        tasks.add(() -> { InfiniteJobFetch10000Entries.main(args); return 0; });
-        tasks.add(() -> { InfiniteJobFetch10000Entries.main(args); return 0; });
+        tasks.add(() -> { JobFetch600Entries.main(args); return 0; });
+        tasks.add(() -> { JobFetch600Entries.main(args); return 0; });
+        tasks.add(() -> { JobFetch600Entries.main(args); return 0; });
+        tasks.add(() -> { JobFetch10000Entries.main(args); return 0; });
+        tasks.add(() -> { JobFetch10000Entries.main(args); return 0; });
         this.executorService.invokeAll(tasks);
     }
 

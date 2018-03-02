@@ -1,6 +1,5 @@
 package project.industrial.benchmark.scenarios;
 
-import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
@@ -17,18 +16,19 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class InfiniteGetByKeyScenario extends Scenario {
 
     private static final Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyScenario.class);
     private Scanner[] scanners;
-    private ExecutorService executorService;
+    private ScheduledExecutorService executorService;
     private KeyGeneratorStrategy keyGeneratorStrategy;
 
     public InfiniteGetByKeyScenario(Scanner[] scanners, KeyGeneratorStrategy keyGeneratorStrategy) {
         super(InfiniteGetByKeyScenario.class);
         this.scanners = scanners;
-        this.executorService = Executors.newFixedThreadPool(scanners.length);
+        this.executorService = Executors.newScheduledThreadPool(scanners.length);
         this.keyGeneratorStrategy = keyGeneratorStrategy;
     }
 
@@ -60,11 +60,9 @@ public class InfiniteGetByKeyScenario extends Scenario {
         }
 
         Scanner[] scanners = new Scanner[10];
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < 20; i++)
             scanners[i] = connector.createScanner(opts.getTableName(), opts.auths);
-            scanners[i].setBatchSize(6);
-            //scanners[i].setReadaheadThreshold(1);
-        }
+
         Scenario scenario;
         if(opts.keyFile == null)
             scenario = new InfiniteGetByKeyScenario(scanners, new RandomKeyGeneratorStrategy());

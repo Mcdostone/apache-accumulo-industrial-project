@@ -56,7 +56,7 @@ public class InfiniteGetByKeyListScenario extends Scenario {
         }
         BatchScanner[] scanners = new BatchScanner[2];
         for(int i = 0; i < scanners.length; i++)
-            scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 20);
+            scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 10);
 
         Scenario scenario;
         if(opts.keyFile == null)

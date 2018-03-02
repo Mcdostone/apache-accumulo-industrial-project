@@ -2,6 +2,7 @@ package project.industrial.benchmark.tasks.mapred;
 
 import org.apache.accumulo.core.cli.MapReduceClientOnRequiredTable;
 import org.apache.accumulo.core.client.mapreduce.AccumuloInputFormat;
+import org.apache.accumulo.core.client.mapreduce.AccumuloRowInputFormat;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -23,7 +24,7 @@ public abstract class JobMapReduce extends Configured implements Tool {
         MapReduceClientOnRequiredTable opts = this.getOpts();
         opts.parseArgs(getClass().getName(), args);
 
-        job.setInputFormatClass(AccumuloInputFormat.class);
+        job.setInputFormatClass(AccumuloRowInputFormat.class);
         opts.setAccumuloConfigs(job);
         job.setMapperClass(this.getMapperClass());
         job.setMapOutputKeyClass(NullWritable.class);
