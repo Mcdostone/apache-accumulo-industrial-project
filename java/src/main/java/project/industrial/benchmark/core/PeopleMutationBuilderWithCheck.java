@@ -56,7 +56,7 @@ public class PeopleMutationBuilderWithCheck implements MutationBuilder {
             };
             mutations.addAll(this.peopleMutationBuilder.buildFromArray(String.valueOf(this.counter), parts));
             this.executorService.schedule(new CheckAvailability(this.scanner, Integer.toString(counter)), 10, TimeUnit.SECONDS);
-            if(key.hashCode() % 20 == 0) {
+            if(key.hashCode() % 2000 == 0) {
                 this.executorService.schedule(() -> {
                     Configuration conf = new Configuration();
                     conf.set("rowkey", Integer.toString(counter));
