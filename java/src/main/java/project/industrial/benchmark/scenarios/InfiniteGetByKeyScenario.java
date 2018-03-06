@@ -13,10 +13,7 @@ import project.industrial.benchmark.tasks.InfiniteGetByKeyTask;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.*;
 
 public class InfiniteGetByKeyScenario extends Scenario {
 
@@ -33,17 +30,17 @@ public class InfiniteGetByKeyScenario extends Scenario {
     }
 
     @Override
-    public void action() throws Exception {
+    public void action() throws InterruptedException {
         List<Callable<Object>> tasks = new ArrayList<>();
-        for (int i =0; i<this.scanners.length;i++){
+        for (int i = 0; i<this.scanners.length;i++){
             tasks.add(new InfiniteGetByKeyTask(
                     this.scanners[i],
                     MetricsManager.getMetricRegistry().timer(String.format("get_by_key.thread_%d",i)),
                     this.keyGeneratorStrategy
             ));
         }
-        logger.info("Invoke all tasks");
         this.executorService.invokeAll(tasks);
+        logger.info("Invoke all tasks");
     }
 
 
@@ -59,7 +56,7 @@ public class InfiniteGetByKeyScenario extends Scenario {
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
 
-        Scanner[] scanners = new Scanner[10];
+        Scanner[] scanners = new Scanner[20];
         for(int i = 0; i < 20; i++)
             scanners[i] = connector.createScanner(opts.getTableName(), opts.auths);
 

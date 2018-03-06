@@ -23,19 +23,21 @@ public class LoopDataRateInjectionAndCheckAvailabilityScenario extends Scenario 
     private final String filename;
     private final Scanner scanner;
     private Injector injector;
+    private String[] args;
     private ScheduledExecutorService executorService;
 
-    public LoopDataRateInjectionAndCheckAvailabilityScenario(BatchWriter bw, String filename, Scanner sc) {
+    public LoopDataRateInjectionAndCheckAvailabilityScenario(BatchWriter bw, String filename, Scanner sc, String[] args) {
         super(LoopDataRateInjectionAndCheckAvailabilityScenario.class);
         this.filename = filename;
         this.injector = new InjectorWithMetrics(bw);
         this.scanner = sc;
         this.executorService =  Executors.newScheduledThreadPool(50);
+        this.args = args;
     }
 
     @Override
     public void action() {
-        PeopleMutationBuilderWithCheck builder = new PeopleMutationBuilderWithCheck(this.scanner, new PeopleMutationBuilder());
+        PeopleMutationBuilderWithCheck builder = new PeopleMutationBuilderWithCheck(this.scanner, new PeopleMutationBuilder(), args);
         builder.loopInjectFromCSV(this.filename, this.injector);
     }
 
@@ -62,7 +64,7 @@ public class LoopDataRateInjectionAndCheckAvailabilityScenario extends Scenario 
             System.out.println(entry.getKey() + " " + entry.getValue());
 
         BatchWriter bw  = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
-        Scenario scenario = new LoopDataRateInjectionAndCheckAvailabilityScenario(bw, opts.csv, sc);
+        Scenario scenario = new LoopDataRateInjectionAndCheckAvailabilityScenario(bw, opts.csv, sc, args);
         scenario.run();
         scenario.finish();
     }

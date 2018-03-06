@@ -1,3 +1,4 @@
 scripts/zookeeper.out
 **/*.tar.gz
 **/*.DS_Store
+benchmark/datasets/dataset_120.csv

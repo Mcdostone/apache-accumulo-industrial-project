@@ -5,43 +5,31 @@ import org.apache.accumulo.core.cli.ClientOnRequiredTable;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Range;
+import project.industrial.benchmark.core.MetricsManager;
 import project.industrial.benchmark.core.Scenario;
 import project.industrial.benchmark.core.Task;
 import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.tasks.GetByKeyTask;
+import project.industrial.benchmark.tasks.InfiniteGetByKeyTask;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * Used to do some tests
  * @author Yann Prono
  */
-public class SandboxScenario extends Scenario {
+public class SandboxScenario {
 
-    public SandboxScenario(String name) {
-        super(name);
-    }
-
-    @Override
-    protected void action() throws Exception {
-
-    }
 
     public static void main(String[] args) throws Exception {
-        ClientOnRequiredTable opts = new ClientOnRequiredTable();
-        Connector connector = opts.getConnector();
-        Scanner sc = connector.createScanner(opts.getTableName(), opts.auths);
-
-        // Initialisation
-        sc.setRange(Range.exact("aaaaaaaaaa"));
-        Iterator it = sc.iterator();
-        System.out.println("Before while");
-        Thread.sleep(3000);
-        while(it.hasNext()) {
-            System.out.println("in while");
-            Thread.sleep(2000);
-            it.next();
-        }
-
+        String[] a = new String[]{"1", "2", "3", "4"};
+        String[] b = Arrays.stream(a).limit(3).toArray(String[]::new);
+        for(String s: b)
+            System.out.println(s);
     }
 }

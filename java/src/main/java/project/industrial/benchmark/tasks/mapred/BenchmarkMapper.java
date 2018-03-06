@@ -24,7 +24,7 @@ public abstract class BenchmarkMapper extends Mapper<Text, PeekingIterator<Map.E
         this.countAttributes = new HashMap<>();
     }
 
-    private void sendMetrics(String metricName, String value) throws IOException {
+    protected void sendMetrics(String metricName, String value) throws IOException {
         long now = System.currentTimeMillis() / 1000;
         String[] cmd = {
                 "/bin/bash",
