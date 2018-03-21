@@ -1,25 +1,22 @@
 # industrial-project-about-accumulo
 
-This reposiory contains all essential resources in order to work on the industrial project
+Le dépot contient toutes les ressources dévéloppées au cours de ce projet industriel.
 
 Organisation
 -----
 
-    docker/             # Contains dockerfiles and custom scripts
-    java/               # Contains the java project with all java classes written for our tests
-    scripts/            # Contains shell scripts
-    schemas/            # Contains all schemas explaining architectures (use draw.io to read them)
-    benchmark/          # Datasets and ome documentation about how to install the benchmark environment)
-    VMs/                # Explainations for the configuration of VMs)
+    java/               # Le projet java pour tester les fonctionnalités et réaliser le benchmark
+    schemas/            # Schémas 
+    benchmark/          # Contient les scripts de déploiement ainsi le Makefile pour le benchmark
+    VMs/                # Quelques explications sur la configuration du cluster
 
 
 Ressources
 ---
- - [docker](http://docker.io/), used for running containers
- - [make](https://www.gnu.org/software/make/manual/make.html), used automate some commands
- - [draw.io](https://draw.io), used for schemas
+ - [make](https://www.gnu.org/software/make/manual/make.html)
+ - [draw.io](https://draw.io), pour les schémas
 
-Authors
+Auteurs
 -----
 
  - Louis-Pol Kelner, [@louis-pol](https://github.com/louis-pol)

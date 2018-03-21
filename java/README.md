@@ -30,3 +30,5 @@ mvn -Pprod clean compile assembly:single    ## inclut les dépendances
  - Louis-Pol KELNER
  - Pierre MAECKEREEL
  - Yann PRONO 
+
+
