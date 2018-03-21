@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
+/**
+ * Scénario exécutant de manière infinie 20 GET BY KEY en parallèle.
+ *
+ * @author Yann Prono
+ */
 public class InfiniteGetByKeyScenario extends Scenario {
 
     private static final Logger logger = LoggerFactory.getLogger(InfiniteGetByKeyScenario.class);
@@ -56,6 +61,7 @@ public class InfiniteGetByKeyScenario extends Scenario {
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
 
+        // Crée 20 scanners pour les 20 GET BY KEY
         Scanner[] scanners = new Scanner[20];
         for(int i = 0; i < 20; i++)
             scanners[i] = connector.createScanner(opts.getTableName(), opts.auths);

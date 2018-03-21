@@ -10,8 +10,11 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.util.Tool;
 
+/**
+ *
+ * @author Yann Prono
+ */
 public abstract class JobMapReduce extends Configured implements Tool {
-
 
     public MapReduceClientOnRequiredTable getOpts(){
         return new MapReduceClientOnRequiredTable();

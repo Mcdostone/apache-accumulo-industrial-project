@@ -9,8 +9,12 @@ import org.apache.hadoop.mapreduce.TaskCounter;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * MapReduce vérifiant si un objet est accessible.
+ *
+ * @author Yann Prono
+ */
 public class CheckObjectExist extends JobMapReduce {
-
 
     public static class MapperCheckObject extends BenchmarkMapper {
 

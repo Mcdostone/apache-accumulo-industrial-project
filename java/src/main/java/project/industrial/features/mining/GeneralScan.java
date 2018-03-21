@@ -14,6 +14,15 @@ import com.beust.jcommander.Parameter;
 
 import project.industrial.features.Printer;
 
+/**
+ * Classe de fonctionnalité
+ *
+ * Cette classe effectue un scan complet d'une table.
+ * Il est également possible de custom la lecture des données.
+ *
+ * @author Yann Prono
+ * @author Pierre Maeckereel
+ */
 public class GeneralScan {
 
 
@@ -77,21 +86,14 @@ public class GeneralScan {
 		
 		// restrict to colqual and colfam if specified
 		if (opts.colqual.equals("")) {
-			if (opts.colfam.equals("")) {
-			}
-			else {
+			if (!opts.colfam.equals(""))
 				scanner.fetchColumnFamily(new Text(opts.colfam));
-			}
 		}
-		else {
+		else
 			scanner.fetchColumn(new Text(opts.colfam), new Text(opts.colqual));
-		}
-	    
 	    // Printing all the scanned rows
 	    System.out.println("Results ->");
-	    
 	    logger.info("Scanning " + opts.getTableName() + "\n");
-
 	    Printer.printAll(scanner.iterator());
 	  }
 }

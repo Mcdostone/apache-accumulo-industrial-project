@@ -15,17 +15,21 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Classe permettant de générer des mutations
+ * Pour le dataset basé sur des personnes.
+ *
+ * @author Yann Prono
+ */
 public class PeopleMutationBuilder implements MutationBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(PeopleMutationBuilder.class);
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
-    private static String LAST_KEY_ADDED;
 
     @Override
     public List<Mutation> build(String data) {
         String[] parts = data.split(",");
         String key = PeopleMutationBuilder.generateRandomKey();
-        LAST_KEY_ADDED = key;
         return this.buildFromArray(key, parts);
     }
 
@@ -38,11 +42,6 @@ public class PeopleMutationBuilder implements MutationBuilder {
         mutations.add(this.buildMutation(key, "access", "url", data[4]));
         mutations.add(this.buildMutation(key, "access", "ip", data[5]));
         return mutations;
-    }
-
-
-    public static String getLastKeyAdded() {
-        return LAST_KEY_ADDED;
     }
 
     public static String generateRandomKey() {

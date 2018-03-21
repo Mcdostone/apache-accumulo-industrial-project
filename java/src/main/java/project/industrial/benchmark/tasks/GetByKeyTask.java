@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
- * Callable task which returns the scanner when this process is finished
+ *
+ * Callable exécutant une opération de GET BY KEY
  *
  * @author Yann Prono
  */

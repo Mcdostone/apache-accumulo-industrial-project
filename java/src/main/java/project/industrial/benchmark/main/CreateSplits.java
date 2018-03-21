@@ -1,5 +1,10 @@
 package project.industrial.benchmark.main;
 
+/**
+ * Génére des splits sur deux charactères.
+ *
+ * @author Yann Prono
+ */
 public class CreateSplits {
 
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";

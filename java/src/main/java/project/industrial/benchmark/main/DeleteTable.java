@@ -5,8 +5,12 @@ import org.apache.accumulo.core.cli.ClientOpts;
 import org.apache.accumulo.core.client.Connector;
 import project.industrial.benchmark.core.Scenario;
 
+/**
+ * Supprime une table d'accumulo.
+ *
+ * @author Yann Prono
+ */
 public class DeleteTable {
-
 
     public static class TableOpts extends ClientOpts {
         @Parameter(names = {"-t", "--table"}, description = "table to use")

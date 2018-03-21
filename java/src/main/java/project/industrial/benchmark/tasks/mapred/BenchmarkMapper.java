@@ -12,6 +12,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Définit un mapper abstrait pour les MapReduces en concurrence.
+ *
+ * @author Yann Prono
+ */
 public abstract class BenchmarkMapper extends Mapper<Text, PeekingIterator<Map.Entry<Key,Value>>, NullWritable, Text> {
 
     protected HashMap<Text, Integer> countAttributes;

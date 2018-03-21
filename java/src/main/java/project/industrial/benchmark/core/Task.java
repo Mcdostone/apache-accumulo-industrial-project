@@ -3,9 +3,9 @@ package project.industrial.benchmark.core;
 import java.util.concurrent.Callable;
 
 /**
- * A task is a callable for execute an operation
- * in accumulo
- * @param <T> The object you want to retrieve when there are concurrency operations
+ * Une Taks est une callable qui exécute une opération dans accumulo.
+ *
+ * @param <T> L'objet que vous souhaitez récupérer
  * @author Yann Prono
  */
 public interface Task<T> extends Callable<T> {

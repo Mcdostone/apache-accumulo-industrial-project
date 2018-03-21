@@ -21,6 +21,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
+/**
+ * Classe permettant de générer des mutations à partir
+ * du dataset de personne. En plus de cela,
+ * Cette classe vérifie la disponibilité de la donnée fraichement injecté
+ * par MapReduce ou simple GET BY KEY.
+ *
+ * @author Yann Prono
+ */
 public class PeopleMutationBuilderWithCheck implements MutationBuilder {
 
     private final ScheduledExecutorService executorService;

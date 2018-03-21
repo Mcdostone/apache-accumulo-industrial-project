@@ -32,6 +32,11 @@ import java.io.PrintStream;
 import java.util.Base64;
 import java.util.Collection;
 
+/**
+ * Injection de données via MapReduce. Le fichier
+ * doit être stocké sur HDFS.
+ *
+ */
 public class WriteHadoop extends Configured implements Tool {
 
     static class Opts extends MapReduceClientOnRequiredTable {

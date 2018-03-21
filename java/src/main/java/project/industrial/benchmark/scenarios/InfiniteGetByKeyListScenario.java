@@ -16,6 +16,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Scénario éxecutant de manière infinie 2 GET BY LIST en parallèle.
+ *
+ * @author Yann Prono
+ */
 public class InfiniteGetByKeyListScenario extends Scenario {
 
     private final KeyGeneratorStrategy keyGen;
@@ -54,6 +59,7 @@ public class InfiniteGetByKeyListScenario extends Scenario {
         for (Map.Entry<Key, Value> entry : sc) {
             System.out.println(entry.getKey() + " " + entry.getValue());
         }
+        // Instancie le nombre de GET BY LIST en parallèle
         BatchScanner[] scanners = new BatchScanner[2];
         for(int i = 0; i < scanners.length; i++)
             scanners[i] = connector.createBatchScanner(opts.getTableName(), opts.auths, 10);

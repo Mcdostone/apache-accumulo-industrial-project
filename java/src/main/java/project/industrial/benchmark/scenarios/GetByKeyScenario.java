@@ -20,6 +20,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Scénario le temps pour accéder à de la donnée via un GET BY KEY.
+ *
+ * @author Yann Prono
+ */
 public class GetByKeyScenario extends Scenario {
 
     private Scanner scanner;
@@ -45,7 +50,6 @@ public class GetByKeyScenario extends Scenario {
         c.stop();
         System.out.println(System.currentTimeMillis() - begin + " ms");
     }
-
 
     public static void main(String[] args) throws Exception {
         ClientOnRequiredTable opts = new ClientOnRequiredTable();

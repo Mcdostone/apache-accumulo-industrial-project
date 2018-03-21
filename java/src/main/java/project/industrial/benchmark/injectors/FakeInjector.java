@@ -8,6 +8,11 @@ import project.industrial.benchmark.core.MetricsManager;
 
 import java.util.List;
 
+/**
+ * FakeInjector est utilisé pour mesurer le temps pour la lecture du fichier CSV + la transformation des données en mutations.
+ *
+ * @author Yann Prono
+ */
 public class FakeInjector implements Injector {
 
     private final Counter counter;
@@ -19,22 +24,22 @@ public class FakeInjector implements Injector {
     }
 
     @Override
-    public int inject(Mutation mutation) throws MutationsRejectedException {
+    public int inject(Mutation mutation) {
         this.counter.inc();
         this.meter.mark();
         return 0;
     }
 
     @Override
-    public int inject(List<Mutation> mutations) throws MutationsRejectedException {
+    public int inject(List<Mutation> mutations) {
         this.counter.inc();
         this.meter.mark();
         return 0;
     }
 
     @Override
-    public void close() throws MutationsRejectedException { }
+    public void close() { }
 
     @Override
-    public void flush() throws MutationsRejectedException { }
+    public void flush() { }
 }

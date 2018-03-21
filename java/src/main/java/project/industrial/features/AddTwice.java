@@ -10,7 +10,11 @@ import org.slf4j.LoggerFactory;
 import project.industrial.examples.InsertWithBatchWriter;
 
 /**
- * Insert two identical values with a same timestamp
+ * Classe de fonctionnalité
+ *
+ * Cette classe vérifie le comportement d'accumulo
+ * lorsque
+ * CInsert two identical values with a same timestamp
  * @author Samia Benjida
  */
 

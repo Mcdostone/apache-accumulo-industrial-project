@@ -18,7 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class that injects some data into accumulo
+ * Classe utilitaire.
+ *
+ * Cette classe permet d'injecter de la donnée dans accumulo.
+ * Par défault, cette classe lit uniquement le fichier 'people.tsv'
+ *
  * @author Yann Prono
  */
 public class PeopleInjector implements Injector {

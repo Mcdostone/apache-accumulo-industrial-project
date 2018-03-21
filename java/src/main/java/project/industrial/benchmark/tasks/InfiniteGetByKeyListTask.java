@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Callable task which returns the scanner when this process is finished
+ * Callable effectuant de manière infinie des GET BY LIST.
  *
  * @author Samia Benjida
  */

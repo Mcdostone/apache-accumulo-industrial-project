@@ -16,8 +16,12 @@ import java.util.Map.Entry;
 
 
 /**
- * Add and update 50K data in a same row.
+ * Classe de fonctionnalité.
+ *
+ * Cette classe vérfie la mise à jour massive d'une
+ * colonne.
  * @author Samia Benjida
+ * @author Yann Prono
  */
 
 public class Update {
@@ -42,7 +46,6 @@ public class Update {
     }
 
     public static void addDataTst(String[] args) throws AccumuloException, AccumuloSecurityException, TableExistsException, TableNotFoundException {
-
         logger.info("Beginning");
         ClientOnRequiredTable opts1 = new ClientOnRequiredTable();
         BatchWriterOpts bwOpts1 = new BatchWriterOpts();
@@ -61,8 +64,7 @@ public class Update {
     }
 
     public static void main( String[] args) throws AccumuloException, AccumuloSecurityException, TableExistsException, TableNotFoundException {
-
-        logger.info("Loading data");
+        logger.info("Injecting data");
         addDataTst(args);
         logger.info("Content");
         getVal(args);
@@ -75,7 +77,7 @@ public class Update {
         if (!connector.tableOperations().exists(opts.getTableName()))
             connector.tableOperations().create(opts.getTableName());
 
-        logger.info("Adding 50 to each value");
+        // On lit les données injectées et on ajoute + 50 pour chacune d'entre elles
         GeneralScan.Opts opts1 = new GeneralScan.Opts();
         ScannerOpts sOpts = new ScannerOpts();
         opts1.parseArgs(GeneralScan.class.getName(), args, sOpts);

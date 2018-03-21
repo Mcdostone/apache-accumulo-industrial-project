@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Fetch all rows that belongs to the list
+ * Classe de fonctionnalité.
+ *
+ * Cette classe récupère les données appartenant à une liste de ROW IDs.
  * @author Yann Prono
  */
 public class GetByList {
@@ -35,7 +37,9 @@ public class GetByList {
         if(!connector.tableOperations().exists(opts.getTableName()))
             logger.warn("Table " + opts.getTableName() + " doesn't exist");
         else {
+            // Prépare un batchScanner pour la lecture
             BatchScanner scanner = connector.createBatchScanner(opts.getTableName(), opts.auths, 10);
+            // Indique au scanner la liste des ROW IDs à fetch
             scanner.setRanges(opts.rowIds.stream().map(id -> Range.exact(new Text(id))).collect(Collectors.toList()));
             logger.info("Looking for rows where ID in {" + String.join(",", opts.rowIds) + "}");
             Printer.printAll(scanner.iterator());

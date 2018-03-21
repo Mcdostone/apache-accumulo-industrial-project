@@ -10,6 +10,12 @@ import project.industrial.benchmark.core.MetricsManager;
 
 import java.util.Map;
 
+/**
+ * Task vérifiant que la donnée est disponible au
+ * moment où ce callable est exécuté.
+ *
+ * @author Yann Prono
+ */
 public class CheckAvailability implements Runnable {
 
     private Counter counterAvailable;

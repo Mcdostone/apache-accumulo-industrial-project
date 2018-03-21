@@ -5,14 +5,17 @@ import org.apache.accumulo.core.cli.ClientOpts;
 import org.apache.accumulo.core.client.Connector;
 import project.industrial.benchmark.core.Scenario;
 
+/**
+ * Crée un table dans accumulo.
+ *
+ * @author Yann Prono
+ */
 public class CreateTable {
-
 
     public static class CreateTableOpts extends ClientOpts {
         @Parameter(names = {"-t", "--table"}, description = "table to use")
         private String tableName;
     }
-
 
     public static void main(String[] args) throws Exception {
         CreateTableOpts opts = new CreateTableOpts();

@@ -13,8 +13,9 @@ import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * A scenario defines a set of instructions (read, write...) that
- * are watched with metrics and measurements (for example time spent to write huge amount of data).
+ * Un scénario définit un ensemble d'actions (de lecture, d'écriture)
+ * qui sont surveillées par des mesures et des métriques.
+ * En général, un scénario fait appel à une ou plusieurs Tasks
  *
  * @author Yann Prono
  */
@@ -62,15 +63,6 @@ public abstract class Scenario {
             iterator.next();
         }
         return (int) countObjects.getCount();
-    }
-
-    /**
-     * Print in the console all data retrieved by a scanner
-     * @param iterator Iterator of the scanner.
-     */
-    public void showResults(Iterator<Map.Entry<Key, Value>> iterator) {
-        while(iterator.hasNext())
-            System.out.println("\u001B[32m" + iterator.next() + "\u001B[0m");
     }
 
     public void assertEquals(String message, Object expected, Object given) throws Exception {
@@ -142,5 +134,3 @@ public abstract class Scenario {
     protected abstract void action() throws Exception;
 
 }
-
-//nb lignes lues + débit

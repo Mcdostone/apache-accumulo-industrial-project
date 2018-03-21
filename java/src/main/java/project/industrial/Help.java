@@ -1,5 +1,9 @@
 package project.industrial;
 
+/**
+ *
+ * @author Yann Prono
+ */
 public class Help {
 
     public static void main(String[] args) {

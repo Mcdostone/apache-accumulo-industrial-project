@@ -8,17 +8,18 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Interface representing an injector for accumulo.
+ * Interface représentant un injecteur de données.
+ *
  * @author Yann Prono
  */
 public interface Injector {
 
-    public int inject(Mutation mutation) throws MutationsRejectedException;
+    int inject(Mutation mutation) throws MutationsRejectedException;
 
-    public int inject(List<Mutation> mutations) throws MutationsRejectedException;
+    int inject(List<Mutation> mutations) throws MutationsRejectedException;
 
-    public void close() throws MutationsRejectedException;
+    void close() throws MutationsRejectedException;
 
-    public void flush() throws MutationsRejectedException;
+    void flush() throws MutationsRejectedException;
 
 }

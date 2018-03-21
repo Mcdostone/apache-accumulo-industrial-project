@@ -15,6 +15,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+/**
+ * Classe de fonctionnalité.
+ *
+ * Cette classe vérifie s'il est possible d'ajouter massivement
+ * une colonne.
+ *
+ * @author Yann Prono
+ */
 public class AddColumn implements Injector {
 
     private static final String FILENAME = "people.tsv";

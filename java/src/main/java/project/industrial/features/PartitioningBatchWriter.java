@@ -9,11 +9,13 @@ import project.industrial.features.injectors.PeopleInjector;
 import project.industrial.features.injectors.PrefixRowIdStrategy;
 
 /**
- * Enables the user to write some data into accumulo
- * by adding a given prefix for all rows ID inserted.
- * The row ID will follow the following format: "PREFIX_ROWID"
+ * Classe de fonctionnalité
  *
- * @author Yann Prono, mcdostone
+ * Cette classe permet à l'utiliser d'écrire des données dans accumulo
+ * en précisant un préfix à ajouter à la row ID. Dans cette classe,
+ * le format de la row ID sera le suivant: "PREFIX_ROW_ROWID"
+ *
+ * @author Yann Prono
  */
 public class PartitioningBatchWriter {
 
@@ -45,7 +47,9 @@ public class PartitioningBatchWriter {
         if(!connector.tableOperations().exists(opts.getTableName()))
             connector.tableOperations().create(opts.getTableName());
 
+        // Instanciation d'un batchWriter pour écrire des données
         BatchWriter bw = connector.createBatchWriter(opts.getTableName(), bwOpts.getBatchWriterConfig());
+        // Configuration de notre injecteur
         PeopleInjector injector = new PeopleInjector(bw);
         injector.setRowIdStrategy(new PrefixRowIdStrategy(opts.prefix));
         injector.insert();

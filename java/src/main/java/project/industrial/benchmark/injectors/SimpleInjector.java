@@ -9,6 +9,11 @@ import org.apache.hadoop.io.Text;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * SimpleInjector est injecteur insérant des données dans Accumulo.
+ *
+ * @author Yann Prono
+ */
 public class SimpleInjector implements Injector {
 
     private final BatchWriter bw;
@@ -22,7 +27,6 @@ public class SimpleInjector implements Injector {
         this.bw.addMutation(mutation);
         return 1;
     }
-
 
     @Override
     public int inject(List<Mutation> mutations) throws MutationsRejectedException {

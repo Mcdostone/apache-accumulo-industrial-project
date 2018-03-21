@@ -1,7 +1,8 @@
 package project.industrial.features.injectors;
 
 /**
- * Define how to generate a row ID
+ * Cette classe définit comment générer une ROW ID.
+ *
  * @author Yann Prono
  */
 public interface RowIdStrategy {

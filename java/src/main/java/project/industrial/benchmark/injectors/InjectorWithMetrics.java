@@ -11,6 +11,10 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 /**
+ * Injecteur injectant des données dans accumulo.
+ * Dans cette injecteur, des métriques sont capturés à des endroits clé
+ * dans le code pour mesurer le débit d'injection.
+ *
  * @author Yann Prono
  */
 public class InjectorWithMetrics implements Injector {

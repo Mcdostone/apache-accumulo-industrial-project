@@ -17,6 +17,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Classe permettant de gérer l'envoi des métriques
+ * via la librairies metrics de DropWizards
+ *
+ * @author Yann Prono
+ */
 public class MetricsManager {
 
     private static boolean reportersInit = false;

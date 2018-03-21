@@ -11,7 +11,11 @@ import project.industrial.features.GetByKey;
 import project.industrial.features.Printer;
 
 /**
- * Fetch all rows that belongs to the range
+ * Classe de fonctionnalité
+ *
+ * Cette classe récupère toute les données dont leur ROW ID fait partie
+ * de la range donnée par l'utilisateur.
+ *
  * @author Yann Prono
  */
 public class GetByRange {
@@ -36,6 +40,7 @@ public class GetByRange {
             logger.warn("Table " + opts.getTableName() + " doesn't exist");
         else {
             Scanner scanner = connector.createScanner(opts.getTableName(), opts.auths);
+            // ON infique la range à fetch
             scanner.setRange(new Range(opts.start, opts.end));
             if(opts.filter != null)
                 scanner.fetchColumn(

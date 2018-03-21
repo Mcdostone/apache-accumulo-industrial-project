@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Statégie visant à générer une ROW ID de manière aléatoire
+ *
+ * @author Yann Prono
+ */
 public class RandomKeyGeneratorStrategy implements KeyGeneratorStrategy {
 
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
@@ -29,8 +34,7 @@ public class RandomKeyGeneratorStrategy implements KeyGeneratorStrategy {
 
     @Override
     public String[] getRange() {
-        System.err.println("Don't call RandomKeyGeneratorStrategy.getRange()");
-        return new String[]{"aaaaaaaaaa", "aaaaabbbbb"};
+        return new String[]{"", ""};
     }
 
     public static String generateRandomKey(int length) {

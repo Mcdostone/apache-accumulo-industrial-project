@@ -11,6 +11,11 @@ import org.apache.hadoop.util.ToolRunner;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * MapReduce récupérant 600 objets durant un full scan.
+ *
+ * @author Yann Prono
+ */
 public class JobFetch600Entries extends JobMapReduce {
 
     public static class Mapper600Entries extends BenchmarkMapper {

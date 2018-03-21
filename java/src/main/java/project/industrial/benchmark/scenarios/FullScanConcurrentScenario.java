@@ -10,6 +10,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Scénario lancant 5 MapReduce en parallèle pour le critère
+ * de performances des actions en concurrence.
+ *
+ * @author Yann Prono
+ */
 public class FullScanConcurrentScenario extends Scenario {
 
     private ExecutorService executorService;

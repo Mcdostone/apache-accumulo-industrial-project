@@ -11,7 +11,11 @@ import org.apache.hadoop.util.ToolRunner;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
+/**
+ * MapReduce récupérant 10000 objets durant un full scan.
+ *
+ * @author Yann Prono
+ */
 public class JobFetch10000Entries extends JobMapReduce {
 
     public static class Mapper10000Entries extends BenchmarkMapper {

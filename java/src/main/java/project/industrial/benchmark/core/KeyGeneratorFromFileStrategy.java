@@ -5,6 +5,12 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stratégie permettant d'obtenir une ROW ID
+ * présent dans un fichier donné par l'utilisateur.
+ *
+ * @author Yann Prono
+ */
 public class KeyGeneratorFromFileStrategy implements KeyGeneratorStrategy {
 
     private List<String> rowKeys;

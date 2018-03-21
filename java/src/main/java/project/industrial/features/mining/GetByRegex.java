@@ -16,6 +16,13 @@ import com.beust.jcommander.Parameter;
 import project.industrial.features.Printer;
 
 
+/**
+ * Classe de fonctionnalité
+ *
+ * Cette classe permet de récupérer les données matchant une regex.
+ *
+ * @author Pierre Maeckereel
+ */
 public class GetByRegex {
 
 	/**
@@ -35,16 +42,12 @@ public class GetByRegex {
 	private static Logger logger = Logger.getLogger(GetByRegex.class);
 	
 	public static void main(String[] args) throws TableNotFoundException, AccumuloException, AccumuloSecurityException {
-		
 		Opts opts = new Opts();
 		ScannerOpts bsOpts = new ScannerOpts();
 	    opts.parseArgs(GetByRegex.class.getName(), args, bsOpts);
-
 	    Connector connector = opts.getConnector();
-
 		//initialize a scanner
 		Scanner scan = connector.createScanner(opts.getTableName(), opts.auths);
-
 		//to use a filter, which is an iterator, you must create an IteratorSetting
 		//specifying which iterator class you are using
 		IteratorSetting iter = new IteratorSetting(15, "myFilter", RegExFilter.class);
@@ -57,9 +60,7 @@ public class GetByRegex {
 		RegExFilter.setRegexs(iter, rowRegex, colfRegex, colqRegex, valueRegex, orFields);
 		//now add the iterator to the scanner, and you're all set
 		scan.addScanIterator(iter);
-		
 	    logger.info("Scanning " + opts.getTableName() + "\n");
-		
 		Printer.printAll(scan.iterator());
 	}
 	

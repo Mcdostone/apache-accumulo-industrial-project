@@ -11,14 +11,13 @@ import project.industrial.benchmark.injectors.Injector;
 import project.industrial.benchmark.injectors.InjectorWithMetrics;
 
 /**
- * This scenario checks the data rate injection in accumulo.
- * We should inject 80000 objects per second
+ *
+ * Ce scénario vérifie le débit d'injection dans accumulo.
  *
  * @author Yann Prono
  */
 public class DataRateInjectionScenario extends Scenario {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataRateInjectionScenario.class);
     private final String filename;
     private Injector injector;
 

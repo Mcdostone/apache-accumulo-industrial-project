@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays the list of all availables java classes
- * that can be executed by accumulo.
+ * Affiche la liste des classes à disposition
+ * afin d'intéragir avec Accumulo.
  *
  * @author Yann Prono
  */
@@ -36,7 +36,6 @@ public class Help {
         classes.add(GetByKey.class);
         classes.add(GeneralScan.class);
         classes.add(GeneralDelete.class);
-        classes.add(DeleteCol.class);
         classes.add(PeopleInjector.class);
         classes.add(AddTwice.class);
         classes.add(SetTTL.class);
